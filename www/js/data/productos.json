@@ -1,0 +1,55 @@
+[
+		{
+			"name": "Producto 1",
+			"categoria": {
+				"name": "Categoria"
+			},
+			"precio": 59.9,
+			"descuento": {},
+			"require_receta": false,
+			"disponible": true
+		},
+		{
+			"name": "Producto 2",
+			"categoria": {
+				"name": "Categoria"
+			},
+			"precio": 199.0,
+			"descuento": {
+				"tipo": "porcentaje",
+				"valor": "25"
+			},
+			"require_receta": false,
+			"disponible": true
+		},
+		{
+			"name": "Producto 3",
+			"categoria": {
+				"name": "Categoria"
+			},
+			"precio": 199.9,
+			"descuento": {},
+			"require_receta": false,
+			"disponible": true
+		},
+		{
+			"name": "Producto 4",
+			"categoria": {
+				"name": "Categoria"
+			},
+			"precio": 150.5,
+			"descuento": {},
+			"require_receta": false,
+			"disponible": true
+		},
+		{
+			"name": "Producto 5",
+			"categoria": {
+				"name": "Categoria"
+			},
+			"precio": 120.00,
+			"descuento": {},
+			"require_receta": false,
+			"disponible": true
+		}
+]

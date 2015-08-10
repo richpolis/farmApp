@@ -1,0 +1,28 @@
+<ion-view hide-nav-bar="!user.first_name" view-title="Productos">
+  <ion-content class="padding fondo-gris" ng-show="!user.first_name">
+    <div class="button-bar">
+	  <a class="button" href="#/app/login">Inicia sesion</a>
+	  <a class="button" href="#/app/registro">Registrarse</a>
+	</div>
+	<figure class="img-logo center">
+		<img src="img/Logo.png"/>
+	</figure>
+	<hgroup class="center">
+		<h1 class="titulo-app text-white">Gracias por utilizar FARMAPP</h1>
+		<h3 class="slogan-app text-white">Tu farmacia en tus manos.</h3>
+	</hgroup>
+	<p class="texto-bienvenida center">
+		Texto de bienvenida.
+	</p>
+	<p class="iconos-inicio center">
+            <i class="icon ion-iphone"></i> <i class="icon ion-chevron-right icon-mini"></i> <i class="icon ion-android-bicycle"></i> <i class="icon ion-chevron-right icon-mini"></i> <i class="icon ion-home"></i>
+	</p>
+  </ion-content>
+
+  <ion-content class="padding" ng-show="user.first_name">
+	<h1>
+		Welcome {{user.getNameComplete()}}
+	</h1>
+  </ion-content>
+
+</ion-view>

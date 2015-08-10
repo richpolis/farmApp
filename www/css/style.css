@@ -1,0 +1,48 @@
+/* Empty. Add your own CSS if you like */
+
+
+.center{
+	text-align: center;
+}
+
+.fondo-gris{
+	background-color: #8791A7;
+	color: white;
+}
+
+.iconos-inicio{
+	font-size: 3em;
+}
+
+.iconos-inicio .icon-mini{
+	font-size: .5em;
+}
+
+.img-logo{
+	padding-top: 1em;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.img-logo img{
+	width: 50%;
+}
+
+.titulo-app{
+	font-size: 1.5em;
+}
+
+.text-white{
+	color: white;
+}
+
+.texto-bienvenida{
+	margin: 2em 0px;
+	font-size: 1.2em;
+}
+
+.slogan-app{
+	font-size: 1.2em;
+	font-style: italic;
+	font-weight: 400;
+}
