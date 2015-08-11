@@ -1,6 +1,6 @@
-angular.module('farmApp.services', [])
+angular.module('farmApp.services', ['ngResource'])
 .factory('User',['$http','$timeout','$window',function($http,$timeout,$window){
-    var user = {};
+    var user = JSON.parse($window.localStorage['user'] || '{}');
     var defaultUser = {
     	first_name: 'Ricardo',
     	last_name: 'Alcantara',
@@ -20,19 +20,18 @@ angular.module('farmApp.services', [])
     		}
     	]
     };
-    var res = JSON.parse($window.localStorage['user'] || '{}');
     return {
     	login: function(email, password, callback){
-    		if(email==res.email && password==res.password){
-    			user = res;
-		        if (callback) {
+    		if(email==user.email && password==user.password){
+    			if (callback) {
 		          $timeout(function() {
 		            callback(user);
 		          });
 		        }
 		    }else if(email == defaultUser.email && password == defaultUser.password){
 		    	user = defaultUser;
-		        if (callback) {
+		    	$window.localStorage['user'] = JSON.stringify(user);
+		    	if (callback) {
 		          $timeout(function() {
 		            callback(user);
 		          });
@@ -42,41 +41,43 @@ angular.module('farmApp.services', [])
     		}
     	},
 	    register: function(first_name, last_name, email, cel, password, callback) {
-	      res.first_name = first_name;
-	      res.last_name = last_name;
-	      res.email = email;
-	      res.cel = cel;
-	      res.password = password;
-	      res.direcciones = [];
-	      $window.localStorage['user'] = JSON.stringify(res);
-	      user = res;
-		  if (callback) {
+	      user.first_name = first_name;
+	      user.last_name = last_name;
+	      user.email = email;
+	      user.cel = cel;
+	      user.password = password;
+	      user.direcciones = [];
+	      $window.localStorage['user'] = JSON.stringify(user);
+	      if (callback) {
 		  	$timeout(function() {
 		    	callback(user);
 		   	});
 		  }
     	},
     	hasUser: function(){
+    		user = this.getUser();
     		return user.first_name;
     	},    
 	    getUser: function() {
-	      return user;
+	      return JSON.parse($window.localStorage['user'] || '{}');
 	    },
 	    logout: function() {
 	      user = {};
+	      $window.localStorage['user'] = JSON.stringify(user);
 	    },
 	    getNameComplete: function(){
-	    	if(this.hasUser){
+	    	if(this.hasUser()){
 	    		return user.first_name + " " + user.last_name;
 	    	}else{
 	    		return 'menu';
 	    	}
-	    }
+	    },
+	    user: user
 	}
 }])
-.factory('Categorias',['ngResource',function($resource){
+.factory('Categorias',function($resource){
 	return $resource('/js/data/categorias.json',{});
-}])
-.factory('Categorias',['ngResource',function($resource){
+})
+.factory('Categorias',function($resource){
 	return $resource('/js/data/productos.json',{});
-}]);
+});

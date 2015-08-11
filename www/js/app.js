@@ -25,6 +25,24 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
 
+  .state('login', {
+    url: '/login',
+    templateUrl: 'templates/login.html',
+    controller: 'LoginController'
+  })
+
+  .state('registro', {
+    url: '/registro',
+    templateUrl: 'templates/registro.html',
+    controller: 'RegistroController'
+  })
+
+  .state('inicio', {
+    url: '/inicio',
+    templateUrl: 'templates/inicio.html',
+    controller: 'DefaultController'
+  })  
+
   .state('app', {
     url: '/app',
     abstract: true,
@@ -32,36 +50,6 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
     controller: 'AppCtrl'
   })
 
-  .state('app.inicio', {
-    url: '/inicio',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/inicio.html',
-          controller: 'DefaultController'
-      }
-    }
-  })
-
-  .state('app.login', {
-    url: '/login',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/login.html',
-          controller: 'LoginController'
-      }
-    }
-  })
-
-  .state('app.registro', {
-    url: '/registro',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/registro.html',
-          controller: 'RegistroController'
-      }
-    }
-  })  
-    
   .state('app.search', {
     url: '/search',
     views: {
@@ -79,25 +67,26 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
         }
       }
     })
-    .state('app.playlists', {
-      url: '/playlists',
+    .state('app.categorias', {
+      url: '/categorias',
       views: {
         'menuContent': {
-          templateUrl: 'templates/playlists.html',
-          controller: 'PlaylistsCtrl'
+          templateUrl: 'templates/categorias.html',
+          controller: 'CategoriasCtrl'
         }
       }
     })
 
-  .state('app.single', {
-    url: '/playlists/:playlistId',
+  .state('app.productos', {
+    url: '/productos/:categoriaId',
     views: {
       'menuContent': {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
+        templateUrl: 'templates/productos.html',
+        controller: 'ProductosCtrl'
       }
     }
-  });
+  })
+  ;
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/inicio');
+  $urlRouterProvider.otherwise('/inicio');
 });
