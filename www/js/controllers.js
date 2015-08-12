@@ -1,6 +1,6 @@
 angular.module('farmApp.controllers', ['farmApp.services'])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, User, $state) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -8,13 +8,25 @@ angular.module('farmApp.controllers', ['farmApp.services'])
   // listen for the $ionicView.enter event:
   //$scope.$on('$ionicView.enter', function(e) {
   //});
+  if(!User.hasUser()){
+    $state.go('inicio');
+  }else{
+    $scope.user = User.getUser();
+  }
+
+  $scope.closeLogin = function(){
+    User.logout();
+    $state.go('inicio');
+  };
+
+  console.log($scope.user);
 
 })
 
 .controller('DefaultController', ["$scope", "User","$state", function($scope,User,$state) {
-  $scope.user = User.user;
+  $scope.user = User.getUser();
   
-  if($scope.user.first_name){
+  if(User.hasUser()){
     $state.go('app.categorias');
   }
 
@@ -27,7 +39,7 @@ angular.module('farmApp.controllers', ['farmApp.services'])
     password: '',
   };
   $scope.password = "";
-  $scope.user = User.user;
+  $scope.user = User.getUser();
   $scope.doLogin = function(){
     User.login($scope.loginData.username, $scope.loginData.password, function(res) {
       if (res.first_name) {
@@ -84,6 +96,44 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 .controller('RegistroController', ["$scope", "$ionicPopup","$ionicModal", "User", "$state", 
   function($scope,$ionicPopup,$ionicModal,User,$state) {
   
+  $scope.userData = {};
+
+  $scope.doRegister = function(){
+    var todoCorrecto = true;
+    var formulario = document.forms[0];
+    for (var i=0; i<formulario.length; i++) {
+        if(formulario[i].type =='text' || formulario[i].type=='tel' || formulario[i].type=='email' || formulario[i].type=='password') {
+          if (formulario[i].value == null || formulario[i].value.length == 0 || /^\s*$/.test(formulario[i].value)){
+              $ionicPopup.alert({
+                title: 'Error de llenado!',
+                template: formulario[i].name+ ' no puede estar vacío o contener sólo espacios en blanco'
+              });
+              todoCorrecto=false;
+              break;
+          }
+        }
+    }
+
+    if (!todoCorrecto) return false;
+
+    if($scope.userData.password != $scope.userData.repetir){
+        $ionicPopup.alert({
+          title: 'Las contraseñas no coinciden!',
+          template: 'Favor de ingresar de repetir el mismo password'
+        });
+        todoCorrecto=false;
+    }
+
+    if (!todoCorrecto) return false;
+
+    User.register($scope.userData, function(user){
+      $scope.user = user;
+      $state.go('app.categorias');
+    });
+
+  };
+
+
   // Crear una ventana de terminos y condiciones
   $ionicModal.fromTemplateUrl('templates/terminosYCondiciones.html', {
     scope: $scope
@@ -110,6 +160,15 @@ angular.module('farmApp.controllers', ['farmApp.services'])
   $scope.categorias = Categorias.query();
 }])
 
-.controller('ProductosCtrl', function($scope, $stateParams) {
-
+.controller('ProductosCtrl', function($scope, $stateParams, Categorias, Productos) {
+  $scope.categorias =  Categorias.query(function(){
+    for(var cont = 0; cont<=$scope.categorias.length; cont++){
+      if($stateParams.categoriaId == $scope.categorias[cont].id){
+        $scope.categoria = $scope.categorias[cont];
+        break;
+      }
+    }
+  });
+  $scope.productos = Productos.query();
+  
 });

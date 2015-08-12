@@ -1,5 +1,10 @@
-<ion-view view-title="Playlist">
+<ion-view view-title="{{categoria.name}}">
   <ion-content>
-    <h1>Playlist</h1>
+    <h1>{{categoria.name}}</h1>
+    <ion-list>
+      <ion-item ng-repeat="producto in productos">
+        {{producto.name}}
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>

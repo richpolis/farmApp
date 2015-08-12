@@ -1,11 +1,11 @@
 angular.module('farmApp.services', ['ngResource'])
-.factory('User',['$http','$timeout','$window',function($http,$timeout,$window){
-    var user = JSON.parse($window.localStorage['user'] || '{}');
+.factory('User',['$http','$timeout',function($http,$timeout){
+    var user = {};
     var defaultUser = {
     	first_name: 'Ricardo',
     	last_name: 'Alcantara',
     	email: 'richpolis@gmail.com',
-    	cel: '5521093249',
+    	cell: '5521093249',
     	password: 'D3m3s1s1',
     	direcciones: [
     		{
@@ -22,6 +22,7 @@ angular.module('farmApp.services', ['ngResource'])
     };
     return {
     	login: function(email, password, callback){
+    		user = this.getUser();
     		if(email==user.email && password==user.password){
     			if (callback) {
 		          $timeout(function() {
@@ -30,7 +31,7 @@ angular.module('farmApp.services', ['ngResource'])
 		        }
 		    }else if(email == defaultUser.email && password == defaultUser.password){
 		    	user = defaultUser;
-		    	$window.localStorage['user'] = JSON.stringify(user);
+		    	window.localStorage.setItem('user',JSON.stringify(user));
 		    	if (callback) {
 		          $timeout(function() {
 		            callback(user);
@@ -40,14 +41,10 @@ angular.module('farmApp.services', ['ngResource'])
     			callback({'message':'Usuario no registrado'});
     		}
     	},
-	    register: function(first_name, last_name, email, cel, password, callback) {
-	      user.first_name = first_name;
-	      user.last_name = last_name;
-	      user.email = email;
-	      user.cel = cel;
-	      user.password = password;
+	    register: function(objUser, callback) {
+	      user = objUser;
 	      user.direcciones = [];
-	      $window.localStorage['user'] = JSON.stringify(user);
+	      window.localStorage.setItem('user',JSON.stringify(user));
 	      if (callback) {
 		  	$timeout(function() {
 		    	callback(user);
@@ -59,11 +56,11 @@ angular.module('farmApp.services', ['ngResource'])
     		return user.first_name;
     	},    
 	    getUser: function() {
-	      return JSON.parse($window.localStorage['user'] || '{}');
+	      return JSON.parse(window.localStorage['user'] || '{}');
 	    },
 	    logout: function() {
 	      user = {};
-	      $window.localStorage['user'] = JSON.stringify(user);
+	      window.localStorage.setItem('user',JSON.stringify(user));
 	    },
 	    getNameComplete: function(){
 	    	if(this.hasUser()){
@@ -71,13 +68,12 @@ angular.module('farmApp.services', ['ngResource'])
 	    	}else{
 	    		return 'menu';
 	    	}
-	    },
-	    user: user
+	    }
 	}
 }])
 .factory('Categorias',function($resource){
 	return $resource('/js/data/categorias.json',{});
 })
-.factory('Categorias',function($resource){
+.factory('Productos',function($resource){
 	return $resource('/js/data/productos.json',{});
 });

@@ -1,5 +1,5 @@
 <ion-view hide-nav-bar="!user.first_name" view-title="Productos">
-  <ion-content class="padding fondo-gris" ng-show="!user.first_name">
+  <ion-content class="padding fondo-gris">
     <div class="button-bar">
 	  <a class="button" href="#/login">Inicia sesion</a>
 	  <a class="button" href="#/registro">Registrarse</a>
@@ -11,18 +11,14 @@
 		<h1 class="titulo-app text-white">Gracias por utilizar FARMAPP</h1>
 		<h3 class="slogan-app text-white">Tu farmacia en tus manos.</h3>
 	</hgroup>
-	<p class="texto-bienvenida center">
+	<p class="texto-bienvenida center" ng-show="!user.first_name">
 		Texto de bienvenida.
+	</p>
+	<p class="texto-bienvenida center" ng-show="user.first_name">
+		Bienvenido(a) {{user.first_name}} {{ user.last_name}}.
 	</p>
 	<p class="iconos-inicio center">
             <i class="icon ion-iphone"></i> <i class="icon ion-chevron-right icon-mini"></i> <i class="icon ion-android-bicycle"></i> <i class="icon ion-chevron-right icon-mini"></i> <i class="icon ion-home"></i>
 	</p>
   </ion-content>
-
-  <ion-content class="padding" ng-show="user.first_name">
-	<h1>
-		Welcome {{user.getNameComplete()}}
-	</h1>
-  </ion-content>
-
 </ion-view>
