@@ -86,6 +86,24 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
       }
     }
   })
+  .state('app.producto.detalle', {
+    url: '/producto/:productoId',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/producto.html',
+        controller: 'ProductoCtrl'
+      }
+    }
+  })
+  .state('app.carrito', {
+    url: '/carrito',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/carrito.html',
+        controller: 'CarritoCtrl'
+      }
+    }
+  })
   ;
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/inicio');

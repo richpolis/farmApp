@@ -6,8 +6,9 @@
 			},
 			"precio": 59.9,
 			"descuento": {},
-			"require_receta": false,
-			"disponible": true
+			"require_receta": true,
+			"disponible": true,
+			"thumbnail": "img/antigripal2.png"
 		},
 		{
 			"name": "Producto 2",
@@ -20,7 +21,8 @@
 				"valor": "25"
 			},
 			"require_receta": false,
-			"disponible": true
+			"disponible": true,
+			"thumbnail": "img/antigripal1.png"
 		},
 		{
 			"name": "Producto 3",
@@ -30,7 +32,8 @@
 			"precio": 199.9,
 			"descuento": {},
 			"require_receta": false,
-			"disponible": true
+			"disponible": true,
+			"thumbnail": "img/antigripal1.png"
 		},
 		{
 			"name": "Producto 4",
@@ -40,7 +43,8 @@
 			"precio": 150.5,
 			"descuento": {},
 			"require_receta": false,
-			"disponible": true
+			"disponible": true,
+			"thumbnail": "img/antigripal1.png"
 		},
 		{
 			"name": "Producto 5",
@@ -48,8 +52,12 @@
 				"name": "Categoria"
 			},
 			"precio": 120.00,
-			"descuento": {},
-			"require_receta": false,
-			"disponible": true
+			"descuento": {
+				"tipo": "porcentaje",
+				"valor": "25"
+			},
+			"require_receta": true,
+			"disponible": true,
+			"thumbnail": "img/antigripal2.png"
 		}
 ]

@@ -169,6 +169,18 @@ angular.module('farmApp.controllers', ['farmApp.services'])
       }
     }
   });
-  $scope.productos = Productos.query();
+  $scope.productos = Productos.query(function(){
+    for(var cont = 0; cont<=$scope.productos.length; cont++){
+      if($scope.productos[cont].descuento.tipo){
+        if($scope.productos[cont].descuento.tipo == "porcentaje"){
+          $scope.productos[cont].descuento_porcentaje = $scope.productos[cont].descuento.valor + "%";
+        }else if($scope.productos[cont].descuento.tipo == "valor"){
+          $scope.productos[cont].descuento_dinero = $scope.productos[cont].descuento.valor;
+        }else if($scope.productos[cont].descuento.tipo == "promocion"){
+          $scope.productos[cont].descuento_promocion = $scope.productos[cont].descuento.valor;
+        }
+      }
+    }
+  });
   
 });
