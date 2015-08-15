@@ -1,0 +1,34 @@
+<ion-view view-title="Pago">
+    <ion-content class="has-header padding">
+        <form id="formRegister" ng-submit="doPago()">
+            <div class="list">
+                <label class="item item-input">
+                    <input type="text" name="tarjeta" ng-model="pago.tarjeta" placeholder="Numero de tarjeta">
+                </label>
+                <div class="row">
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" name="mes" ng-model="pago.mes" placeholder="MM">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" name="ano" ng-model="pago.ano" placeholder="AA">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" name="cvv" ng-model="pago.cvv" placeholder="CVV">
+                        </label>
+                    </div>
+                </div>
+                <label class="item item-input">
+                    <input type="text" name="pais" ng-model="pago.pais" placeholder="Pais">
+                </label>
+                <label class="item">
+                    <button class="button button-block button-positive" type="submit">Registrarse</button>
+                </label>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,45 @@
+<ion-view view-title="{{producto.name}}">
+    <ion-content class="padding">
+        <ion-list class="card">
+            <div class="item item-thumbnail-left">
+                <img ng-src="{{producto.thumbnail}}">
+                <h2>{{producto.name}}</h2>
+                <p>
+                    {{producto.categoria.name}}
+                </p>
+            </div>
+            <ion-item class="item-body item-text-wrap">
+                <p>
+                    {{producto.descripcion}}
+                </p>
+
+            </ion-item>
+            <ion-item class="tabs tabs-secondary">
+                <div class="row">
+                    <div class="col col-50">
+                        <select ng-change="mostrarTotal()" ng-model="producto.cantidad">
+                            <option selected>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <span class="badge badge-assertive" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</span>
+                        <span class="badge badge-assertive"ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</span>
+                        <span class="badge badge-assertive" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</span>
+                    </div>
+                    <div class="col">
+                        <button class="button button-small button-balanced">{{producto.precio *producto.cantidad|currency:"$"}}</button>
+                    </div>
+                </div>
+            </ion-item>
+            <ion-item ng-show="producto.require_receta">
+                <p>
+                    Este producto require de receta medica.<br/>
+                    1.- El repartidor te pedira .... <br/>
+                </p>
+            </ion-item>
+        </ion-list>
+        <a href="#/app/carrito" class="button button-balanced button-block">Agregar a Carrito</a>
+    </ion-content>
+</ion-view>

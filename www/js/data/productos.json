@@ -1,61 +1,71 @@
 [
 		{
+			"id": 1,
+			"descripcion": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem esse saepe aspernatur atque, nostrum similique et adipisci consectetur quos beatae quidem error consequatur dignissimos, doloribus fuga quaerat unde! Fuga, omnis.",
 			"name": "Producto 1",
 			"categoria": {
 				"name": "Categoria"
 			},
 			"precio": 59.9,
-			"descuento": {},
+			"descuento": false,
 			"require_receta": true,
 			"disponible": true,
 			"thumbnail": "img/antigripal2.png"
 		},
 		{
+			
+			"id": 2,
+			"descripcion": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem esse saepe aspernatur atque, nostrum similique et adipisci consectetur quos beatae quidem error consequatur dignissimos, doloribus fuga quaerat unde! Fuga, omnis.",
 			"name": "Producto 2",
 			"categoria": {
 				"name": "Categoria"
 			},
 			"precio": 199.0,
-			"descuento": {
-				"tipo": "porcentaje",
-				"valor": "25"
-			},
+			"descuento": true,
+			"descuento_porcentaje": "25%",
 			"require_receta": false,
 			"disponible": true,
 			"thumbnail": "img/antigripal1.png"
 		},
 		{
+			
+			"id": 3,
+			"descripcion": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem esse saepe aspernatur atque, nostrum similique et adipisci consectetur quos beatae quidem error consequatur dignissimos, doloribus fuga quaerat unde! Fuga, omnis.",
 			"name": "Producto 3",
 			"categoria": {
 				"name": "Categoria"
 			},
 			"precio": 199.9,
-			"descuento": {},
+			"descuento": false,
 			"require_receta": false,
 			"disponible": true,
 			"thumbnail": "img/antigripal1.png"
 		},
 		{
+			
+			"id": 4,
+			"descripcion": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem esse saepe aspernatur atque, nostrum similique et adipisci consectetur quos beatae quidem error consequatur dignissimos, doloribus fuga quaerat unde! Fuga, omnis.",
 			"name": "Producto 4",
 			"categoria": {
 				"name": "Categoria"
 			},
 			"precio": 150.5,
-			"descuento": {},
+			"descuento": false,
 			"require_receta": false,
 			"disponible": true,
 			"thumbnail": "img/antigripal1.png"
 		},
 		{
+			
+			"id": 5,
+			"descripcion": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem esse saepe aspernatur atque, nostrum similique et adipisci consectetur quos beatae quidem error consequatur dignissimos, doloribus fuga quaerat unde! Fuga, omnis.",
 			"name": "Producto 5",
 			"categoria": {
 				"name": "Categoria"
 			},
 			"precio": 120.00,
-			"descuento": {
-				"tipo": "porcentaje",
-				"valor": "25"
-			},
+			"descuento": true,
+			"descuento_valor":"-150.00",
 			"require_receta": true,
 			"disponible": true,
 			"thumbnail": "img/antigripal2.png"

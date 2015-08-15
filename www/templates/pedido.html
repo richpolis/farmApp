@@ -1,0 +1,38 @@
+<ion-view view-title="Pedido">
+    <ion-content class="has-header padding">
+        <form id="formRegister" ng-submit="doPedido()">
+            <div class="list">
+                <label class="item item-input">
+                    <input type="text" name="estado" ng-model="direccion.estado" placeholder="Estado">
+                </label>
+                <label class="item item-input">
+                    <input type="text" name="calle" ng-model="direccion.calle" placeholder="Calle">
+                </label>
+                <div class="row">
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" name="num_exterior" ng-model="direccion.num_exterior" placeholder="Num. Exterior">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" name="num_interior" ng-model="direccion.num_interior" placeholder="Num. Interior">
+                        </label>
+                    </div>
+                </div>
+                <label class="item item-input">
+                    <input type="text" name="codigo_postal" ng-model="direccion.cp" placeholder="Codigo postal">
+                </label>
+                <label class="item item-input">
+                    <input type="text" name="delegacion_municipio" ng-model="direccion.delegacion_municipio" placeholder="Delegacion/Municipio">
+                </label>
+                <label class="item item-input">
+                    <input type="text" name="colonia" ng-model="direccion.colonia" placeholder="Colonia">
+                </label>
+                <label class="item">
+                    <button class="button button-block button-positive" type="submit">Hacer pedido</button>
+                </label>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

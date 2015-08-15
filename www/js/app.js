@@ -6,105 +6,155 @@
 // 'farmApp.controllers' is found in controllers.js
 angular.module('farmApp', ['ionic', 'farmApp.controllers'])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if (window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-      cordova.plugins.Keyboard.disableScroll(true);
+        .run(function ($ionicPlatform) {
+            $ionicPlatform.ready(function () {
+                // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+                // for form inputs)
+                if (window.cordova && window.cordova.plugins.Keyboard) {
+                    cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+                    cordova.plugins.Keyboard.disableScroll(true);
 
-    }
-    if (window.StatusBar) {
-      // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();
-    }
-  });
-})
+                }
+                if (window.StatusBar) {
+                    // org.apache.cordova.statusbar required
+                    StatusBar.styleDefault();
+                }
+            });
+        })
 
-.config(function($stateProvider, $urlRouterProvider) {
-  $stateProvider
+        .config(function ($stateProvider, $urlRouterProvider) {
+            $stateProvider
 
-  .state('login', {
-    url: '/login',
-    templateUrl: 'templates/login.html',
-    controller: 'LoginController'
-  })
+                    .state('login', {
+                        url: '/login',
+                        templateUrl: 'templates/login.html',
+                        controller: 'LoginController'
+                    })
 
-  .state('registro', {
-    url: '/registro',
-    templateUrl: 'templates/registro.html',
-    controller: 'RegistroController'
-  })
+                    .state('registro', {
+                        url: '/registro',
+                        templateUrl: 'templates/registro.html',
+                        controller: 'RegistroController'
+                    })
 
-  .state('inicio', {
-    url: '/inicio',
-    templateUrl: 'templates/inicio.html',
-    controller: 'DefaultController'
-  })  
+                    .state('inicio', {
+                        url: '/inicio',
+                        templateUrl: 'templates/inicio.html',
+                        controller: 'DefaultController'
+                    })
 
-  .state('app', {
-    url: '/app',
-    abstract: true,
-    templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
-  })
+                    .state('app', {
+                        url: '/app',
+                        abstract: true,
+                        templateUrl: 'templates/menu.html',
+                        controller: 'AppController'
+                    })
+                    
+                    .state('app.perfil', {
+                        url: '/perfil',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/perfil.html',
+                                controller: 'PerfilController'
+                            }
+                        }
+                    })
+                    
+                    .state('app.search', {
+                        url: '/search',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/search.html',
+                                controller: 'SearchController'
+                            }
+                        }
+                    })
 
-  .state('app.search', {
-    url: '/search',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/search.html'
-      }
-    }
-  })
+                    .state('app.contacto', {
+                        url: '/contacto',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/contacto.html'
+                            }
+                        }
+                    })
 
-  .state('app.browse', {
-      url: '/browse',
-      views: {
-        'menuContent': {
-          templateUrl: 'templates/browse.html'
-        }
-      }
-    })
-    .state('app.categorias', {
-      url: '/categorias',
-      views: {
-        'menuContent': {
-          templateUrl: 'templates/categorias.html',
-          controller: 'CategoriasCtrl'
-        }
-      }
-    })
+                    .state('app.preguntas', {
+                        url: '/preguntas',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/preguntas.html'
+                            }
+                        }
+                    })
 
-  .state('app.productos', {
-    url: '/productos/:categoriaId',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/productos.html',
-        controller: 'ProductosCtrl'
-      }
-    }
-  })
-  .state('app.producto.detalle', {
-    url: '/producto/:productoId',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/producto.html',
-        controller: 'ProductoCtrl'
-      }
-    }
-  })
-  .state('app.carrito', {
-    url: '/carrito',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/carrito.html',
-        controller: 'CarritoCtrl'
-      }
-    }
-  })
-  ;
-  // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/inicio');
-});
+                    .state('app.periodicos', {
+                        url: '/pedidos/periodicos',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/pedidosPeriodicos.html'
+                            }
+                        }
+                    })
+                    
+                    .state('app.categorias', {
+                        url: '/categorias',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/categorias.html',
+                                controller: 'CategoriasController'
+                            }
+                        }
+                    })
+
+                    .state('app.productos', {
+                        url: '/productos/:categoriaId',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/productos.html',
+                                controller: 'ProductosController'
+                            }
+                        }
+                    })
+                    
+                    .state('app.detalle', {
+                        url: '/producto/:productoId',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/producto.html',
+                                controller: 'ProductoController'
+                            }
+                        }
+                    })
+                    
+                    .state('app.carrito', {
+                        url: '/carrito',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/carrito.html',
+                                controller: 'CarritoController'
+                            }
+                        }
+                    })
+                    .state('app.pedido', {
+                        url: '/pedido',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/pedido.html',
+                                controller: 'PedidoController'
+                            }
+                        }
+                    })
+                    .state('app.pago', {
+                        url: '/pago',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/pago.html',
+                                controller: 'PagoController'
+                            }
+                        }
+                    })
+                    ;
+            // if none of the above states are matched, use this as the fallback
+            $urlRouterProvider.otherwise('/inicio');
+        });

@@ -1,5 +1,10 @@
 <ion-view view-title="Search">
   <ion-content>
     <h1>Search</h1>
+    <div class="list">
+        <div class="item" ng-repeat="producto in productos">
+            {{producto.name}}
+        </div>
+    </div>
   </ion-content>
 </ion-view>
