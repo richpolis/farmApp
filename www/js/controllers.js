@@ -20,6 +20,10 @@ angular.module('farmApp.controllers', ['farmApp.services'])
   };
 
   console.log($scope.user);
+  
+  $scope.goCategorias = function(){
+      $state.go('app.categorias');
+  };
 
 })
 

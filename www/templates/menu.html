@@ -5,8 +5,8 @@
       </ion-nav-back-button>
 
       <ion-nav-buttons side="right">
-        <button id="btn-menu-principal" class="button button-icon button-clear ion-navicon" menu-toggle="right">
-        </button>
+        <button id="btn-menu-buscar" class="button button-icon button-clear ion-search" ng-click="goCategorias()"></button>  
+        <button id="btn-menu-principal" class="button button-icon button-clear ion-navicon" menu-toggle="right"></button>
       </ion-nav-buttons>
 
     </ion-nav-bar>
@@ -14,7 +14,7 @@
   
   </ion-side-menu-content>
 
-  <ion-side-menu side="right">
+  <ion-side-menu side="right" class="balanced-bg">
     <ion-header-bar class="bar-stable bar-balanced">
       <h1 class="title">{{user.first_name}} {{user.last_name}}</h1>
     </ion-header-bar>
@@ -23,26 +23,26 @@
         <!--ion-item menu-close ng-click="showLogin()">
           Login
         </ion-item-->
-        <ion-item menu-close href="#/app/categorias">
+        <ion-item menu-close href="#/app/categorias" class="item-balanced">
           <i class="icon ion-search"></i> Categorias
         </ion-item>
-        <ion-item menu-close href="#/app/perfil">
+        <ion-item menu-close href="#/app/perfil" class="item-balanced">
           <i class="icon ion-person"></i> Registro
         </ion-item>
-        <ion-item menu-close href="#/app/carrito">
+        <ion-item menu-close href="#/app/carrito" class="item-balanced">
           <i class="icon ion-android-cart"></i> Carrito
         </ion-item>
-        <ion-item menu-close href="#/app/pedidos/periodicos">
+        <ion-item menu-close href="#/app/pedidos/periodicos" class="item-balanced">
           <i class="icon ion-clock"></i> Pedidos periodicos
         </ion-item>
-        <ion-item menu-close href="#/app/contacto">
+        <ion-item menu-close href="#/app/contacto" class="item-balanced">
           <i class="icon ion-android-call"></i> Contacto
         </ion-item>
-        <ion-item menu-close href="#/app/preguntas">
+        <ion-item menu-close href="#/app/preguntas" class="item-balanced">
           <i class="icon ion-help"></i> Preguntas frecuentes
         </ion-item>
-        <ion-item menu-close ng-click="closeLogin()">
-          <i class="icon ion-search"></i> Logout
+        <ion-item menu-close ng-click="closeLogin()" class="item-balanced">
+          <i class="icon ion-log-out"></i> Logout
         </ion-item>
       </ion-list>
     </ion-content>

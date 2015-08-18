@@ -8,21 +8,21 @@
             </label>
             <ion-item ng-repeat="producto in productos| orderBy:'nombre' | filter:buscar "
                       class="item-thumbnail-left" href="#/app/producto/{{producto.id}}">
-                <img ng-src="{{producto.thumbnail}}">
+                <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta }">
                 <h2>{{producto.name}}</h2>
                 <p>
                     {{producto.categoria.name}}
                 </p>
-                <p ng-show="producto.require_receta">Require receta</p>
+                <p ng-show="producto.require_receta" class="require-receta">Require receta</p>
                 <div class="row">
                     <div class="col col-50"></div>
                     <div class="col">
-                        <span class="badge badge-assertive" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</span>
-                        <span class="badge badge-assertive"ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</span>
-                        <span class="badge badge-assertive" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</span>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>
                     </div>
                     <div class="col">
-                        <button class="button button-small button-balanced" ng-click="verProducto(producto)">{{producto.precio|currency:"$"}}</button>
+                        <label class="balanced-bg padding color-blanco">{{producto.precio|currency:"$"}}</label>
                     </div>
                 </div>
             </ion-item>
