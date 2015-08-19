@@ -51,12 +51,31 @@
 	font-style: italic;
 	font-weight: 400;
 }
+ion-list ion-item img.require-receta,
+ion-list ion-item img.no-require-receta
+{
+    max-height: 80px;
+    min-height: 80px;
+    max-width: 80px;
+    min-width: 80px;
+}
+ion-list ion-item img.require-receta{
+	border: 3px solid red;
+	border-radius: 5px;
+        padding: 5px;
+}
 
-.require-receta{
+ion-list ion-item img.no-require-receta{
+	border: 3px solid #2EC7C7;
+	border-radius: 5px;
+        padding: 5px;
+}
+
+ion-list ion-item p.require-receta{
     color: red;
 }
 
-img.require-receta{
-	border: 1px solid red;
-	border-radius: 5px;
+ion-list ion-item p.ion-item-categoria{
+    color: #2EC7C7;
 }
+

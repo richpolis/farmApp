@@ -4,11 +4,11 @@
             <ion-item class="item-text-wrap" ng-repeat="producto in productos| orderBy:'nombre' ">
                 <div class="row">
                     <div class="col">
-                        <img ng-src="{{producto.thumbnail}}">
+                        <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta, 'no-require-receta':!producto.require_receta }">
                     </div>
                     <div class="col">
                         <h2>{{producto.name}}</h2>
-                        <p>
+                        <p class="ion-item-categoria">
                             {{producto.categoria.name}}
                         </p>
                     </div>
@@ -33,12 +33,12 @@
                         </select>
                     </div>
                     <div class="col">
-                        <span class="badge badge-assertive" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</span>
-                        <span class="badge badge-assertive"ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</span>
-                        <span class="badge badge-assertive" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</span>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>
                     </div>
                     <div class="col">
-                        <button class="button button-small button-balanced">{{producto.precio * producto.cantidad|currency:"$"}}</button>
+                        <label class="balanced-bg padding color-blanco">{{producto.precio*producto.cantidad|currency:"$"}}</label>
                     </div>
                 </div>
             </ion-item>

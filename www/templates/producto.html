@@ -1,20 +1,20 @@
-<ion-view view-title="{{producto.name}}">
+<ion-view view-title="Detalle producto">
     <ion-content class="padding">
         <ion-list class="card">
-            <div class="item item-thumbnail-left">
-                <img ng-src="{{producto.thumbnail}}">
+            <ion-item class="item-thumbnail-left">
+                <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta, 'no-require-receta':!producto.require_receta }">
                 <h2>{{producto.name}}</h2>
-                <p>
+                <p class="ion-item-categoria">
                     {{producto.categoria.name}}
                 </p>
-            </div>
+            </ion-item>
             <ion-item class="item-body item-text-wrap">
                 <p>
                     {{producto.descripcion}}
                 </p>
 
             </ion-item>
-            <ion-item class="tabs tabs-secondary">
+            <ion-item class="tabs tabs-secondary" style="height: 70px;">
                 <div class="row">
                     <div class="col col-50">
                         <select ng-change="mostrarTotal()" ng-model="producto.cantidad">
@@ -24,12 +24,12 @@
                         </select>
                     </div>
                     <div class="col">
-                        <span class="badge badge-assertive" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</span>
-                        <span class="badge badge-assertive"ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</span>
-                        <span class="badge badge-assertive" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</span>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>
                     </div>
                     <div class="col">
-                        <button class="button button-small button-balanced">{{producto.precio *producto.cantidad|currency:"$"}}</button>
+                        <label class="balanced-bg padding color-blanco">{{producto.precio*producto.cantidad|currency:"$"}}</label>
                     </div>
                 </div>
             </ion-item>

@@ -8,12 +8,12 @@
             </label>
             <ion-item ng-repeat="producto in productos| orderBy:'nombre' | filter:buscar "
                       class="item-thumbnail-left" href="#/app/producto/{{producto.id}}">
-                <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta }">
+                <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta, 'no-require-receta':!producto.require_receta }">
                 <h2>{{producto.name}}</h2>
-                <p>
+                <p class="ion-item-categoria">
                     {{producto.categoria.name}}
                 </p>
-                <p ng-show="producto.require_receta" class="require-receta">Require receta</p>
+                <p ng-show="producto.require_receta" ng-class="{ 'require-receta': producto.require_receta }">Require receta</p>
                 <div class="row">
                     <div class="col col-50"></div>
                     <div class="col">
