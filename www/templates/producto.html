@@ -1,4 +1,4 @@
-<ion-view view-title="Detalle producto">
+<ion-view view-title="{{producto.name || 'Detalle producto' }}">
     <ion-content class="padding">
         <ion-list class="card">
             <ion-item class="item-thumbnail-left">
@@ -17,18 +17,26 @@
             <ion-item class="tabs tabs-secondary" style="height: 70px;">
                 <div class="row">
                     <div class="col col-50">
-                        <select ng-change="mostrarTotal()" ng-model="producto.cantidad">
-                            <option selected>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                        </select>
+                        <div class="list">
+
+                            <label class="item item-input item-select">
+                                <div class="input-label">
+                                    &nbsp;
+                                </div>
+                                <select ng-change="mostrarTotal()" ng-model="producto.cantidad">
+                                    <option selected>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </select>
+                            </label>
+
+                        </div>
+                        
                     </div>
-                    <div class="col">
+                    <div class="col col-50 text-right">
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>
-                    </div>
-                    <div class="col">
                         <label class="balanced-bg padding color-blanco">{{producto.precio*producto.cantidad|currency:"$"}}</label>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
-<ion-view view-title="Productos">
+<ion-view view-title="{{ categoria.name || 'Productos' }}">
     <ion-content class="padding">
-        <h3 class="text-center">{{categoria.name}}</h3>
+        <!--h3 class="text-center">{{categoria.name}}</h3-->
         <ion-list>
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
@@ -16,13 +16,11 @@
                 <p ng-show="producto.require_receta" ng-class="{ 'require-receta': producto.require_receta }">Require receta</p>
                 <div class="row">
                     <div class="col col-50"></div>
-                    <div class="col">
+                    <div class="col col-50 text-right">
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>
-                    </div>
-                    <div class="col">
-                        <label class="balanced-bg padding color-blanco">{{producto.precio|currency:"$"}}</label>
+                        <label class="balanced-bg padding color-blanco etiqueta-precio">{{producto.precio|currency:"$"}}</label>
                     </div>
                 </div>
             </ion-item>

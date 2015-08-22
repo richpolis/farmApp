@@ -33,6 +33,10 @@
 	width: 50%;
 }
 
+.mayusculas{
+    text-transform:  uppercase;
+}
+
 .titulo-app{
 	font-size: 1.5em;
 }
@@ -51,6 +55,8 @@
 	font-style: italic;
 	font-weight: 400;
 }
+
+
 ion-list ion-item img.require-receta,
 ion-list ion-item img.no-require-receta
 {
@@ -68,7 +74,7 @@ ion-list ion-item img.require-receta{
 ion-list ion-item img.no-require-receta{
 	border: 3px solid #2EC7C7;
 	border-radius: 5px;
-        padding: 5px;
+    padding: 5px;
 }
 
 ion-list ion-item p.require-receta{
@@ -79,3 +85,10 @@ ion-list ion-item p.ion-item-categoria{
     color: #2EC7C7;
 }
 
+.item-select {
+  width: 75%; /* Or whatever you'd like the width to be */
+}
+
+.item-select select {
+  left: 0;
+}

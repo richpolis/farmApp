@@ -1,4 +1,12 @@
 {
   "name": "farmApp",
-  "app_id": "937172cb"
+  "app_id": "937172cb",
+  "gulpStartupTasks": [
+    "sass",
+    "watch"
+  ],
+  "watchPatterns": [
+    "www/**/*",
+    "!www/lib/**/*"
+  ]
 }

@@ -9,7 +9,7 @@
 	          <input type="text" ng-model="productoBuscar" placeholder="Ej. Paracetamol">
 	        </label>
 	        <label class="item">
-	          <button class="button button-block button-positive" type="submit">
+	          <button class="button button-block button-balanced" type="submit">
 	           <i class="icon ion-search"></i>	Buscar
 	          </button>
 	        </label>
@@ -19,10 +19,14 @@
   		-o- <br/>
   		Selecciona una Categoría:
   	</p>
-    <ion-list>
-      <ion-item ng-repeat="categoria in categorias" href="#/app/productos/{{categoria.id}}" class="item-balanced">
-        {{categoria.name}}
-      </ion-item>
-    </ion-list>
+    <ion-scroll zooming="false" direction="y" style="width:500px; height:500px;">
+    
+      <ion-list>
+	      <ion-item ng-repeat="categoria in categorias" href="#/app/productos/{{categoria.id}}" class="item-balanced">
+	        {{categoria.name}}
+	      </ion-item>
+	  </ion-list>
+    
+    </ion-scroll>
   </ion-content>
 </ion-view>

@@ -41,10 +41,16 @@
         <ion-item menu-close href="#/app/preguntas" class="item-balanced">
           <i class="icon ion-help"></i> Preguntas frecuentes
         </ion-item>
-        <ion-item menu-close ng-click="closeLogin()" class="item-balanced">
-          <i class="icon ion-log-out"></i> Logout
-        </ion-item>
+        
       </ion-list>
     </ion-content>
+    <ion-footer-bar align-title="left" class="bar-balanced">
+      <div class="buttons">
+        <button class="button button-clear" menu-close ng-click="closeLogin()">
+          <i class="icon ion-log-out"></i> Logout
+        </button>
+      </div>
+    </ion-footer-bar>
+
   </ion-side-menu>
 </ion-side-menus>

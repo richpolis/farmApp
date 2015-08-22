@@ -1,9 +1,9 @@
-<div class="bar bar-header">
+<div class="bar bar-header bar-stable">
   <button class="button button-icon icon ion-arrow-left-c" ng-click="backInicio()"></button>
-  <div class="h1 title">Login</div>
+  <div class="h1 title mayusculas">Iniciar Sesión</div>
 </div>
 <ion-view view-title="Login">
-  <ion-content class="padding has-header">
+  <ion-content class="has-header">
     <form ng-submit="doLogin()">
       <div class="list">
         <label class="item item-input">
@@ -13,10 +13,10 @@
           <input type="password" ng-model="loginData.password" placeholder="Contraseña">
         </label>
         <label class="item">
-          <button class="button button-block button-positive" type="submit">Iniciar sesión</button>
+          <button class="button button-block button-balanced" type="submit">Iniciar sesión</button>
         </label>
         <p>
-          <a class="button  button-clear button-positive button-block" ng-click="showFormRecuperar()">¿Olvidaste tu contraseña?</a>
+          <a class="button  button-clear button-balanced button-block" ng-click="showFormRecuperar()">¿Olvidaste tu contraseña?</a>
         </p>
       </div>
     </form>

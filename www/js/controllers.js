@@ -211,6 +211,7 @@ angular.module('farmApp.controllers', ['farmApp.services'])
     for(var cont = 0; cont<=$scope.categorias.length; cont++){
       if($stateParams.categoriaId == $scope.categorias[cont].id){
         $scope.categoria = $scope.categorias[cont];
+        $scope.$apply();
         break;
       }
     }
@@ -235,6 +236,7 @@ angular.module('farmApp.controllers', ['farmApp.services'])
       if(productos[cont].id == $stateParams.productoId){
         $scope.producto = productos[cont];
         $scope.producto.cantidad = 1;
+        $scope.$apply();
         break;
       }
     }

@@ -1,9 +1,9 @@
-<div class="bar bar-header">
+<div class="bar bar-header bar-stable">
     <button class="button button-icon icon ion-arrow-left-c" ng-click="backInicio()"></button>
     <div class="h1 title">Registro</div>
 </div>
 <ion-view view-title="Registro">
-    <ion-content class="has-header padding">
+    <ion-content class="has-header">
         <form id="formRegister" ng-submit="doRegister()">
             <div class="list">
                 <label class="item item-input">
@@ -25,11 +25,11 @@
                     <input type="password" name="repetir" ng-model="userData.repetir" placeholder="Ingresa la contraseña de nuevo">
                 </label>
                 <label class="item">
-                    <button class="button button-block button-positive" type="submit">Registrar</button>
+                    <button class="button button-block button-balanced" type="submit">Registrar</button>
                 </label>
-                <p>
+                <p class="text-center">
                     Al crear una cuenta FARMAAPP, aceptas nuestros
-                    <a class="button  button-clear button-positive button-block" ng-click="showModalTerminos()">Terminos y condiciones</a>
+                    <a class="button  button-clear button-balanced button-block" ng-click="showModalTerminos()">Terminos y condiciones</a>
                 </p>
             </div>
         </form>
