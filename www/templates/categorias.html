@@ -19,14 +19,10 @@
   		-o- <br/>
   		Selecciona una Categoría:
   	</p>
-    <ion-scroll zooming="false" direction="y" style="width:500px; height:500px;">
-    
-      <ion-list>
+    <ion-list>
 	      <ion-item ng-repeat="categoria in categorias" href="#/app/productos/{{categoria.id}}" class="item-balanced">
 	        {{categoria.name}}
 	      </ion-item>
 	  </ion-list>
-    
-    </ion-scroll>
   </ion-content>
 </ion-view>
