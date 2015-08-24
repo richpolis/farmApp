@@ -292,7 +292,7 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 
 })
 
-.controller('PagoController',function($scope, $ionicPopup, $state) {
+.controller('PagoController',function($scope, User, $ionicPopup, $state, $ionicModal) {
   $scope.pago={
     tarjeta: '',
     pais: '',
@@ -301,12 +301,28 @@ angular.module('farmApp.controllers', ['farmApp.services'])
     ano: ''
   };
 
+  $scope.user = User.getUser();
+
   $scope.doPago = function(){
-    $ionicPopup.alert({
-      title: 'Ejercicio realizado!',
-      template: 'Pago realizado, fin del demo!'
-    });
+    $scope.showPedidoRealizado();
+  };
+
+  // Creamos el modal para finalizar el pago
+  $ionicModal.fromTemplateUrl('templates/pedidoRealizadoModal.html', {
+    scope: $scope
+  }).then(function(pedidoRealizado) {
+    $scope.pedidoRealizado = pedidoRealizado;
+  });
+
+  // Accion para cerrar el formRecuperar
+  $scope.closePedidoRealizado = function() {
+    $scope.pedidoRealizado.hide();
     $state.go('app.categorias');
+  };
+
+  // Accion para mostrar el formRecuperar
+  $scope.showPedidoRealizado = function() {
+    $scope.pedidoRealizado.show();
   };
 
 })

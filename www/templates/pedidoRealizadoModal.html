@@ -1,0 +1,27 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-stable">
+    <h1 class="title">Pedido exitoso</h1>
+    <div class="buttons">
+      <button class="button button-clear" ng-click="closePedidoRealizado()">
+        <i class="icon ion-close-round"></i>
+      </button>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <p class="text-center">
+      <br/>
+      Gracias {{user.first_name}} {{user.last_name}}
+      <br/>
+      <br/>
+      Tu pedido ha sido enviado, recibirás <br/>
+      una notificación cuando el repartidor <br/>
+      este en tu puerta<br/>
+      <i class="icon ion-android-happy" style="font-size: 6em;"></i>
+    </p>
+  </ion-content>
+  <ion-footer-bar style="position:absolute; bottom: 10px;">
+    <button style=" font-size: 1.5em;" class=" button button-block button-balanced" ng-click="closePedidoRealizado()">
+          Cerrar
+    </button>
+  </ion-footer-bar>
+</ion-modal-view>
