@@ -2,37 +2,37 @@
     <ion-content class="padding">
         <ion-list>
             <ion-item class="item-text-wrap" ng-repeat="producto in productos| orderBy:'nombre' ">
-                <div class="row">
-                    <div class="col">
+                <div class="row border-bottom">
+                    <div class="col col-25">
                         <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta, 'no-require-receta':!producto.require_receta }">
                     </div>
-                    <div class="col">
+                    <div class="col col-75">
                         <h2>{{producto.name}}</h2>
                         <p class="ion-item-categoria">
                             {{producto.categoria.name}}
                         </p>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <ion-toggle toggle-class="toggle-calm">¿Obtener este producto periodicamente?</ion-toggle>
+                <div class="row border-bottom padding-top">
+                    <div class="col padding-top">
+                        <ion-toggle style="border: none;" toggle-class="toggle-calm">¿Obtener este producto periodicamente?</ion-toggle>
                     </div>
                 </div>
-                <div class="row" ng-show="producto.require_receta">
-                    <div class="col">
-                        Este producto require receta médica.
-                        El repartidor le solicitara y se quedara con la receta.
+                <div class="row border-bottom padding-top" ng-show="producto.require_receta">
+                    <div class="col text-center">
+                        <label class="require-receta">Este producto require receta médica.</label><br/>
+                        <label class="assertive">El repartidor le solicitara y se quedara con la receta.</label>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col col-50">
+                <div class="row padding-bottom">
+                    <div class="col col-50 padding-top">
                         <div class="list">
 
-                            <label class="item item-input item-select">
+                            <label class="item item-input item-select item-select-cantidad" style="border: none;">
                                 <div class="input-label">
-                                    &nbsp;
+                                    Cantidad:
                                 </div>
-                                <select ng-change="mostrarTotal()" ng-model="producto.cantidad">
+                                <select ng-change="mostrarTotal()" ng-model="producto.cantidad" class="producto-cantidad">
                                     <option selected>1</option>
                                     <option>2</option>
                                     <option>3</option>
@@ -41,7 +41,8 @@
 
                         </div>
                     </div>
-                    <div class="col col-50 text-right padding">
+                    <div class="col col-50 text-right">
+                        <br/>
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
                         <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>

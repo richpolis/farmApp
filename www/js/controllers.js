@@ -207,10 +207,13 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 })
 
 .controller('ProductosController', function($scope, $stateParams, $state, Categorias, Productos) {
+  $scope.title = "Productos";
+  
   $scope.categorias =  Categorias.query(function(){
     for(var cont = 0; cont<=$scope.categorias.length; cont++){
       if($stateParams.categoriaId == $scope.categorias[cont].id){
         $scope.categoria = $scope.categorias[cont];
+        $scope.title = $scope.categoria.name;
         $scope.$apply();
         break;
       }
@@ -230,12 +233,13 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 
 .controller('ProductoController',function($scope,Productos,$stateParams) {
   $scope.total = 0;
-
+  $scope.title = "Detalle producto";
   var productos = Productos.query(function(){
     for(var cont = 0; cont<=productos.length; cont++){
       if(productos[cont].id == $stateParams.productoId){
         $scope.producto = productos[cont];
         $scope.producto.cantidad = 1;
+        $scope.title = $scope.producto.name;
         $scope.$apply();
         break;
       }
@@ -273,7 +277,7 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 })
 .controller('PedidoController',function($scope, $state) {
   $scope.direccion={
-    estado: '',
+    estado: 'México DF',
     calle: '',
     num_exterior: '',
     num_interior: '',

@@ -1,7 +1,16 @@
-<ion-view view-title="{{ categoria.name || 'Productos' }}">
+<ion-view view-title="{{ title }}">
     <ion-content class="padding">
         <!--h3 class="text-center">{{categoria.name}}</h3-->
         <ion-list>
+            <label class="item item-input item-select">
+                <div class="input-label">
+                  Filtrar
+                </div>
+                <select class="balanced">
+                  <option>Mas vendidos</option>
+                  <option selected>A-Z</option>
+                </select>
+            </label>
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
                 <input type="text" placeholder="buscar" ng-model="buscar">

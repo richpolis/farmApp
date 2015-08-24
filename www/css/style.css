@@ -77,7 +77,11 @@ ion-list ion-item img.no-require-receta{
     padding: 5px;
 }
 
-ion-list ion-item p.require-receta{
+ion-list ion-item .font-medium{
+    font-size: .8em;
+}
+
+ion-list ion-item .require-receta{
     color: red;
 }
 
@@ -85,10 +89,17 @@ ion-list ion-item p.ion-item-categoria{
     color: #2EC7C7;
 }
 
-.item-select {
+.item-select-cantidad {
   width: 75%; /* Or whatever you'd like the width to be */
 }
 
-.item-select select {
-  left: 0;
+.item-select-cantidad select {
+  right: 0;
+}
+.item-select-cantidad select.producto-cantidad{
+  border: 1px solid #2EC7C7;
+}
+
+.row.border-bottom{
+    border-bottom: 1px solid silver;
 }

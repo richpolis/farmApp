@@ -1,4 +1,4 @@
-<ion-view view-title="{{producto.name || 'Detalle producto' }}">
+<ion-view view-title="{{ title }}">
     <ion-content class="padding">
         <ion-list class="card">
             <ion-item class="item-thumbnail-left">
@@ -19,11 +19,11 @@
                     <div class="col col-50">
                         <div class="list">
 
-                            <label class="item item-input item-select">
+                            <label class="item item-input item-select item-select-cantidad">
                                 <div class="input-label">
-                                    &nbsp;
+                                    Cantidad:
                                 </div>
-                                <select ng-change="mostrarTotal()" ng-model="producto.cantidad">
+                                <select ng-change="mostrarTotal()" ng-model="producto.cantidad" class="producto-cantidad">
                                     <option selected>1</option>
                                     <option>2</option>
                                     <option>3</option>
@@ -42,12 +42,15 @@
                 </div>
             </ion-item>
             <ion-item ng-show="producto.require_receta">
-                <p>
-                    Este producto require de receta medica.<br/>
-                    1.- El repartidor te pedira .... <br/>
+                <p class="text-center font-medium">
+                    <label class="require-receta">Este producto require de receta medica.</label><br/>
+                    <label class="assertive">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
+                    <label class="assertive">2.- El repartidor te pedira que le muestres la receta.</label>
                 </p>
             </ion-item>
         </ion-list>
-        <a href="#/app/carrito" class="button button-balanced button-block">Agregar a Carrito</a>
+        <a href="#/app/carrito" class="button button-balanced button-block icon-right ion-android-cart">
+            Agregar a Carrito
+        </a>
     </ion-content>
 </ion-view>
