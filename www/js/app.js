@@ -74,7 +74,8 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                         url: '/contacto',
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/contacto.html'
+                                templateUrl: 'templates/contacto.html',
+                                controller: 'ContactoController'
                             }
                         }
                     })
@@ -83,7 +84,8 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                         url: '/preguntas',
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/preguntas.html'
+                                templateUrl: 'templates/preguntas.html',
+                                controller: 'PreguntasController'
                             }
                         }
                     })
@@ -92,7 +94,8 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                         url: '/pedidos/periodicos',
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/pedidosPeriodicos.html'
+                                templateUrl: 'templates/pedidosPeriodicos.html',
+                                controller: 'PedidosPeriodicosController'
                             }
                         }
                     })

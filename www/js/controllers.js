@@ -327,6 +327,36 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 
 })
 
+.controller('PedidosPeriodicosController',function($scope,Productos){
+  $scope.productos = Productos.query(function(){
+    for(var cont=0; cont<=$scope.productos.length;cont++){
+        $scope.productos[cont].cantidad = 1;
+    }
+  });
+})
+
+.controller('ContactoController',function($scope, $state, $ionicPopup){
+  $scope.contactoData = {
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  };
+
+  $scope.doContacto = function(){
+    $ionicPopup.alert({
+      title: 'Enviando...',
+      template: 'Gracias por enviar tus comentarios'
+    });
+  };
+
+})
+
+.controller('PreguntasController',function($scope, Preguntas){
+  $scope.preguntas = Preguntas.query();
+})
+
 .controller('SearchController',function($scope,Productos) {
   $scope.productos = Productos.query(function(){
     // hacer algo despues de la carga

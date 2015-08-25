@@ -1,5 +1,27 @@
 <ion-view view-title="Contacto">
-  <ion-content>
-    <h1>Contacto</h1>
+  <ion-content class="has-header">
+    <form ng-submit="doContacto()">
+      <div class="list">
+        <label class="item item-input">
+          <input type="text" ng-model="contactoData.name" placeholder="Nombre">
+        </label>
+        <label class="item item-input">
+          <input type="text" ng-model="contactoData.email" placeholder="Email">
+        </label>
+        <label class="item item-input">
+          <input type="text" ng-model="contactoData.phone" placeholder="Telefono o Movil">
+        </label>
+        <label class="item item-input">
+          <input type="text" ng-model="contactoData.subject" placeholder="Asunto">
+        </label>
+        <label class="item item-input">
+          <input type="text" ng-model="contactoData.message" placeholder="Mensaje">
+        </label>
+        <label class="item">
+          <button class="button button-block button-balanced" type="submit">Enviar</button>
+        </label>
+      </div>
+    </form>
   </ion-content>
 </ion-view>
+

@@ -71,6 +71,9 @@ angular.module('farmApp.services', ['ngResource'])
 	    }
 	}
 }])
+.factory('Preguntas',function($resource){
+	return $resource('js/data/preguntas.json',{});
+})
 .factory('Categorias',function($resource){
 	return $resource('js/data/categorias.json',{});
 })

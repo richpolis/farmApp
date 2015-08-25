@@ -1,5 +1,10 @@
 <ion-view view-title="Preguntas">
   <ion-content>
-    <h1>Preguntas</h1>
+   	<ion-list>
+   	  <ion-item class="item-text-wrap" ng-repeat="pregunta in preguntas">
+   		<h2 class="balanced">{{pregunta.pregunta}}</h2>
+      	<p class="padding">{{pregunta.respuesta}}</p>
+   	  </ion-item>
+   	</ion-list>
   </ion-content>
 </ion-view>

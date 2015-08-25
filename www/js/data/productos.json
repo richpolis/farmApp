@@ -10,7 +10,7 @@
 			"descuento": false,
 			"require_receta": true,
 			"disponible": true,
-			"thumbnail": "img/antigripal2.png"
+			"thumbnail": "img/2.png"
 		},
 		{
 			
@@ -25,7 +25,7 @@
 			"descuento_porcentaje": "25%",
 			"require_receta": false,
 			"disponible": true,
-			"thumbnail": "img/antigripal1.png"
+			"thumbnail": "img/1.png"
 		},
 		{
 			
@@ -39,7 +39,7 @@
 			"descuento": false,
 			"require_receta": false,
 			"disponible": true,
-			"thumbnail": "img/antigripal1.png"
+			"thumbnail": "img/1.png"
 		},
 		{
 			
@@ -53,7 +53,7 @@
 			"descuento": false,
 			"require_receta": false,
 			"disponible": true,
-			"thumbnail": "img/antigripal1.png"
+			"thumbnail": "img/1.png"
 		},
 		{
 			
@@ -68,6 +68,6 @@
 			"descuento_valor":"-150.00",
 			"require_receta": true,
 			"disponible": true,
-			"thumbnail": "img/antigripal2.png"
+			"thumbnail": "img/2.png"
 		}
 ]
