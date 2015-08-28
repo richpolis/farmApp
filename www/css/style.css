@@ -57,35 +57,35 @@
 }
 
 
-ion-list ion-item img.require-receta,
-ion-list ion-item img.no-require-receta
+.list .item img.require-receta,
+.list .item img.no-require-receta
 {
     max-height: 80px;
     min-height: 80px;
     max-width: 80px;
     min-width: 80px;
 }
-ion-list ion-item img.require-receta{
+.list .item img.require-receta{
 	border: 3px solid red;
 	border-radius: 5px;
         padding: 5px;
 }
 
-ion-list ion-item img.no-require-receta{
+.list .item img.no-require-receta{
 	border: 3px solid #2EC7C7;
 	border-radius: 5px;
     padding: 5px;
 }
 
-ion-list ion-item .font-medium{
+.list .item .font-medium{
     font-size: .8em;
 }
 
-ion-list ion-item .require-receta{
+.list .item .require-receta{
     color: red;
 }
 
-ion-list ion-item p.ion-item-categoria{
+.list .item p.ion-item-categoria{
     color: #2EC7C7;
 }
 
@@ -102,4 +102,29 @@ ion-list ion-item p.ion-item-categoria{
 
 .row.border-bottom{
     border-bottom: 1px solid silver;
+}
+
+.row.border-top{
+    border-top: 1px solid silver;
+}
+
+.list.card:last-child {
+    margin-bottom: 0px;
+}
+
+.list .item label.font-small{
+    font-size: .9em;
+}
+
+ .input-label.hideme-sm:before{
+        content: 'Cantidad: ';
+}
+@media only screen and (max-device-width: 480px){
+    .item-select-cantidad {
+        width: 100%;
+    }
+    .input-label.hideme-sm:before{
+        font-size: .9em;
+        content: 'Cant: ';
+    }
 }

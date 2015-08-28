@@ -19,8 +19,8 @@
                         <div class="list">
 
                             <label class="item item-input item-select item-select-cantidad">
-                                <div class="input-label">
-                                    Cantidad:
+                                <div class="input-label hideme-sm">
+                                    &nbsp;
                                 </div>
                                 <select ng-change="mostrarTotal()" ng-model="producto.cantidad" class="producto-cantidad">
                                     <option selected>1</option>
@@ -40,16 +40,16 @@
                     </div>
                 </div>
             </ion-item>
-            <ion-item ng-show="producto.require_receta">
-                <p class="text-center font-medium">
-                    <label class="require-receta">Este producto require de receta medica.</label><br/>
-                    <label class="assertive">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
-                    <label class="assertive">2.- El repartidor te pedira que le muestres la receta.</label>
+            <ion-item class="item-text-wrap" ng-show="producto.require_receta">
+                <p class="text-center">
+                    <label class="require-receta font-small">Este producto require de receta medica.</label><br/>
+                    <label class="assertive font-small">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
+                    <label class="assertive font-small">2.- El repartidor te pedira que le muestres la receta.</label>
                 </p>
             </ion-item>
         </ion-list>
-        <a href="#/app/carrito" class="button button-balanced button-block icon-right ion-android-cart">
+        <button ng-click="addCarrito(producto)" class="button button-balanced button-block icon-right ion-android-cart">
             Agregar a Carrito
-        </a>
+        </button>
     </ion-content>
 </ion-view>

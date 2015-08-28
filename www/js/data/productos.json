@@ -4,7 +4,7 @@
 			"descripcion": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem esse saepe aspernatur atque, nostrum similique et adipisci consectetur quos beatae quidem error consequatur dignissimos, doloribus fuga quaerat unde! Fuga, omnis.",
 			"name": "Producto 1",
 			"categoria": {
-				"name": "Categoria"
+                            "name": "Categoria"
 			},
 			"precio": 59.9,
 			"descuento": false,
