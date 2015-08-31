@@ -1,5 +1,18 @@
 <ion-view view-title="Pedido">
     <ion-content class="has-header">
+        <div class="list" ng-if="direcciones.length>0">
+
+        <label class="item item-input item-select">
+          <div class="input-label">
+            Direccion guardada
+          </div>
+          <select ng-change="recuperarDireccion()" ng-model="direccionGuardada">
+              <option selected value="">Seleccionar...</option>
+              <option ng-repeat="direccion in direcciones" value="{{direccion.calle}}">{{direccion.calle}}</option>
+          </select>
+        </label>
+
+      </div>
         <form id="formRegister" ng-submit="doPedido()">
             <div class="list">
                 <label class="item item-input">

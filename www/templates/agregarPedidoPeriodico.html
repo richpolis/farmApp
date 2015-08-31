@@ -1,0 +1,98 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">Agregar a pedido periodico</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="closeAgregarPedidoPeriodico()">
+                <i class="icon ion-close-round"></i>
+            </button>
+        </div>
+    </ion-header-bar>
+    <ion-content>
+        <div class="list">
+
+            <li class="item item-input item-select">
+                <div class="input-label">
+                    Periodo
+                </div>
+                <select ng-model="productoSeleccionado.periodico.periodo">
+                    <option value="dia">Dia</option>
+                    <option value="semanal">Semanal</option>
+                    <option value="mensual">Mensual</option>
+                </select>
+            </li>
+            <div ng-show="productoSeleccionado.periodico.periodo == 'dia'">
+                <li class="item item-toggle">
+                    Lunes
+                    <label class="toggle toggle-balanced">
+                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaLunes">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle">
+                    Martes
+                    <label class="toggle toggle-balanced">
+                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaMartes">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle">
+                    Miercoles
+                    <label class="toggle toggle-balanced">
+                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaMiercoles">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle">
+                    Jueves
+                    <label class="toggle toggle-balanced">
+                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaJueves">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle">
+                    Viernes
+                    <label class="toggle toggle-balanced">
+                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaViernes">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle">
+                    Sabado
+                    <label class="toggle toggle-balanced">
+                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaSabado">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+
+                <li class="item item-toggle">
+                    Domingo
+                    <label class="toggle toggle-balanced">
+                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaDomingo">
+                        <div class="track">
+                            <div class="handle"></div>
+                        </div>
+                    </label>
+                </li>
+            </div>
+        </div>
+        <button class="button button-full button-balanced" ng-click="agregarPedidoPeriodico()">Agregar a pedidos periodicos</button>
+        <button class="button button-full button-balanced button-clear" ng-click="closeAgregarPedidoPeriodico()">Cancelar</button>
+    </ion-content>
+</ion-modal-view>

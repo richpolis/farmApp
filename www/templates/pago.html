@@ -8,12 +8,17 @@
                 <div class="row">
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="mes" ng-model="pago.mes" placeholder="MM">
+                            <input type="text" name="mes" ng-model="pago.mes" placeholder="MM" maxlength="2">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <label class="item item-input" style="border: none;">
+                            <input type="text" name="ano" value="/" disabled="disabled" style="background: transparent!important;">
                         </label>
                     </div>
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="ano" ng-model="pago.ano" placeholder="AA">
+                            <input type="text" name="ano" ng-model="pago.ano" placeholder="AA" maxlength="2">
                         </label>
                     </div>
                     <div class="col">
@@ -22,9 +27,6 @@
                         </label>
                     </div>
                 </div>
-                <label class="item item-input">
-                    <input type="text" name="pais" ng-model="pago.pais" placeholder="Pais">
-                </label>
                 <label class="item">
                     <button class="button button-block button-balanced" type="submit">Hacer Pedido</button>
                 </label>

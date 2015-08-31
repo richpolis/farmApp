@@ -1,29 +1,48 @@
-<ion-view view-title="Mi cuenta">
-    <ion-content class="has-header">
-        <form id="formRegister" ng-submit="doRegister()">
-            <div class="list">
-                <label class="item item-input">
-                    <input type="text" name="nombre" ng-model="userData.first_name" placeholder="Nombre">
-                </label>
-                <label class="item item-input">
-                    <input type="text" name="apellido" ng-model="userData.last_name" placeholder="Apellido">
-                </label>
-                <label class="item item-input">
-                    <input type="email" name="email" ng-model="userData.email" placeholder="Email">
-                </label>
-                <label class="item item-input">
-                    <input type="tel" name="celular" ng-model="userData.cell" placeholder="Celular">
-                </label>
-                <label class="item item-input">
-                    <input type="password" name="password" ng-model="userData.password" placeholder="Contraseña">
-                </label>
-                <label class="item item-input">
-                    <input type="password" name="repetir" ng-model="userData.repetir" placeholder="Ingresa la contraseña de nuevo">
-                </label>
-                <label class="item">
-                    <button class="button button-block button-balanced" type="submit">Registrar</button>
-                </label>
-            </div>
-        </form>
-    </ion-content>
-</ion-view>
+<ion-view title="Mi cuenta">
+
+        <ion-tabs tabs-type="tabs-icon-only" class="tabs-striped tabs-background-balanced tabs-color-light">
+            
+            <ion-tab title="Perfil" icon-on="ion-person" icon-off="ion-person">
+                <ion-content class="has-header">
+                    <br/>
+                    <br/>
+                    <form id="formRegister" ng-submit="doRegister()">
+                        <div class="list">
+                            <label class="item item-input">
+                                <input type="text" name="nombre" ng-model="userData.first_name" placeholder="Nombre">
+                            </label>
+                            <label class="item item-input">
+                                <input type="text" name="apellido" ng-model="userData.last_name" placeholder="Apellido">
+                            </label>
+                            <label class="item item-input">
+                                <input type="email" name="email" ng-model="userData.email" placeholder="Email">
+                            </label>
+                            <label class="item item-input">
+                                <input type="tel" name="celular" ng-model="userData.cell" placeholder="Celular">
+                            </label>
+                            <label class="item item-input">
+                                <input type="password" name="password" ng-model="userData.password" placeholder="Contraseña">
+                            </label>
+                            <label class="item item-input">
+                                <input type="password" name="repetir" ng-model="userData.repetir" placeholder="Ingresa la contraseña de nuevo">
+                            </label>
+                            <label class="item">
+                                <button class="button button-block button-balanced" type="submit">Registrar</button>
+                            </label>
+                        </div>
+                    </form>
+                </ion-content>
+            </ion-tab>
+
+            <ion-tab title="Direcciones" icon-on="ion-location" icon-off="ion-location">
+                <ion-content has-header="true" padding="true">
+                    <br/>
+                    <br/>
+                    <h2>Direcciones</h2>
+                </ion-content>
+            </ion-tab>
+            
+        </ion-tabs>
+
+
+    </ion-view>

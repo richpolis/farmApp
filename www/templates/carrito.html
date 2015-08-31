@@ -1,5 +1,5 @@
-<ion-view view-title="Carrito">
-    <ion-content class="">
+<ion-view cache-view="false" view-title="Carrito">
+    <ion-content>
         <ion-list>
             <ion-item class="item-text-wrap" ng-repeat="producto in productos| orderBy:'name' " style="padding: 10px 2px;">
                 <div class="list card" style="padding: .2em;">
@@ -12,10 +12,15 @@
                         <i class="icon ion-close-round" ng-click="removeProducto(producto)" style="position: absolute; top: 2px; right: 2px; font-size: 1.5em;"></i>
                     </div>
                     <div class="item item-text-wrap">
-                        <div class="row padding-top">
+                        <div class="row padding-top" ng-show="!producto.periodico.pedido">
                             <div class="col padding-top">
-                                <ion-toggle ng-model="producto.pedido_periodico" style="border: none; font-size: .9em;" toggle-class="toggle-calm">¿Obtener este producto periodicamente?</ion-toggle>
+                                <ion-toggle ng-change="showAgregarPedidoPeriodico(producto)" ng-model="producto.periodico.pedido" style="border: none; font-size: .9em;" toggle-class="toggle-calm">¿Obtener este producto periodicamente?</ion-toggle>
                             </div>
+                        </div>
+                        <div class="row padding-top" ng-show="producto.periodico.pedido">
+                            <div class="col padding-top">
+                                <label class="font-small">{{producto.periodico.periocidad | uppercase}}</label>
+                            </div>                        
                         </div>
                         <div class="row border-bottom border-top padding-top" ng-show="producto.require_receta">
                             <div class="col text-center">
@@ -63,7 +68,7 @@
                 </div>
             </ion-item>
         </ion-list>
-        <a href="#/app/pedido" class="button button-block button-balanced">Hacer pedido</a>
+        <a href="#/app/pedido" class="button button-block button-balanced" ng-if="productos.length>0">Hacer pedido</a>
         <a href="#/app/categorias" class="button button-block button-balanced button-clear">Seguir comprando</a>
     </ion-content>
 </ion-view>

@@ -68,6 +68,19 @@ angular.module('farmApp.services', ['ngResource'])
                         } else {
                             return 'menu';
                         }
+                    },
+                    getDirecciones: function () {
+                        return user.direcciones;
+                    },
+                    addDireccion: function (direccion) {
+                        user.direcciones.push(direccion);
+                        window.localStorage.setItem('user', JSON.stringify(user));
+                        return true;
+                    },
+                    removeDireccion: function (direccion) {
+                        user.direcciones.splice(user.direcciones.indexOf(direccion), 1);
+                        window.localStorage.setItem('user', JSON.stringify(user));
+                        return this.getDirecciones();
                     }
                 }
             }])
@@ -83,6 +96,13 @@ angular.module('farmApp.services', ['ngResource'])
         .factory('Carrito', function () {
             var productos = [];
             productos =  JSON.parse(window.localStorage['carrito'] || '[]');
+            function sumarTotal(){
+                var total = 0;
+                for (var cont = 0; cont <= productos.length-1; cont++) {
+                    total += productos[cont].precio * productos[cont].cantidad;
+                }
+                return total;
+            }
             return {
                 getProductos: function () {
                     return productos;
@@ -97,14 +117,44 @@ angular.module('farmApp.services', ['ngResource'])
                     window.localStorage.setItem('carrito', JSON.stringify(productos));
                     return productos;
                 },
-                getTotal: function(){
-                    var total = 0;
-                    for (var cont = 0; cont <= productos.length-1; cont++) {
-                        total += productos[cont].precio * productos[cont].cantidad;
-                    }
-                    return total;
+                getTotal: sumarTotal
+            };
+        })
+        .factory('PedidosPeriodicos', function () {
+            var productos = [];
+            productos =  JSON.parse(window.localStorage['periodicos'] || '[]');
+            
+            function getPeriocidad(producto){
+                if(producto.periodico.periodo == "dia"){
+                    var dias = "";
+                    if(producto.periodico.diaLunes){ dias += (dias.length>0?",lunes":"lunes");}
+                    if(producto.periodico.diaMartes){ dias += (dias.length>0?",martes":"martes");}
+                    if(producto.periodico.diaMiercoles){ dias += (dias.length>0?",miercoles":"miercoles");}
+                    if(producto.periodico.diaJueves){ dias += (dias.length>0?",jueves":"jueves");}
+                    if(producto.periodico.diaViernes){ dias += (dias.length>0?",viernes":"viernes");}
+                    if(producto.periodico.diaSabado){ dias += (dias.length>0?",sabado":"sabado");}
+                    if(producto.periodico.diaDomingo){ dias += (dias.length>0?",domingo":"domingo");}
+                    return dias;
+                }else{
+                    return producto.periodico.periodo;
+                }
+            }
+            
+            return {
+                getProductos: function () {
+                    return productos;
+                },
+                addProducto: function (producto) {
+                    producto.periodico.periocidad = getPeriocidad(producto);
+                    productos.push(producto);
+                    window.localStorage.setItem('periodicos', JSON.stringify(productos));
+                    return true;
+                },
+                removeProducto: function (producto) {
+                    productos.splice(productos.indexOf(producto), 1);
+                    window.localStorage.setItem('periodicos', JSON.stringify(productos));
+                    return productos;
                 }
             };
         })
-
         ;

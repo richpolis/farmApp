@@ -245,7 +245,18 @@ angular.module('farmApp.controllers', ['farmApp.services'])
                     if (productos[cont].id == $stateParams.productoId) {
                         $scope.producto = productos[cont];
                         $scope.producto.cantidad = 1;
-                        $scope.producto.pedido_periodico = false;
+                        $scope.producto.periodico = {};
+                        $scope.producto.periodico.pedido = false;
+                        $scope.producto.periodico.periodo = "Semanal";
+                        $scope.producto.periodico.visitas = 1;
+                        $scope.producto.periodico.diaLunes = true;
+                        $scope.producto.periodico.diaMartes = false;
+                        $scope.producto.periodico.diaMiercoles = false;
+                        $scope.producto.periodico.diaJueves = false;
+                        $scope.producto.periodico.diaViernes = false;
+                        $scope.producto.periodico.diaSabado = false;
+                        $scope.producto.periodico.diaDomingo = false;
+                        $scope.producto.periodico.periocidad = "";
                         $scope.title = $scope.producto.name;
                         $timeout(function(){
                             $scope.$apply();
@@ -265,13 +276,14 @@ angular.module('farmApp.controllers', ['farmApp.services'])
                    $state.go('app.carrito');
                }
             };
-
+            
         })
 
-        .controller('CarritoController', function ($scope, $ionicPopup, $timeout, Carrito) {
+        .controller('CarritoController', function ($scope, $ionicPopup, $ionicModal, $timeout, Carrito, PedidosPeriodicos) {
             
             $scope.productos = Carrito.getProductos();
             $scope.total = Carrito.getTotal();
+            $scope.productoSeleccionado = {};
             
             $timeout(function(){
                $scope.$apply(); 
@@ -289,8 +301,35 @@ angular.module('farmApp.controllers', ['farmApp.services'])
                 $scope.productos = Carrito.removeProducto(producto);
                 $scope.mostrarTotal();
             };
+            
+            
+            // Crear un formulario modal de pedido periodico
+            $ionicModal.fromTemplateUrl('templates/agregarPedidoPeriodico.html', {
+                scope: $scope
+            }).then(function (modalAgregarPedidoPeridico) {
+                $scope.modalAgregarPedidoPeridico = modalAgregarPedidoPeridico;
+            });
+
+            $scope.closeAgregarPedidoPeriodico = function () {
+                $scope.modalAgregarPedidoPeridico.hide();
+            };
+
+            // Accion para mostrar form modal pedido periodico
+            $scope.showAgregarPedidoPeriodico = function (producto) {
+                if(producto.periodico.pedido){
+                    $scope.productoSeleccionado = producto;
+                    $scope.modalAgregarPedidoPeridico.show();
+                }
+            };
+            
+            $scope.agregarPedidoPeriodico = function(){
+                PedidosPeriodicos.addProducto($scope.productoSeleccionado);
+                $scope.productoSeleccionado = {};
+                $scope.closeAgregarPedidoPeriodico();
+            };
+            
         })
-        .controller('PedidoController', function ($scope, $state) {
+        .controller('PedidoController', function ($scope, $state, User) {
             $scope.direccion = {
                 estado: 'México DF',
                 calle: '',
@@ -300,9 +339,16 @@ angular.module('farmApp.controllers', ['farmApp.services'])
                 delegacion_municipio: '',
                 colonia: ''
             };
-
+            var user = User.getUser();
+            $scope.direcciones = user.getDirecciones();
+            $scope.direccionGuardada = "";
+            
             $scope.doPedido = function () {
                 $state.go('app.pago');
+            };
+            
+            $scope.recuperarDireccion = function(){
+                alert($scope.direccionGuardada);
             };
 
         })
@@ -310,7 +356,6 @@ angular.module('farmApp.controllers', ['farmApp.services'])
         .controller('PagoController', function ($scope, User, $ionicPopup, $state, $ionicModal) {
             $scope.pago = {
                 tarjeta: '',
-                pais: '',
                 cvv: '',
                 mes: '',
                 ano: ''
@@ -342,12 +387,21 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 
         })
 
-        .controller('PedidosPeriodicosController', function ($scope, Productos) {
-            $scope.productos = Productos.query(function () {
-                for (var cont = 0; cont <= $scope.productos.length; cont++) {
-                    $scope.productos[cont].cantidad = 1;
-                }
+        .controller('PedidosPeriodicosController', function ($scope, $timeout, $ionicPopup, PedidosPeriodicos) {
+            $scope.productos = PedidosPeriodicos.getProductos();
+            
+            $timeout(function(){
+               $scope.$apply(); 
             });
+            
+            $scope.removeProducto = function (producto) {
+                $ionicPopup.alert({
+                    title: 'Quitando!',
+                    template: 'Se quito de listado de productos periodicos'
+                });
+                $scope.productos = PedidosPeriodicos.removeProducto(producto);
+            };
+            
         })
 
         .controller('ContactoController', function ($scope, $state, $ionicPopup) {
