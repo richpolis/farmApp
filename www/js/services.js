@@ -11,7 +11,7 @@ angular.module('farmApp.services', ['ngResource'])
                         {
                             id: '1',
                             localidad: 'Mexico D.F.',
-                            street: 'Itzcuina mza. 42 lt. 69',
+                            calle: 'Itzcuina mza. 42 lt. 69',
                             num_interior: '',
                             num_exterior: '',
                             codigo_postal: '04630',
@@ -43,7 +43,7 @@ angular.module('farmApp.services', ['ngResource'])
                     },
                     register: function (objUser, callback) {
                         user = objUser;
-                        user.direcciones = [];
+                        user.direcciones = objUser.direcciones || [];
                         window.localStorage.setItem('user', JSON.stringify(user));
                         if (callback) {
                             $timeout(function () {
@@ -81,6 +81,18 @@ angular.module('farmApp.services', ['ngResource'])
                         user.direcciones.splice(user.direcciones.indexOf(direccion), 1);
                         window.localStorage.setItem('user', JSON.stringify(user));
                         return this.getDirecciones();
+                    },
+                    getDireccionVacia: function(){
+                        var direccionVacia = {
+                            estado: 'México DF',
+                            calle: '',
+                            num_exterior: '',
+                            num_interior: '',
+                            cp: '',
+                            delegacion_municipio: '',
+                            colonia: ''
+                        };
+                        return direccionVacia;
                     }
                 }
             }])

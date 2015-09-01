@@ -163,6 +163,8 @@ angular.module('farmApp.controllers', ['farmApp.services'])
         .controller('PerfilController', function ($scope, $ionicPopup, User) {
 
             $scope.userData = User.getUser();
+            $scope.direccionSeleccionada = "";
+            $scope.direccionGuardada = User.getDireccionVacia();
 
             $scope.doRegister = function () {
                 var todoCorrecto = true;
@@ -195,13 +197,44 @@ angular.module('farmApp.controllers', ['farmApp.services'])
                     return false;
 
                 User.register($scope.userData, function (user) {
-                    $scope.user = user;
+                    $scope.userData = user;
                     $ionicPopup.alert({
                         title: 'Actualizacion!',
                         template: 'Actualizacion realizada'
                     });
                 });
 
+            };
+            
+            $scope.recuperarDireccion = function(){
+              var select = document.getElementById('recuperar-direccion');
+              if(select.value != ""){
+                    for(var cont=0;cont<=$scope.userData.direcciones.length;cont++){
+                        if($scope.userData.direcciones[cont].calle == select.value){
+                            $scope.direccionGuardada = $scope.userData.direcciones[cont];
+                            break;
+                        }
+                    }
+                }else{
+                    $scope.direccionGuardada = User.getDireccionVacia();
+                }
+            };
+            
+            $scope.doDireccion = function () {
+                var select = document.getElementById('recuperar-direccion');
+                if(select.value != ""){
+                    for (var cont = 0; cont <= $scope.userData.direcciones.length; cont++) {
+                        if ($scope.userData.direcciones[cont].calle == select.value) {
+                            $scope.userData.direcciones[cont] = $scope.direccionGuardada;
+                            User.save($scope.userData);
+                            break;
+                        }
+                    }
+                }else{
+                    User.addDireccion($scope.direccionGuardada);
+                    $scope.userData = User.getUser();
+                    $scope.direccionGuardada = User.getDireccionVacia();
+                }
             };
 
         })
@@ -330,17 +363,8 @@ angular.module('farmApp.controllers', ['farmApp.services'])
             
         })
         .controller('PedidoController', function ($scope, $state, User) {
-            $scope.direccion = {
-                estado: 'México DF',
-                calle: '',
-                num_exterior: '',
-                num_interior: '',
-                cp: '',
-                delegacion_municipio: '',
-                colonia: ''
-            };
-            var user = User.getUser();
-            $scope.direcciones = user.getDirecciones();
+            $scope.direccionGuardada = User.getDireccionVacia();
+            $scope.userData = User.getUser();
             $scope.direccionGuardada = "";
             
             $scope.doPedido = function () {
@@ -348,7 +372,34 @@ angular.module('farmApp.controllers', ['farmApp.services'])
             };
             
             $scope.recuperarDireccion = function(){
-                alert($scope.direccionGuardada);
+              var select = document.getElementById('recuperar-direccion-pedido');
+              if(select.value != ""){
+                    for(var cont=0;cont<=$scope.userData.direcciones.length;cont++){
+                        if($scope.userData.direcciones[cont].calle == select.value){
+                            $scope.direccionGuardada = $scope.userData.direcciones[cont];
+                            break;
+                        }
+                    }
+                }else{
+                    $scope.direccionGuardada = User.getDireccionVacia();
+                }
+            };
+            
+            $scope.doDireccion = function () {
+                var select = document.getElementById('recuperar-direccion-pedido');
+                if(select.value != ""){
+                    for (var cont = 0; cont <= $scope.userData.direcciones.length; cont++) {
+                        if ($scope.userData.direcciones[cont].calle == select.value) {
+                            $scope.userData.direcciones[cont] = $scope.direccionGuardada;
+                            User.save($scope.userData);
+                            break;
+                        }
+                    }
+                }else{
+                    User.addDireccion($scope.direccionGuardada);
+                    $scope.userData = User.getUser();
+                    $scope.direccionGuardada = User.getDireccionVacia();
+                }
             };
 
         })
