@@ -160,7 +160,7 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 
         })
 
-        .controller('PerfilController', function ($scope, $ionicPopup, User) {
+        .controller('PerfilController', function ($scope, $ionicPopup, $ionicModal,$cordovaGeolocation, User) {
 
             $scope.userData = User.getUser();
             $scope.direccionSeleccionada = "";
@@ -235,6 +235,42 @@ angular.module('farmApp.controllers', ['farmApp.services'])
                     $scope.userData = User.getUser();
                     $scope.direccionGuardada = User.getDireccionVacia();
                 }
+            };
+            
+            // Crear una ventana de terminos y condiciones
+            $ionicModal.fromTemplateUrl('templates/mapaModal.html', {
+                scope: $scope
+            }).then(function (mapa) {
+                $scope.mapa = mapa;
+            });
+
+            $scope.closeMapa = function () {
+                $scope.mapa.hide();
+            };
+
+            // Accion para mostrar modalTerminos
+            $scope.showMapa = function () {
+                var posOptions = {timeout: 10000, enableHighAccuracy: false};
+                $cordovaGeolocation
+                    .getCurrentPosition(posOptions)
+                    .then(function (position) {
+                      $scope.lat  = position.coords.latitude
+                      $scope.long = position.coords.longitude
+                      $scope.mapa.show();
+                      $scope.ubicacionDelMapa();
+                    }, function(err) {
+                      $ionicPopup.alert({
+                            title: 'Error de localizacion!',
+                            template: 'No esta activa la localizacion'
+                        });
+                    });
+            };
+            
+            $scope.ubicacionDelMapa = function(){
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat: $scope.lat, lng: $scope.long},
+                    zoom: 8
+                });
             };
 
         })
