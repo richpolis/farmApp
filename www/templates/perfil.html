@@ -81,11 +81,25 @@
                         <label class="item">
                             <button class="button button-block button-balanced" type="submit">Guardar direccion</button>
                         </label>
-                        <label class="item">
+                        <label class="item" ng-show="!mostrarMapa">
                             <button class="button button-block button-clear" ng-click="showMapa()">Buscar en mapa ubicacion</button>
                         </label>
                     </div>
                 </form>
+				<div class="formMapa" ng-show="mostrarMapa">
+					<div class="list">
+					  <div class="item item-input-inset">
+						<label class="item-input-wrapper">
+						  <input type="text" name="direccionBuscar" id="direccionBuscar" placeholder="Ingresa la direccion">
+						</label>
+						<button class="button button-small" ng-click="buscarDireccion()">
+						  Buscar
+						</button>
+					  </div>
+					</div>
+					<div id="mapa">
+					</div>
+				</div>
             </ion-content>
         </ion-tab>
 

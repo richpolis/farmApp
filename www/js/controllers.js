@@ -1,4 +1,4 @@
-angular.module('farmApp.controllers', ['farmApp.services'])
+angular.module('farmApp.controllers', ['farmApp.services','ngCordova'])
 
         .controller('AppController', function ($scope, User, $state) {
 
@@ -160,11 +160,12 @@ angular.module('farmApp.controllers', ['farmApp.services'])
 
         })
 
-        .controller('PerfilController', function ($scope, $ionicPopup, $ionicModal,$cordovaGeolocation, User) {
+        .controller('PerfilController', function ($scope, $ionicPopup, $ionicModal,$cordovaGeolocation, $compile, $ionicLoading, User) {
 
             $scope.userData = User.getUser();
             $scope.direccionSeleccionada = "";
             $scope.direccionGuardada = User.getDireccionVacia();
+			$scope.mostrarMapa = false;
 
             $scope.doRegister = function () {
                 var todoCorrecto = true;
@@ -254,9 +255,12 @@ angular.module('farmApp.controllers', ['farmApp.services'])
                 $cordovaGeolocation
                     .getCurrentPosition(posOptions)
                     .then(function (position) {
+						console.log(position);
                       $scope.lat  = position.coords.latitude
                       $scope.long = position.coords.longitude
-                      $scope.mapa.show();
+                      /*$scope.mapa.show();*/
+						debugger;
+					  $scope.mostrarMapa = true;
                       $scope.ubicacionDelMapa();
                     }, function(err) {
                       $ionicPopup.alert({
@@ -267,12 +271,78 @@ angular.module('farmApp.controllers', ['farmApp.services'])
             };
             
             $scope.ubicacionDelMapa = function(){
-                var map = new google.maps.Map(document.getElementById('map'), {
-                    center: {lat: $scope.lat, lng: $scope.long},
-                    zoom: 8
-                });
+				var myLatlng = new google.maps.LatLng($scope.lat,$scope.long);
+        
+				var mapOptions = {
+				  center: myLatlng,
+				  zoom: 16,
+				  mapTypeId: google.maps.MapTypeId.ROADMAP
+				};
+				$scope.map = new google.maps.Map(document.getElementById("mapa"),mapOptions);
+				
+				var marker = new google.maps.Marker({
+				  position: myLatlng,
+				  map: $scope.map,
+				  title: 'Mi ubicación actual (' + User.getNameComplete() +')'
+				});
+				
+				$scope.buscarDireccion = function () {
+					var geocoder = new google.maps.Geocoder();
+					var mapa = document.getElementById("mapa");
+					var direccionBuscar = document.getElementById("direccionBuscar");
+					console.log(direccionBuscar.value);
+					geocoder.geocode({ 'address': direccionBuscar.value}, function(results, status) {
+						// Verificamos el estatus
+						if (status == 'OK') {
+							// Si hay resultados encontrados, centramos y repintamos el mapa
+							// esto para eliminar cualquier pin antes puesto
+							var mapOptions = {
+								center: results[0].geometry.location,
+								mapTypeId: google.maps.MapTypeId.ROADMAP
+							};
+							$scope.map = new google.maps.Map(mapa, mapOptions);
+							// fitBounds acercará el mapa con el zoom adecuado de acuerdo a lo buscado
+							$scope.map.fitBounds(results[0].geometry.viewport);
+							// Dibujamos un marcador con la ubicación del primer resultado obtenido
+							var markerOptions = { 
+								position: results[0].geometry.location,
+								draggable: true,
+								dragend: function(e) {
+									$scope.lat = e.latLng.A;
+									$scope.long = e.latLng.F;
+							  }};
+							var marker = new google.maps.Marker(markerOptions);
+							marker.setMap($scope.map);
+						} else {
+							// En caso de no haber resultados o que haya ocurrido un error
+							// lanzamos un mensaje con el error
+							alert("Geocoding no tuvo éxito debido a: " + status);
+						}
+					});
+					/*GMaps.geocode({
+						address: $scope.direccionBuscar,
+						callback: function (results, status) {
+							if (status == 'OK') {
+								var latlng = results[0].geometry.location;
+								$scope.map.setCenter(latlng.lat(), latlng.lng());
+								$scope.lat = latlng.lat();
+								$scope.long = latlng.lng();
+								$scope.map.addMarker({
+									lat: latlng.lat(),
+									lng: latlng.lng(),
+									draggable: true,
+									dragend: function(e) {
+										$scope.lat = e.latLng.A;
+										$scope.long = e.latLng.F;
+								  }
+								});
+							}
+						}
+					});*/
+				};
             };
-
+			
+			
         })
 
         .controller('CategoriasController', function ($scope, Categorias) {

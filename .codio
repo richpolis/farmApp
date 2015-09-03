@@ -1,0 +1,16 @@
+{
+// Configure your Run and Preview buttons here.
+
+// Run button configuration
+  "commands": {
+	  	"Iniciar Apache2": "parts start apache2",
+	  	"Stop Apache2": "parts stop apache2",
+	  	"Reiniciar Apache2": "parts restart apache2",
+        "Node version": "node --version"
+  },
+
+// Preview button configuration
+  "preview": {
+        "Box URL": "http://{{domain}}:3000/"
+  }
+}
