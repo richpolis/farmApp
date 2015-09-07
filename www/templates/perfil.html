@@ -3,9 +3,7 @@
     <ion-tabs tabs-type="tabs-icon-only" class="tabs-striped tabs-background-balanced tabs-color-light">
 
         <ion-tab title="Perfil" icon-on="ion-person" icon-off="ion-person">
-            <ion-content class="has-header">
-                <br/>
-                <br/>
+            <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}}">
                 <form id="formRegister" ng-submit="doRegister()">
                     <div class="list">
                         <label class="item item-input">
@@ -35,9 +33,7 @@
         </ion-tab>
 
         <ion-tab title="Direcciones" icon-on="ion-location" icon-off="ion-location">
-            <ion-content has-header="true" padding="true">
-                <br/>
-                <br/>
+            <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}}">
                 <div class="list" ng-if="userData.direcciones.length > 0">
                     <label class="item item-input item-select">
                         <div class="input-label">
@@ -86,24 +82,21 @@
                         </label>
                     </div>
                 </form>
-				<div class="formMapa" ng-show="mostrarMapa">
-					<div class="list">
-					  <div class="item item-input-inset">
-						<label class="item-input-wrapper">
-						  <input type="text" name="direccionBuscar" id="direccionBuscar" placeholder="Ingresa la direccion">
-						</label>
-						<button class="button button-small" ng-click="buscarDireccion()">
-						  Buscar
-						</button>
-					  </div>
-					</div>
-					<div id="mapa">
-					</div>
-				</div>
+                <div class="formMapa" ng-show="mostrarMapa">
+                    <div class="list">
+                        <div class="item item-input-inset">
+                            <label class="item-input-wrapper">
+                                <input type="text" name="direccionBuscar" id="direccionBuscar" placeholder="Ingresa la direccion">
+                            </label>
+                            <button class="button button-small" ng-click="buscarDireccion()">
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="mapa">
+                    </div>
+                </div>
             </ion-content>
         </ion-tab>
-
     </ion-tabs>
-
-
 </ion-view>

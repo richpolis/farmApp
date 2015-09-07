@@ -16,7 +16,9 @@ angular.module('farmApp.services', ['ngResource'])
                             num_exterior: '',
                             codigo_postal: '04630',
                             colonia: 'Adolfo Ruiz Cortinez',
-                            delegacion_municipio: 'Coyoacan'
+                            delegacion_municipio: 'Coyoacan', 
+                            latitude: 0,
+                            longitude: 0
                         }
                     ]
                 };
@@ -90,9 +92,14 @@ angular.module('farmApp.services', ['ngResource'])
                             num_interior: '',
                             cp: '',
                             delegacion_municipio: '',
-                            colonia: ''
+                            colonia: '',
+                            latitude: 0,
+                            longitude: 0
                         };
                         return direccionVacia;
+                    },
+                    save : function (objUser, callback) {
+                        this.register(objUser,callback);
                     }
                 }
             }])

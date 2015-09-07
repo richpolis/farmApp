@@ -1,19 +1,17 @@
 <ion-view view-title="Pedido">
     <ion-content class="has-header">
-        <div class="list" ng-if="userData.direcciones.length>0">
-
-        <label class="item item-input item-select">
-          <div class="input-label">
-            Direccion guardada
-          </div>
-          <select ng-change="recuperarDireccion()" ng-model="direccionGuardada" id="recuperar-direccion-pedido">
-              <option selected value="">Nueva...</option>
-              <option ng-repeat="direccion in userData.direcciones" value="{{direccion.calle}}">{{direccion.calle}}</option>
-          </select>
-        </label>
-
-      </div>
-        <form id="formRegister" ng-submit="doPedido()">
+        <div class="list" ng-if="userData.direcciones.length > 0">
+            <label class="item item-input item-select">
+                <div class="input-label">
+                    Direccion guardada
+                </div>
+                <select ng-change="recuperarDireccion()" ng-model="direccionSeleccionada" id="recuperar-direccion">
+                    <option selected value="">Nueva...</option>
+                    <option ng-repeat="direccion in userData.direcciones" value="{{direccion.calle}}">{{direccion.calle}}</option>
+                </select>
+            </label>
+        </div>
+        <form id="formDireccion" ng-submit="doDireccion()">
             <div class="list">
                 <label class="item item-input">
                     <input type="text" name="estado" ng-model="direccionGuardada.localidad" placeholder="Estado">
@@ -43,12 +41,26 @@
                     <input type="text" name="colonia" ng-model="direccionGuardada.colonia" placeholder="Colonia">
                 </label>
                 <label class="item">
-                    <button class="button button-block button-balanced" type="submit">Hacer pedido</button>
+                    <button class="button button-block button-balanced" type="submit">Guardar direccion</button>
                 </label>
-                <label class="item">
-                    <button class="button button-block button-clear" ng-click="ubicacionEnMapa()">Buscar en mapa ubicacion</button>
+                <label class="item" ng-show="!mostrarMapa">
+                    <button class="button button-block button-clear" ng-click="showMapa()">Buscar en mapa ubicacion</button>
                 </label>
             </div>
         </form>
+        <div class="formMapa" ng-show="mostrarMapa">
+            <div class="list">
+                <div class="item item-input-inset">
+                    <label class="item-input-wrapper">
+                        <input type="text" name="direccionBuscar" id="direccionBuscar" placeholder="Ingresa la direccion">
+                    </label>
+                    <button class="button button-small" ng-click="buscarDireccion()">
+                        Buscar
+                    </button>
+                </div>
+            </div>
+            <div id="mapa">
+            </div>
+        </div>
     </ion-content>
 </ion-view>
