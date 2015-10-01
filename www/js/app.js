@@ -19,6 +19,8 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                     // org.apache.cordova.statusbar required
                     StatusBar.styleDefault();
                 }
+
+                Conekta.setPublishableKey('key_FrzHZPkJxzRSbUNFcnpGyYw');
             });
         })
 
@@ -49,7 +51,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                         templateUrl: 'templates/menu.html',
                         controller: 'AppController'
                     })
-                    
+
                     .state('app.perfil', {
                         url: '/perfil',
                         views: {
@@ -59,12 +61,12 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                             }
                         }
                     })
-                    
+
                     .state('app.search', {
                         url: '/search',
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/search.html',
+                                templateUrl: 'templates/productos.html',
                                 controller: 'SearchController'
                             }
                         }
@@ -99,7 +101,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                             }
                         }
                     })
-                    
+
                     .state('app.categorias', {
                         url: '/categorias',
                         views: {
@@ -119,7 +121,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                             }
                         }
                     })
-                    
+
                     .state('app.detalle', {
                         url: '/producto/:productoId',
                         views: {
@@ -129,7 +131,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                             }
                         }
                     })
-                    
+
                     .state('app.carrito', {
                         url: '/carrito',
                         views: {
@@ -157,7 +159,19 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
                             }
                         }
                     })
+                    .state('app.recetas', {
+                        url: '/recetas',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/recetas.html',
+                                controller: 'ImageController'
+                            }
+                        }
+                    })
                     ;
             // if none of the above states are matched, use this as the fallback
             $urlRouterProvider.otherwise('/inicio');
-        });
+        })
+        /*.run(function(djangoAuth){
+         djangoAuth.initialize('//polar-hollows-6621.herokuapp.com/auth', false);
+         })*/;

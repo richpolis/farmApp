@@ -8,6 +8,16 @@
     </div>
   </ion-header-bar>
   <ion-content>
-    <div id="map"></div>
+    <div class="list">
+      <div class="item item-input-inset">
+        <label class="item-input-wrapper">
+          <input type="text" name="direccionBuscar" id="direccionBuscar" placeholder="Ingresa la direccion">
+        </label>
+        <button class="button button-small" ng-click="buscarDireccion()">
+          Buscar
+        </button>
+      </div>
+    </div>
+    <div id="mapa"></div>
   </ion-content>
 </ion-modal-view>

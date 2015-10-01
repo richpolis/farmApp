@@ -4,10 +4,10 @@
             <ion-item class="item-text-wrap" ng-repeat="producto in productos| orderBy:'name' " style="padding: 10px 2px;">
                 <div class="list card" style="padding: .2em;">
                     <div class="item item-thumbnail-left">
-                        <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta, 'no-require-receta':!producto.require_receta }">
+                        <img ng-src="{{producto.image}}" ng-class="{ 'require-receta': producto.require_prescription, 'no-require-receta':!producto.require_prescription }">
                         <h2>{{producto.name}}</h2>
                         <p class="ion-item-categoria">
-                            {{producto.categoria.name}}
+                            {{producto.category.name}}
                         </p>
                         <i class="icon ion-close-round" ng-click="removeProducto(producto)" style="position: absolute; top: 2px; right: 2px; font-size: 1.5em;"></i>
                     </div>
@@ -19,13 +19,14 @@
                         </div>
                         <div class="row padding-top" ng-show="producto.periodico.pedido">
                             <div class="col padding-top">
-                                <label class="font-small">{{producto.periodico.periocidad | uppercase}}</label>
+                                <label class="font-small">{{producto.periodico.period | uppercase}}</label>
                             </div>                        
                         </div>
-                        <div class="row border-bottom border-top padding-top" ng-show="producto.require_receta">
-                            <div class="col text-center">
+                        <div class="row border-bottom border-top padding-top" ng-show="producto.require_prescription">
+                            <div class="col text-center" ng-if="producto.recipe>1">
                                 <label class="require-receta font-small">Este producto require receta médica.</label><br/>
-                                <label class="assertive font-small">El repartidor le solicitara y se quedara con la receta.</label>
+                                <label class="assertive font-small" ng-show="producto.recipe == 3">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
+                                <label class="assertive font-small" ng-show="producto.recipe == 2">2.- El repartidor te pedira que le muestres la receta.</label>
                             </div>
                         </div>
                     </div>
@@ -38,7 +39,7 @@
                                         <div class="input-label hideme-sm">
                                             &nbsp;
                                         </div>
-                                        <select style="height: 50px;" ng-change="mostrarTotal()" ng-model="producto.cantidad" class="producto-cantidad">
+                                        <select style="height: 50px;" ng-change="mostrarTotal()" ng-model="producto.quantity" class="producto-cantidad">
                                             <option selected>1</option>
                                             <option>2</option>
                                             <option>3</option>
@@ -48,22 +49,36 @@
                             </div>
                             <div class="col col-50 text-right">
                                 <br/>
-                                <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
-                                <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
-                                <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>
-                                <label class="balanced-bg padding color-blanco">{{producto.precio * producto.cantidad|currency:"$"}}</label>
+                                <label class="assertive-bg padding color-blanco" ng-show="producto.discount.short_name">{{producto.discount.short_name}}</label>
+                                <label class="balanced-bg padding color-blanco">{{producto.price * producto.quantity|currency:"$"}}</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </ion-item>
             <ion-item>
-                <div class="row">
+                <div class="row" ng-if="totales.descuento > 0">
                     <div class="col">
-                        Total: 
+                        Subtotal:
                     </div>
                     <div class="col text-right">
-                        {{ total|currency:"$" }}
+                        {{ totales.subtotal|currency:"$" }}
+                    </div>
+                </div>
+                <div class="row" ng-if="totales.descuento > 0">
+                    <div class="col">
+                        Descuento:
+                    </div>
+                    <div class="col text-right">
+                        {{ totales.descuento|currency:"$" }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Total:
+                    </div>
+                    <div class="col text-right">
+                        {{ totales.total|currency:"$" }}
                     </div>
                 </div>
             </ion-item>

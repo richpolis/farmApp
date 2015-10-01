@@ -1,4 +1,4 @@
-<ion-view view-title="{{ title }}">
+<ion-view cache-view="false" view-title="{{ title }}">
     <ion-content class="padding">
         <!--h3 class="text-center">{{categoria.name}}</h3-->
         <ion-list>
@@ -15,21 +15,19 @@
                 <i class="icon ion-search placeholder-icon"></i>
                 <input type="text" placeholder="buscar" ng-model="buscar">
             </label>
-            <ion-item ng-repeat="producto in productos| orderBy:'nombre' | filter:buscar "
+            <ion-item ng-repeat="producto in productos| orderBy:'name' | filter:buscar "
                       class="item-thumbnail-left" href="#/app/producto/{{producto.id}}">
-                <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta, 'no-require-receta':!producto.require_receta }">
+                <img ng-src="{{producto.image}}" ng-class="{ 'require-receta': producto.require_prescription, 'no-require-receta':!producto.require_prescription }">
                 <h2>{{producto.name}}</h2>
                 <p class="ion-item-categoria">
-                    {{producto.categoria.name}}
+                    {{producto.category.name}}
                 </p>
-                <p ng-show="producto.require_receta" ng-class="{ 'require-receta': producto.require_receta }">Require receta</p>
+                <p ng-show="producto.require_receta" ng-class="{ 'require-receta': producto.require_prescription }">Require receta</p>
                 <div class="row">
                     <div class="col col-50"></div>
                     <div class="col col-50 text-right">
-                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
-                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
-                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>
-                        <label class="balanced-bg padding color-blanco etiqueta-precio">{{producto.precio|currency:"$"}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.discount.short_name">{{producto.discount.short_name}}</label>
+                        <label class="balanced-bg padding color-blanco etiqueta-precio">{{producto.price|currency:"$"}}</label>
                     </div>
                 </div>
             </ion-item>

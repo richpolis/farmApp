@@ -3,27 +3,30 @@
         <form id="formRegister" ng-submit="doPago()">
             <div class="list">
                 <label class="item item-input">
-                    <input type="text" name="tarjeta" ng-model="pago.tarjeta" placeholder="Numero de tarjeta">
+                    <input type="text" name="name" ng-model="tarjeta.card.name" placeholder="Nombre de cliente">
+                </label>
+                <label class="item item-input">
+                    <input type="text" name="number" ng-model="tarjeta.card.number" placeholder="Numero de tarjeta">
                 </label>
                 <div class="row">
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="mes" ng-model="pago.mes" placeholder="MM" maxlength="2">
+                            <input type="text" name="exp_month" ng-model="tarjeta.card.exp_month" placeholder="MM" maxlength="2">
                         </label>
                     </div>
                     <div class="col">
                         <label class="item item-input" style="border: none;">
-                            <input type="text" name="ano" value="/" disabled="disabled" style="background: transparent!important;">
+                            <input type="text" value="/" disabled="disabled" style="background: transparent!important;">
                         </label>
                     </div>
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="ano" ng-model="pago.ano" placeholder="AA" maxlength="2">
+                            <input type="text" name="exp_year" ng-model="tarjeta.card.exp_year" placeholder="AAAA" maxlength="4">
                         </label>
                     </div>
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="cvv" ng-model="pago.cvv" placeholder="CVV" maxlength="3">
+                            <input type="text" name="cvc" ng-model="tarjeta.card.cvc" placeholder="CVC" maxlength="3">
                         </label>
                     </div>
                 </div>

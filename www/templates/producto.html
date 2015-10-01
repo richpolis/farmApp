@@ -1,50 +1,45 @@
-<ion-view view-title="{{ title }}">
+<ion-view cache-view="false" view-title="{{ title }}">
     <ion-content class="padding">
         <ion-list class="card">
             <ion-item class="item-thumbnail-left">
-                <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta, 'no-require-receta':!producto.require_receta }">
+                <img ng-src="{{producto.image}}" ng-class="{ 'require-receta': producto.require_prescription, 'no-require-receta':!producto.require_prescription }">
                 <h2>{{producto.name}}</h2>
                 <p class="ion-item-categoria">
-                    {{producto.categoria.name}}
+                    {{producto.category.name}}
                 </p>
             </ion-item>
             <ion-item class="item-body item-text-wrap">
                 <p>
-                    {{producto.descripcion}}
+                    {{producto.description}}
                 </p>
             </ion-item>
             <ion-item class="tabs tabs-secondary" style="height: 70px;">
                 <div class="row">
                     <div class="col col-50">
                         <div class="list">
-
                             <label class="item item-input item-select item-select-cantidad">
                                 <div class="input-label hideme-sm">
                                     &nbsp;
                                 </div>
-                                <select ng-change="mostrarTotal()" ng-model="producto.cantidad" class="producto-cantidad">
+                                <select ng-change="mostrarTotal()" ng-model="producto.quantity" class="producto-cantidad">
                                     <option selected>1</option>
                                     <option>2</option>
                                     <option>3</option>
                                 </select>
                             </label>
-
                         </div>
-                        
                     </div>
                     <div class="col col-50 text-right">
-                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_dinero">{{producto.descuento_dinero|currency:"$"}}</label>
-                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_porcentaje">{{producto.descuento_porcentaje}}</label>
-                        <label class="assertive-bg padding color-blanco" ng-show="producto.descuento_promocion">{{producto.descuento_promocion}}</label>
-                        <label class="balanced-bg padding color-blanco">{{producto.precio*producto.cantidad|currency:"$"}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.discount.short_name">{{producto.discount.short_name}}</label>
+                        <label class="balanced-bg padding color-blanco">{{producto.price * producto.quantity |currency:"$"}}</label>
                     </div>
                 </div>
             </ion-item>
-            <ion-item class="item-text-wrap" ng-show="producto.require_receta">
-                <p class="text-center">
-                    <label class="require-receta font-small">Este producto require de receta medica.</label><br/>
-                    <label class="assertive font-small">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
-                    <label class="assertive font-small">2.- El repartidor te pedira que le muestres la receta.</label>
+            <ion-item class="item-text-wrap" ng-show="producto.require_prescription">
+                <p class="text-center" ng-if="producto.recipe > 1">
+                    <label class="require-receta font-small" >Este producto require de receta medica.</label><br/>
+                    <label class="assertive font-small" ng-show="producto.recipe == 3">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
+                    <label class="assertive font-small" ng-show="producto.recipe == 2">2.- El repartidor te pedira que le muestres la receta.</label>
                 </p>
             </ion-item>
         </ion-list>

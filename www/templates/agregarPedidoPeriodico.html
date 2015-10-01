@@ -2,97 +2,73 @@
     <ion-header-bar class="bar-stable">
         <h1 class="title">Agregar a pedido periodico</h1>
         <div class="buttons">
-            <button class="button button-clear" ng-click="closeAgregarPedidoPeriodico()">
+            <button class="button button-clear" ng-click="cancelarPedidoPeriodico()">
                 <i class="icon ion-close-round"></i>
             </button>
         </div>
     </ion-header-bar>
     <ion-content>
         <div class="list">
-
+            <li class="item item-input item-select">
+                <div class="input-label">
+                    Cantidad
+                </div>
+                <select ng-model="productoSeleccionado.periodico.quantity">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </li>
             <li class="item item-input item-select">
                 <div class="input-label">
                     Periodo
                 </div>
-                <select ng-model="productoSeleccionado.periodico.periodo">
-                    <option value="dia">Dia</option>
+                <select ng-model="productoSeleccionado.periodico.period">
+                    <option value="por dia">Por dia</option>
                     <option value="semanal">Semanal</option>
                     <option value="mensual">Mensual</option>
                 </select>
             </li>
-            <div ng-show="productoSeleccionado.periodico.periodo == 'dia'">
-                <li class="item item-toggle">
-                    Lunes
-                    <label class="toggle toggle-balanced">
-                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaLunes">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </li>
-
-                <li class="item item-toggle">
-                    Martes
-                    <label class="toggle toggle-balanced">
-                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaMartes">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </li>
-
-                <li class="item item-toggle">
-                    Miercoles
-                    <label class="toggle toggle-balanced">
-                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaMiercoles">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </li>
-
-                <li class="item item-toggle">
-                    Jueves
-                    <label class="toggle toggle-balanced">
-                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaJueves">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </li>
-
-                <li class="item item-toggle">
-                    Viernes
-                    <label class="toggle toggle-balanced">
-                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaViernes">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </li>
-
-                <li class="item item-toggle">
-                    Sabado
-                    <label class="toggle toggle-balanced">
-                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaSabado">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </li>
-
-                <li class="item item-toggle">
-                    Domingo
-                    <label class="toggle toggle-balanced">
-                        <input type="checkbox" ng-model="productoSeleccionado.periodico.diaDomingo">
-                        <div class="track">
-                            <div class="handle"></div>
-                        </div>
-                    </label>
-                </li>
-            </div>
+            <li class="item item-input item-select" ng-if="productoSeleccionado.periodico.period == 'por dia'">
+                <div class="input-label">
+                    Cada cuantos dias?
+                </div>
+                <select ng-model="productoSeleccionado.periodico.days">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+            </li>
+            <li class="item item-input item-select">
+                <div class="input-label" ng-if="productoSeleccionado.periodico.period == 'por dia'">
+                    Por cuantas veces?
+                </div>
+                <div class="input-label" ng-if="productoSeleccionado.periodico.period == 'semanal'">
+                    Por cuantas semanas?
+                </div>
+                <div class="input-label" ng-if="productoSeleccionado.periodico.period == 'mensual'">
+                    Por cuantos meses?
+                </div>
+                <select ng-model="productoSeleccionado.periodico.times">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+            </li>
         </div>
         <button class="button button-full button-balanced" ng-click="agregarPedidoPeriodico()">Agregar a pedidos periodicos</button>
-        <button class="button button-full button-balanced button-clear" ng-click="closeAgregarPedidoPeriodico()">Cancelar</button>
+        <button class="button button-full button-balanced button-clear" ng-click="cancelarPedidoPeriodico()">Cancelar</button>
     </ion-content>
 </ion-modal-view>

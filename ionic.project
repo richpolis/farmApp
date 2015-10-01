@@ -1,6 +1,12 @@
 {
   "name": "farmApp",
   "app_id": "937172cb",
+  "proxies": [
+    {
+      "path": "/api-token-auth/",
+      "proxyUrl": "https://polar-hollows-6621.herokuapp.com/api-token-auth/"
+    }
+  ],
   "gulpStartupTasks": [
     "sass",
     "watch"

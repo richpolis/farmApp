@@ -6,7 +6,7 @@
 	  <form ng-submit="doBuscar()" style="border: none;">
 	      <div class="list">
 	        <label class="item item-input">
-	          <input type="text" ng-model="productoBuscar" placeholder="Ej. Paracetamol">
+	          <input type="text" id="buscar" placeholder="Ej. Paracetamol">
 	        </label>
 	        <label class="item">
 	          <button class="button button-block button-balanced" type="submit">
@@ -15,11 +15,11 @@
 	        </label>
 	      </div>
 	   </form>
-  	<p class="text-center">
-  		-o- <br/>
-  		Selecciona una Categoría:
-  	</p>
-    <ion-list>
+		<p class="text-center">
+			-o- <br/>
+			Selecciona una Categoría:
+		</p>
+		<ion-list>
 	      <ion-item ng-repeat="categoria in categorias" href="#/app/productos/{{categoria.id}}" class="item-balanced">
 	        {{categoria.name}}
 	      </ion-item>

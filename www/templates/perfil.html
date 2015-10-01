@@ -1,4 +1,4 @@
-<ion-view title="Mi cuenta">
+<ion-view cache-view="false" title="Mi cuenta">
 
     <ion-tabs tabs-type="tabs-icon-only" class="tabs-striped tabs-background-balanced tabs-color-light">
 
@@ -13,19 +13,13 @@
                             <input type="text" name="apellido" ng-model="userData.last_name" placeholder="Apellido">
                         </label>
                         <label class="item item-input">
-                            <input type="email" name="email" ng-model="userData.email" placeholder="Email">
+                            <input type="email" name="email" ng-model="userData.email" placeholder="Email" ng-disabled="true">
                         </label>
                         <label class="item item-input">
                             <input type="tel" name="celular" ng-model="userData.cell" placeholder="Celular">
                         </label>
-                        <label class="item item-input">
-                            <input type="password" name="password" ng-model="userData.password" placeholder="Contraseña">
-                        </label>
-                        <label class="item item-input">
-                            <input type="password" name="repetir" ng-model="userData.repetir" placeholder="Ingresa la contraseña de nuevo">
-                        </label>
                         <label class="item">
-                            <button class="button button-block button-balanced" type="submit">Registrar</button>
+                            <button class="button button-block button-balanced" type="submit">Actualizar</button>
                         </label>
                     </div>
                 </form>
@@ -34,68 +28,86 @@
 
         <ion-tab title="Direcciones" icon-on="ion-location" icon-off="ion-location">
             <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}}">
-                <div class="list" ng-if="userData.direcciones.length > 0">
-                    <label class="item item-input item-select">
+                <div class="list">
+                    <label class="item item-input item-select" ng-if="direcciones.length > 0">
                         <div class="input-label">
                             Direccion guardada
                         </div>
                         <select ng-change="recuperarDireccion()" ng-model="direccionSeleccionada" id="recuperar-direccion">
                             <option selected value="">Nueva...</option>
-                            <option ng-repeat="direccion in userData.direcciones" value="{{direccion.calle}}">{{direccion.calle}}</option>
+                            <option ng-repeat="direccion in direcciones" value="{{direccion.street}}">{{direccion.street}}</option>
                         </select>
                     </label>
+                    <div class="item item-button-right"  ng-show="!mostrarMapa">
+                        Buscar en mapa
+                        <button class="button button-balanced" ng-click="showMapa()">
+                            <i class="icon ion-map"></i>
+                        </button>
+                    </div>
+                    <div class="item item-button-right"  ng-show="mostrarMapa">
+                        Ocultar mapa
+                        <button class="button button-balanced" ng-click="hideMapa()">
+                            <i class="icon ion-map"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="formMapa" ng-show="mostrarMapa">
+                    <div class="list">
+                        <div class="list list-inset">
+                            <label class="item item-input">
+                                <i class="icon ion-search placeholder-icon"></i>
+                                <input id="direccionBuscar" type="text" placeholder="Lugar o direccion" ng-keypress="buscarDireccionKeyPress($event)">
+                            </label>
+                        </div>
+                    </div>
+                    <div id="mapa" data-tab-disabled="true"></div>
                 </div>
                 <form id="formDireccion" ng-submit="doDireccion()">
                     <div class="list">
                         <label class="item item-input">
-                            <input type="text" name="estado" ng-model="direccionGuardada.localidad" placeholder="Estado">
+                            <input type="text" name="estado" ng-model="direccionGuardada.location" placeholder="Estado">
                         </label>
                         <label class="item item-input">
-                            <input type="text" name="calle" ng-model="direccionGuardada.calle" placeholder="Calle">
+                            <input type="text" name="calle" ng-model="direccionGuardada.street" placeholder="Calle">
                         </label>
                         <div class="row">
                             <div class="col">
                                 <label class="item item-input">
-                                    <input type="text" name="num_exterior" ng-model="direccionGuardada.num_exterior" placeholder="Num. Exterior">
+                                    <input type="text" name="num_exterior" ng-model="direccionGuardada.exterior_number" placeholder="Num. Exterior">
                                 </label>
                             </div>
                             <div class="col">
                                 <label class="item item-input">
-                                    <input type="text" name="num_interior" ng-model="direccionGuardada.num_interior" placeholder="Num. Interior">
+                                    <input type="text" name="num_interior" ng-model="direccionGuardada.interior_number" placeholder="Num. Interior">
                                 </label>
                             </div>
                         </div>
                         <label class="item item-input">
-                            <input type="text" name="codigo_postal" ng-model="direccionGuardada.codigo_postal" placeholder="Codigo postal">
+                            <input type="text" name="codigo_postal" ng-model="direccionGuardada.postal_code" placeholder="Codigo postal">
                         </label>
                         <label class="item item-input">
-                            <input type="text" name="delegacion_municipio" ng-model="direccionGuardada.delegacion_municipio" placeholder="Delegacion/Municipio">
+                            <input type="text" name="delegacion_municipio" ng-model="direccionGuardada.delegation_municipaly" placeholder="Delegacion/Municipio">
                         </label>
-                        <label class="item item-input">
-                            <input type="text" name="colonia" ng-model="direccionGuardada.colonia" placeholder="Colonia">
+                        <label class="item item-input" ng-show="colonias.length==0">
+                            <input type="text" name="colonia" ng-model="direccionGuardada.colony" placeholder="Colonia">
+                        </label>
+                        <label class="item item-input item-select"  ng-if="colonias.length>1">
+                            <div class="input-label">
+                                Colonia
+                            </div>
+                            <select ng-model="direccionGuardada.colony">
+                                <option ng-repeat="colonia in colonias" value="{{colonia}}" selected>{{colonia}}</option>
+                            </select>
                         </label>
                         <label class="item">
-                            <button class="button button-block button-balanced" type="submit">Guardar direccion</button>
+                            <button class="button button-block button-balanced" type="submit">
+                                <span  ng-show="!direccionGuardada.id">Guardar dirección</span>
+                                <span  ng-show="direccionGuardada.id">Actualizar dirección</span>
+                            </button>
                         </label>
-                        <label class="item" ng-show="!mostrarMapa">
-                            <button class="button button-block button-clear" ng-click="showMapa()">Buscar en mapa ubicacion</button>
-                        </label>
+
                     </div>
                 </form>
-                <div class="formMapa" ng-show="mostrarMapa">
-                    <div class="list">
-                        <div class="item item-input-inset">
-                            <label class="item-input-wrapper">
-                                <input type="text" name="direccionBuscar" id="direccionBuscar" placeholder="Ingresa la direccion">
-                            </label>
-                            <button class="button button-small" ng-click="buscarDireccion()">
-                                Buscar
-                            </button>
-                        </div>
-                    </div>
-                    <div id="mapa">
-                    </div>
-                </div>
             </ion-content>
         </ion-tab>
     </ion-tabs>

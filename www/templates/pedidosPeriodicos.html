@@ -1,60 +1,87 @@
 <ion-view cache-view="false" view-title="Pedidos Periodicos">
     <ion-content>
         <ion-list>
-            <ion-item class="item-text-wrap" ng-repeat="producto in productos| orderBy:'name' " style="padding: 10px 2px;">
+            <ion-item class="item-text-wrap" ng-repeat="pedido in pedidos| orderBy:'pedido.id' " style="padding: 10px 2px;">
                 <div class="list card" style="padding: .2em;">
                     <div class="item item-thumbnail-left">
-                        <img ng-src="{{producto.thumbnail}}" ng-class="{ 'require-receta': producto.require_receta, 'no-require-receta':!producto.require_receta }">
-                        <h2>{{producto.name}}</h2>
+                        <img ng-src="{{pedido.product.image}}" ng-class="{ 'require-receta': pedido.product.require_prescription, 'no-require-receta':!pedido.producto.require_prescription }">
+                        <h2>{{pedido.product.name}}</h2>
                         <p class="ion-item-categoria">
-                            {{producto.categoria.name}}
+                            {{pedido.product.category.name}}
                         </p>
-                        <i class="icon ion-close-round" ng-click="removeProducto(producto)" style="position: absolute; top: 2px; right: 2px; font-size: 1.5em;"></i>
+                        <i class="icon ion-close-round" ng-click="removePedido(pedido)" style="position: absolute; top: 2px; right: 2px; font-size: 1.5em;"></i>
                     </div>
                     <div class="item item-text-wrap">
-                        <div class="row padding-top" ng-show="producto.periodico.pedido">
+                        <div class="row padding-top">
                             <div class="col padding-top">
-                                <label class="font-small">{{producto.periodico.periocidad | uppercase}}</label>
+                                <label class="font-small">{{pedido.period | uppercase}}</label>
                             </div>                        
                         </div>
                     </div>
-                    <div class="item">
-                        <div class="row">
-                            <div class="col col-50">
-                                <div class="list padding-top">
-                                    <label class="item item-input item-select item-select-cantidad" style="border: none;">
-                                        <div class="input-label periodo-sm">
-                                            &nbsp;
-                                        </div>
-                                        <select style="height: 50px;" ng-model="producto.periodico.periodo" class="producto-cantidad">
-                                            <option value="dia">Dia</option>
-                                            <option value="semanal">Semanal</option>
-                                            <option value="mensual">Mensual</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col col-50 text-right">
-                                <div class="list padding-top">
-                                    <label class="item item-input item-select item-select-cantidad" style="border: none;">
-                                        <div class="input-label hideme-sm">
-                                            &nbsp;
-                                        </div>
-                                        <select style="height: 50px;" ng-model="producto.cantidad" class="producto-cantidad">
-                                            <option selected>1</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
+                    <div class="item item-input item-select">
+                        <div class="input-label">
+                            Cantidad
                         </div>
+                        <select ng-model="pedido.quantity" ng-change="cambioPedido(pedido)">
+                            <option value="1" selected>1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                    <div class="item item-input item-select">
+                        <div class="input-label">
+                            Periodo
+                        </div>
+                        <select ng-model="pedido.period" ng-change="cambioPedido(pedido)">
+                            <option value="por dia">Por dia</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
+                        </select>
+                    </div>
+                    <div class="item item-input item-select" ng-if="pedido.period == 'por dia'">
+                        <div class="input-label">
+                            Cada cuantos dias?
+                        </div>
+                        <select ng-model="pedido.days" ng-change="cambioPedido(pedido)">
+                            <option value="1" selected>1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                        </select>
+                    </div>
+                    <div class="item item-input item-select">
+                        <div class="input-label" ng-if="pedido.period == 'por dia'">
+                            Por cuantas veces?
+                        </div>
+                        <div class="input-label" ng-if="pedido.period == 'semanal'">
+                            Por cuantas semanas?
+                        </div>
+                        <div class="input-label" ng-if="pedido.period == 'mensual'">
+                            Por cuantos meses?
+                        </div>
+                        <select ng-model="pedido.times" ng-change="cambioPedido(pedido)">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
                     </div>
                     <div class="item item-text-wrap">
-                        <div class="row border-bottom border-top padding-top" ng-show="producto.require_receta">
-                            <div class="col text-center">
+                        <div class="row border-bottom border-top padding-top" ng-show="pedido.product.require_prescription">
+                            <div class="col text-center" ng-if="pedido.product.recipe>1">
                                 <label class="require-receta font-small">Este producto require receta médica.</label><br/>
-                                <label class="assertive font-small">El repartidor le solicitara y se quedara con la receta.</label>
+                                <label class="assertive font-small" ng-show="pedido.product.recipe == 3">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
+                                <label class="assertive font-small" ng-show="pedido.product.recipe == 2">2.- El repartidor te pedira que le muestres la receta.</label>
                             </div>
                         </div>
                     </div>
