@@ -58,6 +58,7 @@
 
 
 .list .item img.require-receta,
+.list .item img.require-show-receta,
 .list .item img.no-require-receta
 {
     max-height: 80px;
@@ -68,7 +69,13 @@
 .list .item img.require-receta{
 	border: 3px solid red;
 	border-radius: 5px;
-        padding: 5px;
+    padding: 5px;
+}
+
+.list .item img.require-show-receta{
+    border: 3px solid darkorange;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 .list .item img.no-require-receta{
@@ -83,6 +90,10 @@
 
 .list .item .require-receta{
     color: red;
+}
+
+.list .item .require-show-receta{
+    color: darkorange;
 }
 
 .list .item p.ion-item-categoria{

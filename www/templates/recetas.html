@@ -1,14 +1,14 @@
 <ion-view cache-view="false" view-title="Recetas">
     <ion-content class="has-header padding" ng-controller="ImageController">
-        <ion-scroll direction="x" style="height:200px; min-height: 200px; overflow: scroll; white-space: nowrap;">
+        <ion-scroll ng-show="images.length>0" direction="x" style="height:200px; min-height: 200px; overflow: scroll; white-space: nowrap;">
             <img ng-repeat="image in images" ng-src="{{urlForImage(image)}}" style="height:200px; padding: 5px 5px 5px 5px;"/>
         </ion-scroll>
         <br><br>
         <button class="button button-full button-balanced" ng-click="addMedia()">
             Agregar imagen
         </button>
-        <button class="button button-full button-positive" ng-click="guardar()">
-            Guardar
+        <button class="button button-full button-positive" ng-click="realizarPago()">
+            Siguiente
         </button>
     </ion-content>
 </ion-view>

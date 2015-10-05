@@ -7,7 +7,7 @@
                   Filtrar
                 </div>
                 <select class="balanced">
-                  <option>Mas vendidos</option>
+                  <!--option>Mas vendidos</option-->
                   <option selected>A-Z</option>
                 </select>
             </label>
@@ -17,12 +17,12 @@
             </label>
             <ion-item ng-repeat="producto in productos| orderBy:'name' | filter:buscar "
                       class="item-thumbnail-left" href="#/app/producto/{{producto.id}}">
-                <img ng-src="{{producto.image}}" ng-class="{ 'require-receta': producto.require_prescription, 'no-require-receta':!producto.require_prescription }">
+                <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}">
                 <h2>{{producto.name}}</h2>
                 <p class="ion-item-categoria">
                     {{producto.category.name}}
                 </p>
-                <p ng-show="producto.require_receta" ng-class="{ 'require-receta': producto.require_prescription }">Require receta</p>
+                <p ng-show="producto.recipe > 1" ng-class="{ 'require-receta': producto.recipe > 1 }">Require receta</p>
                 <div class="row">
                     <div class="col col-50"></div>
                     <div class="col col-50 text-right">
@@ -30,6 +30,12 @@
                         <label class="balanced-bg padding color-blanco etiqueta-precio">{{producto.price|currency:"$"}}</label>
                     </div>
                 </div>
+            </ion-item>
+            <ion-item class="item-thumbnail-left" ng-show="productos.length == 0">
+                <h2>Por el momento no contamos con este producto</h2>
+                <p class="ion-item-categoria">
+                    resultados de busqueda
+                </p>
             </ion-item>
         </ion-list>
     </ion-content>

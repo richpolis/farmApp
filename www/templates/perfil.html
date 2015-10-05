@@ -110,5 +110,33 @@
                 </form>
             </ion-content>
         </ion-tab>
+        <ion-tab title="Ventas" icon-on="ion-ios-cart-outline" icon-off="ion-ios-cart-outline">
+            <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}}">
+                <ion-list ng-repeat="pedido in pedidos">
+                    <ion-item class="item-divider">
+                        {{pedido.created | date }}
+                        <span class="item-note">
+                          {{pedido.total|currency:"$"}}
+                        </span>
+                    </ion-item>
+                    <ion-item ng-repeat="detalle in pedido.detail_sales" class="item-thumbnail-left">
+                        <img ng-src="{{detalle.product.image}}" ng-class="{ 'no-require-receta': detalle.product.recipe == 1, 'require-show-receta': detalle.product.recipe==2,  'require-receta': detalle.product.recipe==3}">
+                        <h2>{{detalle.product.name}}</h2>
+                        <p class="ion-item-categoria">
+                            {{detalle.product.category.name}}
+                        </p>
+                        <p ng-show="detalle.product.recipe > 1" ng-class="{ 'require-receta': detalle.product.recipe > 1 }">Require receta</p>
+                        <div class="row">
+                            <div class="col col-50"></div>
+                            <div class="col col-50 text-right">
+                                <label class="balanced-bg padding color-blanco etiqueta-precio">{{detalle.quantity}}</label>
+                                <i class="icon ion-android-close"></i>
+                                <label class="balanced-bg padding color-blanco etiqueta-precio">{{detalle.total|currency:"$"}}</label>
+                            </div>
+                        </div>
+                    </ion-item>
+                </ion-list>
+            </ion-content>
+        </ion-tab>
     </ion-tabs>
 </ion-view>

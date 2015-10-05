@@ -2,7 +2,7 @@
     <ion-content class="padding">
         <ion-list class="card">
             <ion-item class="item-thumbnail-left">
-                <img ng-src="{{producto.image}}" ng-class="{ 'require-receta': producto.require_prescription, 'no-require-receta':!producto.require_prescription }">
+                <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}">
                 <h2>{{producto.name}}</h2>
                 <p class="ion-item-categoria">
                     {{producto.category.name}}
@@ -35,8 +35,8 @@
                     </div>
                 </div>
             </ion-item>
-            <ion-item class="item-text-wrap" ng-show="producto.require_prescription">
-                <p class="text-center" ng-if="producto.recipe > 1">
+            <ion-item class="item-text-wrap" ng-show="producto.recipe > 1">
+                <p class="text-center">
                     <label class="require-receta font-small" >Este producto require de receta medica.</label><br/>
                     <label class="assertive font-small" ng-show="producto.recipe == 3">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
                     <label class="assertive font-small" ng-show="producto.recipe == 2">2.- El repartidor te pedira que le muestres la receta.</label>

@@ -1,10 +1,7 @@
-angular.module('farmApp.services', ['ngResource'])
-        .factory('Request', function(){
-
-        })
+angular.module('farmApp.services', [])
         .factory('Loader', ['$ionicLoading', '$timeout',
             function($ionicLoading, $timeout) {
-                var LOADERAPI = {
+                return {
                     showLoading: function(text) {
                         text = text || 'Loading...';
                         $ionicLoading.show({
@@ -21,7 +18,6 @@ angular.module('farmApp.services', ['ngResource'])
                         }, timeout || 3000);
                     }
                 };
-                return LOADERAPI;
         }])
         .factory('FileService', function() {
             var images;
@@ -53,27 +49,27 @@ angular.module('farmApp.services', ['ngResource'])
 
             }
         })
-        .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile) {
+        .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile, URL_BASE, API_PATH) {
 
-            function makeid() {
-                var text = '';
-                var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                function makeid() {
+                    var text = '';
+                    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-                for (var i = 0; i < 5; i++) {
-                    text += possible.charAt(Math.floor(Math.random() * possible.length));
-                }
-                return text;
-            };
+                    for (var i = 0; i < 5; i++) {
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    return text;
+                };
 
-            function optionsForType(type) {
-                var source;
-                switch (type) {
-                    case 0:
-                        source = Camera.PictureSourceType.CAMERA;
-                        break;
-                    case 1:
-                        source = Camera.PictureSourceType.PHOTOLIBRARY;
-                        break;
+                function optionsForType(type) {
+                    var source;
+                    switch (type) {
+                        case 0:
+                            source = Camera.PictureSourceType.CAMERA;
+                            break;
+                        case 1:
+                            source = Camera.PictureSourceType.PHOTOLIBRARY;
+                            break;
                 }
                 return {
                     destinationType: Camera.DestinationType.FILE_URI,
@@ -104,8 +100,37 @@ angular.module('farmApp.services', ['ngResource'])
                 })
             };
 
+            function getImageUploadOptions(imageURI, params, headers) {
+                var options = new FileUploadOptions();
+                options.fileName = imageURI.substr(imageURI.lastIndexOf('/')+1);
+                options.mimeType = "image/" + imageURI.substr(imageURI.lastIndexOf('.')+1);
+                options.params = params;
+                options.httpMethod = "POST";
+                options.headers = headers;
+                /*uploadOptions.headers = {
+                    Connection:"close"
+                };*/
+                return options;
+            }
+
+            function savedFile(file, cb) {
+                return function () {
+                    cb(file);
+                };
+            }
+
             return {
-                handleMediaDialog: saveMedia
+                handleMediaDialog: saveMedia,
+                upload: function (images, params, headers, onSuccess, onError) {
+                    var ft =  new FileTransfer();
+                    for (var i = 0; i < images.length; i++) {
+                        var image = images[i];
+                        var urlImage = FileService.getUrlForImage(image);
+                        ft.upload(urlImage,
+                            encodeURI(BASE_URL.urlBase + API_PATH.images_ventas),
+                            savedFile(image, onSuccess), onError, getImageUploadOptions(urlImage, params, headers));
+                    }
+                }
             }
         })
         .factory('User', function ($http, $timeout, $q, URL_BASE, AUTH_PATH, API_PATH) {
@@ -513,6 +538,30 @@ angular.module('farmApp.services', ['ngResource'])
                 getDataPostalCode: get_data_postal_code
             };
         })
+        .factory('Pedidos', function ($http, $timeout, $q, User, URL_BASE, API_PATH) {
+            var token = User.getAuthToken();
+            return {
+                getPedidos: function () {
+                    var configHttp = {
+                        method: "GET",
+                        url: URL_BASE.urlBase + API_PATH.ventas,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + token
+                        }
+                    };
+                    return $q(function (resolve, reject) {
+                        $http(configHttp)
+                            .success(function (data) {
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                    });
+                }
+            };
+        })
         .factory('Preguntas', function ($http, $timeout, $q, User ,URL_BASE, API_PATH) {
             var token = User.getAuthToken();
             var preguntas = [];
@@ -719,32 +768,35 @@ angular.module('farmApp.services', ['ngResource'])
         .factory('Buscador', function($q, $http, User, Productos, URL_BASE, API_PATH){
             var token = User.getAuthToken();
             var query = "";
-            query = window.localStorage.getItem('buscar');
-            var buscar_productos = function(){
-                var configHttp = {
-                    method: "GET",
-                    url: URL_BASE.urlBase + API_PATH.productos ,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Token " + token
-                    },
-                    params: { q: query }
-                };
-                return $q(function (resolve, reject) {
-                    $http(configHttp)
-                        .success(function (productos) {
-                            resolve(productos);
-                        })
-                        .error(function (err) {
-                            reject(err);
-                        });
-                });
-            };
+            query = JSON.parse(window.localStorage['query'] || '{}');
             return {
-                setQuery: function(query){
-                    window.localStorage.setItem('buscar', query);
+                setQuery: function(q){
+                    query = q;
+                    window.localStorage.setItem('query', JSON.stringify(query));
                 },
-                getProductos: buscar_productos
+                getQuery: function(){
+                    return query;
+                },
+                getProductos: function(){
+                    var configHttp = {
+                        method: "GET",
+                        url: URL_BASE.urlBase + API_PATH.productos ,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + token
+                        },
+                        params: { q: query.producto }
+                    };
+                    return $q(function (resolve, reject) {
+                        $http(configHttp)
+                            .success(function (productos) {
+                                resolve(productos);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                    });
+                }
             };
         })
         .factory('Carrito', function ($q, $http, User, Direcciones, Descuentos, ImageService, FileService ,
@@ -866,6 +918,9 @@ angular.module('farmApp.services', ['ngResource'])
                     return totales;
 
                 },
+                getVenta: function(){
+                  return venta;
+                },
                 enviarPedido: function(){
                     var configHttp = {
                         method: "POST",
@@ -920,55 +975,42 @@ angular.module('farmApp.services', ['ngResource'])
                         },
                         data: { sale: venta.id, product: productos[indice].id, quantity: productos[indice].quantity }
                     };
+                    console.log(configHttp);
                     return $q(function (resolve, reject) {
                         $http(configHttp)
-                            .success(function (producto) {
-                                if(productos.length>(indice+1)){
-                                    enviarDetalleVentas(indice+1).then(function(detalle){
-                                        resolve(indice);
-                                    },function(err){
-                                        reject(err);
-                                    });
-                                }else{
-                                    resolve(indice);
-                                }
+                            .success(function (data) {
+                                resolve(data);
                             })
                             .error(function (err) {
                                 reject(err);
                             });
                     });
                 },
-                enviarImagenes: function(indice){
+                enviarImagenes: function(){
+                    var dataJson = [];
+                    for(var cont=0; cont<images.length; cont++){
+                        var urlImage = FileService.getUrlForImage(images[cont]);
+                        var image = { sale: venta.id, image_recipe: urlImage };
+                        dataJson.push(image);
+                    }
+                    console.log(dataJson);
+                    var configHttp = {
+                        method: "POST",
+                        url: URL_BASE.urlBase + API_PATH.images_ventas ,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + token
+                        },
+                        data: { sale: venta.id, image_recipe: urlImage }
+                    };
+                    console.log(configHttp);
                     return $q(function (resolve, reject) {
-                        if(images.length>indice){
-                            var urlImage = FileService.getUrlForImage(images[indice]);
-                            var configHttp = {
-                                method: "POST",
-                                url: URL_BASE.urlBase + API_PATH.images_ventas ,
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": "Token " + token
-                                },
-                                data: { sale: venta.id, image_recipe: urlImage }
-                            };
-                            $http(configHttp)
-                                .success(function (image) {
-                                    console.log(image);
-                                    if(images.length>(indice+1)){
-                                        enviarImagenes(indice+1).then(function(index){
-                                            resolve(index);
-                                        },function(err){
-                                            reject(err);
-                                        });
-                                    }else{
-                                        resolve(indice);
-                                    }
-                                }).error(function (err) {
-                                    reject(err);
-                                });
-                        }else{
-                            reject(indice);
-                        }
+                        $http(configHttp)
+                            .success(function (data) {
+                                resolve(data);
+                            }).error(function (err) {
+                                reject(err);
+                            });
                     });
                 },
                 empty: function(){

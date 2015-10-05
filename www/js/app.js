@@ -24,7 +24,8 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers'])
             });
         })
 
-        .config(function ($stateProvider, $urlRouterProvider) {
+        .config(function ($stateProvider, $urlRouterProvider, $compileProvider) {
+            $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|content|file|assets-library):/);
             $stateProvider
 
                     .state('login', {

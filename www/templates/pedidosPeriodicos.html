@@ -4,7 +4,7 @@
             <ion-item class="item-text-wrap" ng-repeat="pedido in pedidos| orderBy:'pedido.id' " style="padding: 10px 2px;">
                 <div class="list card" style="padding: .2em;">
                     <div class="item item-thumbnail-left">
-                        <img ng-src="{{pedido.product.image}}" ng-class="{ 'require-receta': pedido.product.require_prescription, 'no-require-receta':!pedido.producto.require_prescription }">
+                        <img ng-src="{{pedido.product.image}}" ng-class="{ 'no-require-receta': pedido.product.recipe == 1, 'require-show-receta': pedido.product.recipe==2,  'require-receta': pedido.product.recipe==3}">
                         <h2>{{pedido.product.name}}</h2>
                         <p class="ion-item-categoria">
                             {{pedido.product.category.name}}
@@ -77,8 +77,8 @@
                         </select>
                     </div>
                     <div class="item item-text-wrap">
-                        <div class="row border-bottom border-top padding-top" ng-show="pedido.product.require_prescription">
-                            <div class="col text-center" ng-if="pedido.product.recipe>1">
+                        <div class="row border-bottom border-top padding-top" ng-show="pedido.product.recipe > 1">
+                            <div class="col text-center">
                                 <label class="require-receta font-small">Este producto require receta médica.</label><br/>
                                 <label class="assertive font-small" ng-show="pedido.product.recipe == 3">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
                                 <label class="assertive font-small" ng-show="pedido.product.recipe == 2">2.- El repartidor te pedira que le muestres la receta.</label>

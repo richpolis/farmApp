@@ -171,7 +171,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
         })
 
         .controller('PerfilController', function ($scope, $ionicPopup, $cordovaGeolocation, $ionicLoading,
-                                      User, Direcciones, Loader) {
+                                      User, Direcciones, Pedidos, Loader) {
 
             $scope.userData = User.getUser();
             $scope.direccionSeleccionada = "";
@@ -181,6 +181,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.marginTop = ($scope.platform == "android" ? '100px' : '50px');
             $scope.direcciones = [];
             $scope.colonias = [];
+            $scope.pedidos = [];
             Direcciones.getDirecciones().then(function(direcciones){
                 $scope.direcciones = direcciones;
             },function(err){
@@ -189,6 +190,9 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     template: err
                 });
             });
+            Pedidos.getPedidos().then(function(pedidos){
+               $scope.pedidos = pedidos;
+            });
 
             $scope.doRegister = function () {
                 var todoCorrecto = true;
@@ -196,6 +200,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 for (var i = 0; i < formulario.length; i++) {
                     if (formulario[i].type == 'text' || formulario[i].type == 'tel' || formulario[i].type == 'email' || formulario[i].type == 'password') {
                         if (formulario[i].value == null || formulario[i].value.length == 0 || /^\s*$/.test(formulario[i].value)) {
+                            alert(formulario[i].name);
                             $ionicPopup.alert({
                                 title: 'Error de llenado!',
                                 template: formulario[i].name + ' no puede estar vacío o contener sólo espacios en blanco'
@@ -210,10 +215,17 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     return false;
 
                 User.update($scope.userData).then(function(user){
-                    $scope.userData = user;
-                    $ionicPopup.alert({
-                        title: 'Actualizacion!',
-                        template: 'Actualizacion realizada'
+                    User.me().then(function(usuario){
+                        $scope.userData = usuario;
+                        $ionicPopup.alert({
+                            title: 'Actualizacion!',
+                            template: 'Actualizacion realizada'
+                        });
+                    },function(err){
+                        $ionicPopup.alert({
+                            title: 'Actualizacion!',
+                            template: err.detail
+                        });
                     });
                 },function (err) {
                     console.log(err);
@@ -457,7 +469,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
         })
 
         .controller('CategoriasController', function ($scope,$state, $ionicPopup, Categorias, Buscador,  Loader) {
-
+            $scope.buscar = Buscador.getQuery();
             Loader.showLoading("Cargando categorias...");
             $scope.categorias = Categorias.getCategorias().then(function(categorias){
                 Loader.hideLoading();
@@ -471,9 +483,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             });
 
             $scope.doBuscar = function(){
-                var buscar = document.getElementById("buscar");
-                console.log("Buscar: " + buscar);
-                Buscador.setQuery(buscar.value);
+                console.log("Buscar "+ $scope.buscar.producto);
+                Buscador.setQuery($scope.buscar);
                 $state.go('app.search')
             };
         })
@@ -488,7 +499,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     title: 'Error en buscador',
                     template: err.detail
                 });
-            })
+            });
 
             $scope.verProducto = function (producto) {
                 $state.go('app.detalle', {productoId: producto.id});
@@ -873,8 +884,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
         })
 
-        .controller('ImageController', function($scope, $cordovaDevice, $cordovaFile, $ionicActionSheet,
-                                                ImageService, FileService) {
+        .controller('ImageController', function($scope,  $ionicActionSheet, ImageService, FileService) {
             $scope.images = FileService.images();
 
             $scope.urlForImage = function(imageName) {
@@ -904,43 +914,19 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
         })
 
-        .controller('PagoController', function ($scope, $ionicPopup, $state, $ionicModal, User,
-                                                Carrito, UIConekta, Loader) {
+        .controller('PagoController', function ($scope, $ionicPopup, $state, $ionicModal, $cordovaCamera,
+                                                User, Carrito, FileService, ImageService,  UIConekta, Loader) {
             $scope.tarjeta = Carrito.getTarjeta();
             $scope.user = User.getUser();
-            $scope.venta = {};
+            $scope.venta = Carrito.getVenta();
+            $scope.productos = Carrito.getProductos();
+            $scope.images = FileService.images();
             $scope.doPago = function () {
                 if($scope.tarjeta.card.number){
-                    Loader.showLoading('Creando pedido...');
+                    Loader.showLoading('Enviando datos pago...');
                     UIConekta.getTarjetaToken($scope.tarjeta).then(function(token){
-                        Loader.showLoading('Enviando detalle...');
-                        Carrito.enviarPedido().then(function(venta){
-                            Carrito.enviarDetalleVentas(0).then(function(indice){
-                                Carrito.enviarImages(0).then(function(indiceImagen){
-                                    Loader.hideLoading();
-                                    $scope.showPedidoRealizado();
-                                },function(err){
-                                    Loader.hideLoading();
-                                    $ionicPopup.alert({
-                                        title: 'Error subir imagenes de receta!',
-                                        template: err.detail
-                                    });
-                                });
-                            },function(err){
-                                Loader.hideLoading();
-                                $ionicPopup.alert({
-                                    title: 'Error subir el detalle del pedido!',
-                                    template: err.detail
-                                });
-                            });
-                         }, function(err){
-                            Loader.hideLoading();
-                            $ionicPopup.alert({
-                                title: 'Error en procesar pedido!',
-                                template: err.detail
-                            });
-                        });
-
+                        Loader.hideLoading();
+                        enviarPedido();
                     },function(err){
                         Loader.hideLoading();
                         $ionicPopup.alert({
@@ -949,6 +935,72 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         });
                     });
                 }
+            };
+
+            function enviarDetallePedido(indice){
+                var indice = indice || 0;
+                Loader.showLoading('Enviando detalle de pedido...');
+                Carrito.enviarDetalleVentas(indice).then(function(detalle){
+                    console.log(detalle);
+                    if($scope.productos.length >(indice+1)){
+                        enviarDetallePedido(indice + 1);
+                    }else if($scope.images.length > 0) {
+                        Loader.hideLoading();
+                        transferirImagenes();
+                    }else{
+                        Loader.hideLoading();
+                        $scope.showPedidoRealizado();
+                    }
+                },function(err){
+                    Loader.hideLoading();
+                    $ionicPopup.alert({
+                        title: 'Error subir el detalle del pedido!',
+                        template: err.detail
+                    });
+                });
+            };
+
+            function enviarPedido(){
+                if($scope.venta == undefined || $scope.venta.id == undefined) {
+                    Loader.showLoading('Enviando pedido...');
+                    Carrito.enviarPedido().then(function (venta) {
+                        $scope.venta = venta;
+                        Loader.hideLoading();
+                        enviarDetallePedido();
+                    }, function (err) {
+                        Loader.hideLoading();
+                        $ionicPopup.alert({
+                            title: 'Error en procesar pedido!',
+                            template: err.detail
+                        });
+                    });
+                }else{
+                    enviarDetallePedido();
+                }
+            };
+
+            function transferirImagenes(){
+                var cont = images.length;
+                Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
+                var params = {'venta': $scope.venta.id},
+                    headers =  { "Content-Type": "application/json","Authorization": "Token " + User.getAuthToken() };
+                ImageService.upload($scope.images, params, headers, function(result){
+                    console.log("SUCCESS: " + JSON.stringify(result.response));
+                    cont--;
+                    if(cont<=0){
+                        Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
+                    }else{
+                        $scope.showPedidoRealizado();
+                    }
+                },function(err){
+                    console.log("ERROR: " + JSON.stringify(err));
+                    cont--;
+                    if(cont<=0){
+                        Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
+                    }else{
+                        $scope.showPedidoRealizado();
+                    }
+                });
             };
 
             // Creamos el modal para finalizar el pago
