@@ -1,8 +1,15 @@
 <ion-view cache-view="false" view-title="Recetas">
     <ion-content class="has-header padding" ng-controller="ImageController">
-        <ion-scroll ng-show="images.length>0" direction="x" style="height:200px; min-height: 200px; overflow: scroll; white-space: nowrap;">
-            <img ng-repeat="image in images" ng-src="{{urlForImage(image)}}" style="height:200px; padding: 5px 5px 5px 5px;"/>
-        </ion-scroll>
+        <div class="list card" ng-repeat="image in images">
+            <div class="item item-image">
+                <img ng-src="{{urlForImage(image)}}" />
+            </div>
+
+            <a class="item item-icon-left assertive" href="#" ng-click="eliminar(image)">
+                <i class="icon ion-trash-a"></i>
+                Eliminar
+            </a>
+        </div>
         <br><br>
         <button class="button button-full button-balanced" ng-click="addMedia()">
             Agregar imagen

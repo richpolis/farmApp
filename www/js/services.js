@@ -196,6 +196,7 @@ angular.module('farmApp.services', [])
                     },
                     data: {"email": email, "password": password}
                 };
+                console.log(configHttp);
                 return $q(function (resolve, reject) {
                     $http(configHttp)
                             .success(function (data) {
@@ -203,6 +204,7 @@ angular.module('farmApp.services', [])
                                 // Set the token as header for your requests!
                                 $http.defaults.headers.common['Authorization'] = 'Token ' + accessToken.auth_token;
                                 window.localStorage.setItem('access_token', JSON.stringify(accessToken));
+                                console.log(accessToken);
                                 resolve(data);
                             })
                             .error(function (err) {
@@ -617,6 +619,7 @@ angular.module('farmApp.services', [])
                             "Authorization": "Token " + token
                         }
                     };
+                    console.log(configHttp);
                     return $q(function (resolve, reject) {
                         $http(configHttp)
                             .success(function (data) {
@@ -694,6 +697,7 @@ angular.module('farmApp.services', [])
                     },
                     params: { category: categoriaId }
                 };
+                console.log(configHttp);
                 return $q(function (resolve, reject) {
                     $http(configHttp)
                         .success(function (data) {
@@ -842,6 +846,9 @@ angular.module('farmApp.services', [])
                 getProductos: function () {
                     return productos;
                 },
+                getCountProductos: function(){
+                    return productos.length;
+                },
                 addProducto: function (item) {
                     var encontrado = false;
                     for(var i = 0; i < productos.length; i++){
@@ -919,6 +926,7 @@ angular.module('farmApp.services', [])
 
                 },
                 getVenta: function(){
+                  venta = JSON.parse(window.localStorage['venta'] || '{}');
                   return venta;
                 },
                 enviarPedido: function(){
@@ -966,6 +974,7 @@ angular.module('farmApp.services', [])
                     });
                 },
                 enviarDetalleVentas: function(indice){
+                    venta = this.getVenta();
                     var configHttp = {
                         method: "POST",
                         url: URL_BASE.urlBase + API_PATH.detalle_ventas ,
@@ -987,6 +996,7 @@ angular.module('farmApp.services', [])
                     });
                 },
                 enviarImagenes: function(){
+                    venta = this.getVenta();
                     var dataJson = [];
                     for(var cont=0; cont<images.length; cont++){
                         var urlImage = FileService.getUrlForImage(images[cont]);
@@ -1134,6 +1144,9 @@ angular.module('farmApp.services', [])
 
             return {
                 getPedidos: get_pedidos_periodicos,
+                getCountPedidos: function(){
+                    return pedidos.length;
+                },
                 addPedido: function (producto) {
                     var encontrado = false;
                     for (var i = 0; i < pedidos.length; i++) {

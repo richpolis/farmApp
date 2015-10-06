@@ -9,7 +9,7 @@ angular.module('farmApp')
             me: 'auth/me/',
             register: 'auth/register/',
             change_password: 'auth/password/',
-            register_user_conekta: 'auth/register/user/conekta/'
+            register_user_conekta: 'usuarios/register/user/conekta/'
         })
         .constant('API_PATH', {
             categorias: 'api/categorias/',

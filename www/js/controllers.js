@@ -1,5 +1,5 @@
 angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
-        .controller('AppController', function ($scope, User, $state) {
+        .controller('AppController', function ($scope, $state, $timeout, User, Carrito, PedidosPeriodicos) {
             if (!User.hasToken()) {
                 $state.go('inicio');
             } else {
@@ -15,12 +15,33 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.goCategorias = function () {
                 $state.go('app.categorias');
             };
+
+            $scope.productos = Carrito.getCountProductos();
+            $scope.$on("carrito",function(event, data){
+                $timeout(function(){
+                    $scope.$apply(function(){
+                        $scope.productos = Carrito.getCountProductos();
+                    });
+                }, 1000);
+            });
+
+            $scope.periodicos = PedidosPeriodicos.getCountPedidos();
+            $scope.$on("periodicos",function(event, data){
+                $timeout(function(){
+                    $scope.$apply(function(){
+                        $scope.periodicos = PedidosPeriodicos.getCountPedidos();
+                    });
+                }, 1000);
+            });
+
         })
-        .controller('DefaultController', function ($scope, User, $state) {
+        .controller('DefaultController', function ($scope, $state, User) {
             $scope.user = User.getUser();
             if (User.hasUser()) {
                 $state.go('app.categorias');
             }
+
+
         })
         .controller('LoginController', function ($scope, $ionicPopup, $ionicModal, $state, User, Loader) {
             $scope.data = {
@@ -506,12 +527,16 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
 
         })
-        .controller('ProductosController', function ($scope, $stateParams, $ionicPopup, $state, Categorias, Productos) {
-            $scope.title = "Productos";
+        .controller('ProductosController', function ($scope, $timeout, $stateParams, $ionicPopup, $state, Categorias, Productos) {
 
-            $scope.categoria = Categorias.getCategoria($stateParams.categoriaId).then(function(categoria){
+            $scope.title = "Productos";
+            Categorias.getCategoria($stateParams.categoriaId).then(function(categoria){
                 $scope.categoria = categoria;
-                $scope.title = categoria.name;
+                $timeout(function(){
+                    $scope.$apply(function(){
+                        $scope.title = $scope.categoria.name;
+                    });
+                },1000);
             },function(err){
                 $ionicPopup.alert({
                     title: 'Error en categoria!',
@@ -519,7 +544,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 });
             });
 
-            $scope.productos = Productos.getProductos($stateParams.categoriaId).then(function(productos){
+            Productos.getProductos($stateParams.categoriaId).then(function(productos){
                 $scope.productos = productos;
             },function(err){
                 $ionicPopup.alert({
@@ -540,11 +565,15 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.descuento = 0.0;
             $scope.total = 0.0;
             $scope.title = "Detalle producto";
-            $scope.producto = Productos.getProducto($stateParams.productoId).then(function(producto){
+            Productos.getProducto($stateParams.productoId).then(function(producto){
                 $scope.producto = producto;
                 $scope.producto.quantity = 1;
                 $scope.producto = PedidosPeriodicos.configurarProducto($scope.producto);
-                $scope.title = $scope.producto.name;
+                $timeout(function(){
+                    $scope.$apply(function(){
+                        $scope.title = $scope.producto.name;
+                    });
+                },500);
             },function(err){
                 $ionicPopup.alert({
                     title: 'Error en producto!',
@@ -560,6 +589,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             $scope.addCarrito = function (producto) {
                 if (Carrito.addProducto(producto)) {
+                    $scope.$emit('carrito', 'actualizacion');
                     $state.go('app.carrito');
                 }
             };
@@ -585,6 +615,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 });
                 $scope.productos = Carrito.removeProducto(producto);
                 $scope.mostrarTotal();
+                $scope.$emit('carrito', 'actualizacion');
             };
 
 
@@ -620,6 +651,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             $scope.agregarPedidoPeriodico = function () {
                 PedidosPeriodicos.addPedido($scope.productoSeleccionado).then(function(pedido){
+                    $scope.$emit('periodicos', 'actualizacion');
                     for(var cont = 0; cont < $scope.productos.length; cont++){
                         if($scope.productos[cont].id == $scope.productoSeleccionado.id){
                             $scope.productos[cont] = PedidosPeriodicos.configurarProducto($scope.productos[cont]);
@@ -884,7 +916,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
         })
 
-        .controller('ImageController', function($scope,  $ionicActionSheet, ImageService, FileService) {
+        .controller('ImageController', function($scope, $state,  $ionicActionSheet, ImageService, FileService) {
             $scope.images = FileService.images();
 
             $scope.urlForImage = function(imageName) {
@@ -912,6 +944,10 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 });
             };
 
+            $scope.realizarPago = function(){
+                $state.go('app.pago');
+            };
+
         })
 
         .controller('PagoController', function ($scope, $ionicPopup, $state, $ionicModal, $cordovaCamera,
@@ -922,6 +958,9 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.productos = Carrito.getProductos();
             $scope.images = FileService.images();
             $scope.doPago = function () {
+                if($scope.tarjeta.token){
+                    delete $scope.tarjeta.token;
+                }
                 if($scope.tarjeta.card.number){
                     Loader.showLoading('Enviando datos pago...');
                     UIConekta.getTarjetaToken($scope.tarjeta).then(function(token){
@@ -961,6 +1000,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
 
             function enviarPedido(){
+                $scope.venta = Carrito.getVenta();
                 if($scope.venta == undefined || $scope.venta.id == undefined) {
                     Loader.showLoading('Enviando pedido...');
                     Carrito.enviarPedido().then(function (venta) {
@@ -980,6 +1020,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
 
             function transferirImagenes(){
+                $scope.venta = Carrito.getVenta();
                 var cont = images.length;
                 Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
                 var params = {'venta': $scope.venta.id},
@@ -1043,6 +1084,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             $scope.removePedido = function (pedido) {
                 $scope.pedidos = PedidosPeriodicos.removePedido(pedido);
+                $scope.$emit('periodicos', 'actualizacion');
             };
 
             $scope.cambioPedido = function(pedido){

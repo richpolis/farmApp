@@ -31,9 +31,11 @@
         </ion-item>
         <ion-item menu-close href="#/app/carrito" class="item-balanced">
           <i class="icon ion-android-cart"></i> Carrito
+          <span class="badge badge-assertive" ng-show="productos > 0">{{productos}}</span>
         </ion-item>
         <ion-item menu-close href="#/app/pedidos/periodicos" class="item-balanced">
           <i class="icon ion-clock"></i> Pedidos periodicos
+          <span class="badge badge-assertive" ng-show="periodicos > 0">{{periodicos}}</span>
         </ion-item>
         <ion-item menu-close href="#/app/contacto" class="item-balanced">
           <i class="icon ion-android-call"></i> Contacto
@@ -41,10 +43,8 @@
         <ion-item menu-close href="#/app/preguntas" class="item-balanced">
           <i class="icon ion-help"></i> Preguntas frecuentes
         </ion-item>
-        <ion-item menu-close class="item-balanced">
-          <a href="tel:15179234" target="_blank" class="button button-clear button-icon ion-ios-telephone">
-              Llamarnos
-          </a>
+        <ion-item menu-close class="item-balanced" href="tel:15179234" target="_blank">
+          <i class="icon ion-ios-telephone"></i> Llamarnos
         </ion-item>
         
       </ion-list>

@@ -2,7 +2,7 @@
     <ion-content class="padding">
         <!--h3 class="text-center">{{categoria.name}}</h3-->
         <ion-list>
-            <label class="item item-input item-select">
+            <label class="item item-input item-select"  ng-show="productos.length > 0">
                 <div class="input-label">
                   Filtrar
                 </div>
@@ -11,7 +11,7 @@
                   <option selected>A-Z</option>
                 </select>
             </label>
-            <label class="item item-input">
+            <label class="item item-input"  ng-show="productos.length > 0">
                 <i class="icon ion-search placeholder-icon"></i>
                 <input type="text" placeholder="buscar" ng-model="buscar">
             </label>
@@ -31,7 +31,7 @@
                     </div>
                 </div>
             </ion-item>
-            <ion-item class="item-thumbnail-left" ng-show="productos.length == 0">
+            <ion-item ng-show="productos.length == 0">
                 <h2>Por el momento no contamos con este producto</h2>
                 <p class="ion-item-categoria">
                     resultados de busqueda
