@@ -45,8 +45,6 @@ angular.module('farmApp.services', [])
                     images=[];
                     window.localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(images));
                 }
-
-
             }
         })
         .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile, URL_BASE, API_PATH) {
@@ -271,7 +269,8 @@ angular.module('farmApp.services', [])
                         "password": objUser.password,
                         "first_name": objUser.first_name,
                         "last_name": objUser.last_name,
-                        "cell": objUser.cell
+                        "cell": objUser.cell,
+                        "inapam": objUser.inapam
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -298,7 +297,8 @@ angular.module('farmApp.services', [])
                     data: {
                         "first_name": objUser.first_name,
                         "last_name": objUser.last_name,
-                        "cell": objUser.cell
+                        "cell": objUser.cell,
+                        "inapam": objUser.inapam
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -378,6 +378,27 @@ angular.module('farmApp.services', [])
                 setPedidosPeriodicos: function(pedidos){
                     user.schedules_orders = pedidos;
                     window.localStorage.setItem('user', JSON.stringify(user));
+                },
+                enviarCalificacion: function(calificacion){
+                    var configHttp = {
+                        method: "POST",
+                        url: URL_BASE.urlBase + API_PATH.ratings,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + accessToken.auth_token
+                        },
+                        data: {"user": user.id, "rating": calificacion }
+                    };
+                    console.log(configHttp);
+                    return $q(function (resolve, reject) {
+                        $http(configHttp)
+                                .success(function (data) {
+                                    resolve(data);
+                                })
+                                .error(function (err) {
+                                    reject(err);
+                                });
+                    });
                 }
             }
         })

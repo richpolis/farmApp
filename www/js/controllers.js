@@ -545,7 +545,13 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             });
 
             Productos.getProductos($stateParams.categoriaId).then(function(productos){
-                $scope.productos = productos;
+                var products = [];
+                for(var i=0; i<productos.length; i++){
+                    if(productos[i].inventory>0){
+                        products.push(productos[i]);
+                    }
+                }
+                $scope.productos = products;
             },function(err){
                 $ionicPopup.alert({
                     title: 'Error en productos!',
@@ -1053,14 +1059,46 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             // Accion para cerrar el pedidoRealizado
             $scope.closePedidoRealizado = function () {
+                if($scope.calificacion > 0){
+                    User.enviarCalificacion($scope.calificacion);
+                }
                 $scope.pedidoRealizado.hide();
                 window.location.href = "#/app/categorias";
             };
+
+            $scope.ratingArr = [{
+                        value: 1,
+                       icon: 'ion-ios-star-outline'
+                   }, {
+                        value: 2,
+                       icon: 'ion-ios-star-outline'
+                   }, {
+                        value: 3,
+                       icon: 'ion-ios-star-outline'
+                   }, {
+                        value: 4,
+                       icon: 'ion-ios-star-outline'
+                   }, {
+                        value: 5,
+                       icon: 'ion-ios-star-outline'
+                   }];
+            $scope.calificacion = 0;
+            $scope.setRating = function(val) {
+                       $scope.calificacion = val;
+                       var rtgs = $scope.ratingArr;
+                       for (var i = 0; i < rtgs.length; i++) {
+                           if (i < val) {
+                               rtgs[i].icon = 'ion-ios-star';
+                           } else {
+                               rtgs[i].icon = 'ion-ios-star-outline';
+            ￼￼￼￼￼} };
+            }
 
             // Accion para mostrar el pedidoRealizado
             $scope.showPedidoRealizado = function () {
                 Carrito.cerrarPedido().then(function(data){
                     Carrito.empty();
+                    $scope.$emit('carrito', 'actualizacion');
                     $scope.pedidoRealizado.show();
                 },function(err){
                     $ionicPopup.alert({
