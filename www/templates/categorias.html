@@ -1,28 +1,28 @@
 <ion-view view-title="Categorías">
-  <ion-content class="padding">
-	  <p class="text-center">
-  	  	Escribe el nombre del producto o sustancia activa.
-  	  </p>
-	  <form ng-submit="doBuscar()" style="border: none;">
-	      <div class="list">
-	        <label class="item item-input">
-	          <input type="text" ng-model="buscar.producto" id="buscar" placeholder="Ej. Paracetamol">
-	        </label>
-	        <label class="item">
-	          <button class="button button-block button-balanced" type="submit">
-	           <i class="icon ion-search"></i>	Buscar
-	          </button>
-	        </label>
-	      </div>
-	   </form>
-		<p class="text-center">
-			-o- <br/>
-			Selecciona una Categoría:
-		</p>
-		<ion-list>
-	      <ion-item ng-repeat="categoria in categorias" href="#/app/productos/{{categoria.id}}" class="item-balanced">
-	        {{categoria.name}}
-	      </ion-item>
-	  </ion-list>
-  </ion-content>
+    <ion-content class="padding">
+        <p class="text-center">
+            Escribe el nombre del producto o sustancia activa.
+        </p>
+        <form ng-submit="doBuscar()" style="border: none;">
+            <div class="list">
+                <label class="item item-input">
+                    <input type="text" ng-model="buscar.producto" id="buscar" placeholder="Ej. Paracetamol">
+                </label>
+                <label class="item">
+                    <button class="button button-block button-balanced" type="submit">
+                        <i class="icon ion-search"></i>	Buscar
+                    </button>
+                </label>
+            </div>
+        </form>
+        <p class="text-center">
+            -o- <br/>
+            Selecciona una Categoría:
+        </p>
+        <ion-list>
+            <ion-item ng-repeat="categoria in categorias" href="#/app/productos/{{categoria.id}}" class="item-balanced">
+                {{categoria.name}}
+            </ion-item>
+        </ion-list>
+    </ion-content>    
 </ion-view>

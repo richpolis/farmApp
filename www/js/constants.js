@@ -21,5 +21,5 @@ angular.module('farmApp')
             detalle_ventas: 'api/detalle/ventas/',
             pedidos_periodicos: 'api/pedidos/periodicos/',
             images_ventas: 'api/images/ventas/',
-            rating: 'ratings/'
+            ratings: 'api/ratings/'
         });

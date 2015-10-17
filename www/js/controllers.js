@@ -501,6 +501,11 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     title: 'Error en categorias!',
                     template: err.detail
                 });
+                if(err.detail == "Token inválido."){
+                    window.localStorage.removeItem('user');
+                    window.localStorage.removeItem('access_token');
+                    window.location.href = "/app/categorias";
+                }
             });
 
             $scope.doBuscar = function(){
@@ -964,12 +969,12 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.productos = Carrito.getProductos();
             $scope.images = FileService.images();
             $scope.doPago = function () {
-                if($scope.tarjeta.token){
-                    delete $scope.tarjeta.token;
-                }
-                if($scope.tarjeta.card.number){
+                var tarjeta = $scope.tarjeta;
+                if(tarjeta.token){
+                    enviarPedido();
+                }else if(tarjeta.card.number){
                     Loader.showLoading('Enviando datos pago...');
-                    UIConekta.getTarjetaToken($scope.tarjeta).then(function(token){
+                    UIConekta.getTarjetaToken(tarjeta).then(function(token){
                         Loader.hideLoading();
                         enviarPedido();
                     },function(err){
@@ -979,6 +984,11 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                             template: err.message
                         });
                     });
+                }else {
+                    $ionicPopup.alert({
+                        title: 'Datos de tarjeta',
+                        template: 'Ingrese los datos completo de la tarjeta'
+                    });
                 }
             };
 
@@ -986,7 +996,6 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 var indice = indice || 0;
                 Loader.showLoading('Enviando detalle de pedido...');
                 Carrito.enviarDetalleVentas(indice).then(function(detalle){
-                    console.log(detalle);
                     if($scope.productos.length >(indice+1)){
                         enviarDetallePedido(indice + 1);
                     }else if($scope.images.length > 0) {
@@ -1063,7 +1072,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     User.enviarCalificacion($scope.calificacion);
                 }
                 $scope.pedidoRealizado.hide();
-                window.location.href = "#/app/categorias";
+                window.location.href = "/";
             };
 
             $scope.ratingArr = [{
@@ -1082,17 +1091,20 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         value: 5,
                        icon: 'ion-ios-star-outline'
                    }];
+
             $scope.calificacion = 0;
-            $scope.setRating = function(val) {
-                       $scope.calificacion = val;
-                       var rtgs = $scope.ratingArr;
-                       for (var i = 0; i < rtgs.length; i++) {
-                           if (i < val) {
-                               rtgs[i].icon = 'ion-ios-star';
-                           } else {
-                               rtgs[i].icon = 'ion-ios-star-outline';
-            ￼￼￼￼￼} };
-            }
+
+            $scope.setRating = function (val) {
+                $scope.calificacion = val;
+                var rtgs = $scope.ratingArr;
+                for(var i=0;i<rtgs.length; i++){
+                    if(i < val){
+                        rtgs[i].icon = 'ion-ios-star';
+                    }else{
+                        rtgs[i].icon = 'ion-ios-star-outline';
+                    }
+                }
+            };
 
             // Accion para mostrar el pedidoRealizado
             $scope.showPedidoRealizado = function () {

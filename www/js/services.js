@@ -1046,11 +1046,9 @@ angular.module('farmApp.services', [])
                 },
                 empty: function(){
                     // limpiar los datos del carrito.
-                    tarjeta = {};
                     direccion = {};
                     productos = [];
                     venta = {};
-                    window.localStorage.setItem('tarjeta', JSON.stringify(tarjeta));
                     window.localStorage.setItem('direccion', JSON.stringify(direccion));
                     window.localStorage.setItem('carrito', JSON.stringify(productos));
                     window.localStorage.setItem('venta', JSON.stringify(venta));

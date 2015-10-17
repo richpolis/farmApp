@@ -18,19 +18,18 @@
             este en tu puerta<br/>
             <i class="icon ion-android-happy" style="font-size: 6em;"></i>
         </p>
-        <p>
-            <h3>Envianos tu opinión</h3>
-            <div>
+        <p class="text-center">
+            <h3 class="text-center">Envianos tu opinión</h3>
+            <div class="text-center">
                 <a href="javascript:" ng-repeat="r in ratingArr"
                    class="padding" style="text-decoration:none;">
-                    <i class="icon {{r.icon}}"
-                       ng-click="setRating(r.value)"></i>
+                    <i class="icon balanced {{r.icon}}" ng-click="setRating(r.value)"></i>
                 </a>
             </div>
         </p>
     </ion-content>
-    <ion-footer-bar style="position:absolute; bottom: 10px;">
-        <button style="font-size: 1.5em; padding: 20px;" class=" button button-block button-balanced"
+    <ion-footer-bar style="position: absolute; bottom: 30px;">
+        <button style="font-size: 1.5em; height: 3em; " class="button button-block button-balanced"
                 ng-click="closePedidoRealizado()">
             Cerrar
         </button>

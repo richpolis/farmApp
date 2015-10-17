@@ -1,6 +1,6 @@
 <ion-view view-title="Pedido">
     <ion-content class="has-header">
-        <div class="list" ng-if="direcciones.length > 0">
+        <div class="list" ng-if="direcciones.length > 0" style="margin-bottom: 5px;">
             <label class="item item-input item-select">
                 <div class="input-label">
                     Direccion guardada
@@ -24,8 +24,8 @@
             </div>
         </div>
         <div class="formMapa padding" ng-show="mostrarMapa">
-            <div class="list">
-                <div class="list list-inset">
+            <div class="list" style="margin-bottom: 5px;">
+                <div class="list list-inset" style="margin-top: 5px;">
                     <label class="item item-input">
                         <i class="icon ion-search placeholder-icon"></i>
                         <input id="direccionBuscar" type="text" placeholder="Lugar o direccion" ng-keypress="buscarDireccionKeyPress($event)">
@@ -35,14 +35,14 @@
             <div id="mapa" data-tab-disabled="true"></div>
         </div>
         <form id="formDireccion" ng-submit="doDireccion()">
-            <div class="list">
-                <label class="item item-input">
+            <div class="list" style="margin-bottom: 5px;">
+                <label class="item item-input" ng-hide="mostrarMapa">
                     <input type="text" name="estado" ng-model="direccionGuardada.location" placeholder="Estado">
                 </label>
-                <label class="item item-input">
+                <label class="item item-input" ng-hide="mostrarMapa">
                     <input type="text" name="calle" ng-model="direccionGuardada.street" placeholder="Calle">
                 </label>
-                <div class="row">
+                <div class="row" ng-hide="mostrarMapa">
                     <div class="col">
                         <label class="item item-input">
                             <input type="text" name="exterior_number" ng-model="direccionGuardada.exterior_number" placeholder="Num. Exterior">
@@ -54,13 +54,13 @@
                         </label>
                     </div>
                 </div>
-                <label class="item item-input">
+                <label class="item item-input" ng-hide="mostrarMapa">
                     <input type="text" name="postal_code" ng-model="direccionGuardada.postal_code" placeholder="Codigo postal">
                 </label>
-                <label class="item item-input">
+                <label class="item item-input" ng-hide="mostrarMapa">
                     <input type="text" name="delegation_municipaly" ng-model="direccionGuardada.delegation_municipaly" placeholder="Delegacion/Municipio">
                 </label>
-                <label class="item item-input">
+                <label class="item item-input" ng-hide="mostrarMapa">
                     <input type="text" name="colony" ng-model="direccionGuardada.colony" placeholder="Colonia">
                 </label>
                 <label class="item">
