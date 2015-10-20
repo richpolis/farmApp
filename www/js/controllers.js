@@ -192,7 +192,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
         })
 
         .controller('PerfilController', function ($scope, $ionicPopup, $cordovaGeolocation, $ionicLoading,
-                                      User, Direcciones, Pedidos, Loader) {
+                                      $ionicModal ,User, Direcciones, Pedidos, Loader) {
 
             $scope.userData = User.getUser();
             $scope.direccionSeleccionada = "";
@@ -265,22 +265,14 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                             $scope.direccionGuardada = $scope.direcciones[cont];
                             var direccionBuscar = document.getElementById("direccionBuscar");
                             direccionBuscar.value = "";
-                            if($scope.mostrarMapa){
-                                $scope.showMapa();
-                            }
                             break;
                         }
                     }
                 } else {
                     $scope.direccionGuardada = Direcciones.getDireccionVacia();
                     $scope.mostrarMapa = false;
-                    var mapa = document.getElementById("mapa");
-                    mapa.innerHTML = "";
                     var direccionBuscar = document.getElementById("direccionBuscar");
                     direccionBuscar.value = "";
-                    if($scope.mostrarMapa){
-                        $scope.showMapa();
-                    }
                 }
             };
 
@@ -344,10 +336,10 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                }
             });
 
-            // Abrir el mapa
-            $scope.showMapa = function () {
-                Loader.showLoading('cargando informacion...');
-            	if ($scope.direccionGuardada.lat == 0) {
+            $scope.mapCreated = function(map){
+                $scope.map = map;
+                 Loader.showLoading('cargando informacion...');
+                if ($scope.direccionGuardada.lat == 0) {
                     var posOptions = {timeout: 10000, enableHighAccuracy: false};
                     $cordovaGeolocation
                         .getCurrentPosition(posOptions)
@@ -382,11 +374,21 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         $scope.buscarDireccion();
                     }
                 }
+            }
 
+            // Abrir el mapa
+            $scope.showModalMap = function () {
+                $ionicModal.fromTemplateUrl('templates/mapaModal.html', function(modal) {
+                    $scope.modal = modal;
+                }, {
+                    animation: 'slide-in-up',
+                    focusFirstInput: true
+                });
             };
 
             $scope.hideMapa = function(){
-                $scope.mostrarMapa = false;
+                $scope.modal.hide();
+                $scope.modal.remove();
             };
 
             $scope.setValuesResults = function(results){
@@ -410,8 +412,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     mapTypeId: google.maps.MapTypeId.ROADMAP
                 };
 
-                $scope.map = new google.maps.Map(document.getElementById("mapa"), mapOptions);
-
+                $scope.map.setCenter(myLatlng);
 
                 var marker = new google.maps.Marker({
                     position: myLatlng,
@@ -439,7 +440,6 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             $scope.buscarDireccion = function () {
                 var geocoder = new google.maps.Geocoder();
-                var mapa = document.getElementById("mapa");
                 var direccionBuscar = document.getElementById("direccionBuscar");
                 geocoder.geocode({'address': direccionBuscar.value}, function (results, status) {
                     // Verificamos el estatus
@@ -452,16 +452,17 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         $scope.direccionGuardada.lat = results[0].geometry.location.H;
                         $scope.direccionGuardada.lng = results[0].geometry.location.L;
                         $scope.direccionGuardada.street = direccionBuscar.value;
+                        var myLatlng = results[0].geometry.location;
                         var mapOptions = {
-                            center: results[0].geometry.location,
+                            center: myLatlng,
                             mapTypeId: google.maps.MapTypeId.ROADMAP
                         };
-                        $scope.map = new google.maps.Map(mapa, mapOptions);
+                        $scope.map.setCenter(myLatlng);
                         // fitBounds acercará el mapa con el zoom adecuado de acuerdo a lo buscado
                         $scope.map.fitBounds(results[0].geometry.viewport);
                         // Dibujamos un marcador con la ubicación del primer resultado obtenido
                         var markerOptions = {
-                            position: results[0].geometry.location,
+                            position: myLatlng,
                             draggable: true,
                             title: results[0].formatted_address
                         };
