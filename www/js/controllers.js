@@ -263,16 +263,12 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     for (var cont = 0; cont <= $scope.direcciones.length; cont++) {
                         if ($scope.direcciones[cont].street == select.value) {
                             $scope.direccionGuardada = $scope.direcciones[cont];
-                            var direccionBuscar = document.getElementById("direccionBuscar");
-                            direccionBuscar.value = "";
                             break;
                         }
                     }
                 } else {
                     $scope.direccionGuardada = Direcciones.getDireccionVacia();
                     $scope.mostrarMapa = false;
-                    var direccionBuscar = document.getElementById("direccionBuscar");
-                    direccionBuscar.value = "";
                 }
             };
 
@@ -337,6 +333,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             });
 
             $scope.mapCreated = function(map){
+				console.log("Entro a crear el mapa");
                 $scope.map = map;
                  Loader.showLoading('cargando informacion...');
                 if ($scope.direccionGuardada.lat == 0) {
@@ -375,19 +372,25 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     }
                 }
             }
+			
+			
 
             // Abrir el mapa
             $scope.showModalMap = function () {
-                $ionicModal.fromTemplateUrl('templates/mapaModal.html', function(modal) {
-                    $scope.modal = modal;
-                }, {
-                    animation: 'slide-in-up',
-                    focusFirstInput: true
-                });
+				Loader.showLoading("Abriendo el mapa");
+				$ionicModal.fromTemplateUrl('templates/mapaModal.html',{
+					scope: $scope,
+					animation: 'slide-in-up',
+					focusFirstInput: true
+				}).then(function(modal){
+					Loader.hideLoading();
+					$scope.modal = modal;
+					$scope.modal.show();
+				});
             };
 
-            $scope.hideMapa = function(){
-                $scope.modal.hide();
+            $scope.hideModalMap = function(){
+				$scope.modal.hide();
                 $scope.modal.remove();
             };
 
@@ -433,7 +436,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
 
             $scope.buscarDireccionKeyPress = function(evento){
-                if(evento.charCode == 13){
+				if(evento.charCode == 13){
+                	console.log(evento);
                     $scope.buscarDireccion();
                 }
             };
@@ -441,6 +445,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.buscarDireccion = function () {
                 var geocoder = new google.maps.Geocoder();
                 var direccionBuscar = document.getElementById("direccionBuscar");
+				console.log(direccionBuscar);
                 geocoder.geocode({'address': direccionBuscar.value}, function (results, status) {
                     // Verificamos el estatus
                     if (status == 'OK') {
