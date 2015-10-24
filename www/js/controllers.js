@@ -336,7 +336,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 				console.log("Entro a crear el mapa");
                 $scope.map = map;
                  Loader.showLoading('cargando informacion...');
-                if ($scope.direccionGuardada.lat == 0) {
+                if (!$scope.direccionGuardada.lat || $scope.direccionGuardada.lat == 0) {
                     var posOptions = {timeout: 10000, enableHighAccuracy: false};
                     $cordovaGeolocation
                         .getCurrentPosition(posOptions)
@@ -357,13 +357,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     $scope.mostrarMapa = true;
                     var direccionBuscar = document.getElementById("direccionBuscar");
                     if($scope.map){
-                        console.log($scope.direccionGuardada);
-                        var myLatlng = new google.maps.LatLng($scope.direccionGuardada.lat, $scope.direccionGuardada.lng);
-                        $scope.map.setCenter(myLatlng);
-                        var marker = new google.maps.Marker({
-                            map: $scope.map,
-                            position: myLatlng
-                        });
+                        alert("Direccion guardada lat: "+$scope.direccionGuardada.lat + " lng: "+$scope.direccionGuardada.lng);
+                        $scope.ubicacionDelMapa();
                     }else {
                         if (direccionBuscar.value == "") {
                             direccionBuscar.value = $scope.direccionGuardada.street;
@@ -425,27 +420,19 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 });
 
                 google.maps.event.addListener(marker, 'dragend', function () {
-                    //console.log(marker.getPosition());
+                    alert(marker.getPosition());
                     var pos = marker.getPosition();
                     $scope.direccionGuardada.lat = pos.G;
                     $scope.direccionGuardada.lng = pos.K;
                     console.log(pos);
                 });
 
-
-            };
-
-            $scope.buscarDireccionKeyPress = function(evento){
-				if(evento.charCode == 13){
-                	console.log(evento);
-                    $scope.buscarDireccion();
-                }
             };
 
             $scope.buscarDireccion = function () {
                 var geocoder = new google.maps.Geocoder();
                 var direccionBuscar = document.getElementById("direccionBuscar");
-				console.log(direccionBuscar);
+				alert(direccionBuscar);
                 geocoder.geocode({'address': direccionBuscar.value}, function (results, status) {
                     // Verificamos el estatus
                     if (status == 'OK') {

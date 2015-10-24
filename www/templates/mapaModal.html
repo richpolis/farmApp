@@ -8,12 +8,14 @@
     </div>
   </ion-header-bar>
   <div class="bar bar-subheader">
-    <div class="list">
-      <div class="list list-inset">
-        <label class="item item-input">
-          <i class="icon ion-search placeholder-icon"></i>
-          <input id="direccionBuscar" type="text" placeholder="Lugar o direccion" ng-keypress="buscarDireccionKeyPress($event)">
+    <div class="list" style="margin: 0px; padding: 0px;">
+      <div class="item item-input-inset">
+        <label class="item-input-wrapper">
+          <input id="direccionBuscar" type="text" placeholder="Buscar direccion">
         </label>
+        <button class="button button-small" ng-click="buscarDireccion()">
+          <i class="icon ion-search placeholder-icon"></i>
+        </button>
       </div>
     </div>
   </div>
