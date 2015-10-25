@@ -146,12 +146,12 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     return false;
                 Loader.showLoading("Cargando información...");
                 User.register($scope.data).then(function (user) {
-                    $scope.user = user;
+                    var usuario =  user;
                     $ionicPopup.alert({
                         title: 'Registro!',
                         template: 'Registro realizado'
                     });
-                    User.login($scope.user.email, $scope.data.password).then(function(token){
+                    User.login(usuario.email, usuario.password).then(function(token){
                         Loader.hideLoading();
                         $state.go('app.categorias');
                     },function(err){
@@ -195,7 +195,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                                       $ionicModal ,User, Direcciones, Pedidos, Loader) {
 
             $scope.userData = User.getUser();
-            $scope.direccionSeleccionada = "";
+            $scope.direccionBuscar = "";
             $scope.direccionGuardada = Direcciones.getDireccionVacia();
             $scope.mostrarMapa = false;
             $scope.platform = ionic.Platform.platform();
@@ -331,13 +331,31 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         });
                }
             });
-
-            $scope.mapCreated = function(map){
-				console.log("Entro a crear el mapa");
-                $scope.map = map;
-                 Loader.showLoading('cargando informacion...');
-                if (!$scope.direccionGuardada.lat || $scope.direccionGuardada.lat == 0) {
-                    var posOptions = {timeout: 10000, enableHighAccuracy: false};
+    
+            $scope.hasDireccionbuscar = function(){
+                var direccionBuscar = document.getElementById('direccionBuscar');
+                return direccionBuscar.value.length > 0;
+            }
+            
+            $scope.confirmarDireccionBuscar = function() {
+               var confirmPopup = $ionicPopup.confirm({
+                 title: 'Confirmar direccion',
+                 template: 'Es correcta la direccion '+ $scope.direccionBuscar +'?'
+               });
+               confirmPopup.then(function(res) {
+                 if(res) {
+                   $scope.doDireccion();
+                   $scope.hideModalMap();
+                 } else {
+                   $scope.direccionBuscar = "";
+                   $scope.direccionBuscar.focus();
+                 }
+               });
+             };
+            
+            $scope.centerOnMe =  function(){
+                if(!$scope.map) return;
+                var posOptions = {timeout: 10000, enableHighAccuracy: false};
                     $cordovaGeolocation
                         .getCurrentPosition(posOptions)
                         .then(function (position) {
@@ -352,25 +370,21 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                                 template: 'No esta activa la localizacion'
                             });
                         });
+            }
+
+            $scope.mapCreated = function(map){
+				console.log("Entro a crear el mapa");
+                $scope.map = map;
+                 Loader.showLoading('cargando informacion...');
+                if (!$scope.direccionGuardada.lat || $scope.direccionGuardada.lat == 0) {
+                    $scope.centerOnMe();
                 } else {
                     Loader.hideLoading();
-                    $scope.mostrarMapa = true;
-                    var direccionBuscar = document.getElementById("direccionBuscar");
-                    if($scope.map){
-                        alert("Direccion guardada lat: "+$scope.direccionGuardada.lat + " lng: "+$scope.direccionGuardada.lng);
-                        $scope.ubicacionDelMapa();
-                    }else {
-                        if (direccionBuscar.value == "") {
-                            direccionBuscar.value = $scope.direccionGuardada.street;
-                        }
-                        $scope.buscarDireccion();
-                    }
+                    $scope.ubicacionDelMapa();
                 }
-            }
-			
-			
-
-            // Abrir el mapa
+            };
+            
+            // Abrir el mapa en modal
             $scope.showModalMap = function () {
 				Loader.showLoading("Abriendo el mapa");
 				$ionicModal.fromTemplateUrl('templates/mapaModal.html',{
@@ -402,6 +416,9 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
 
             $scope.ubicacionDelMapa = function () {
+                
+                alert("Direccion guardada lat: "+$scope.direccionGuardada.lat + " lng: "+$scope.direccionGuardada.lng);
+                
                 var myLatlng = new google.maps.LatLng($scope.direccionGuardada.lat, $scope.direccionGuardada.lng);
 
                 var mapOptions = {
@@ -424,49 +441,38 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     var pos = marker.getPosition();
                     $scope.direccionGuardada.lat = pos.G;
                     $scope.direccionGuardada.lng = pos.K;
-                    console.log(pos);
                 });
 
             };
 
             $scope.buscarDireccion = function () {
                 var geocoder = new google.maps.Geocoder();
-                var direccionBuscar = document.getElementById("direccionBuscar");
-				alert(direccionBuscar);
+                if($scope.hasDireccionbuscar()){
+                    var direccionBuscar = document.getElementById('direccionBuscar');
+                }else{
+                    alert("Favor de ingresar una direccion para buscar");
+                    return;
+                }
                 geocoder.geocode({'address': direccionBuscar.value}, function (results, status) {
                     // Verificamos el estatus
                     if (status == 'OK') {
                         // Si hay resultados encontrados, centramos y repintamos el mapa
                         // esto para eliminar cualquier pin antes puesto
-
-                        console.log("Resultados");
-                        console.log(results);
-                        $scope.direccionGuardada.lat = results[0].geometry.location.H;
-                        $scope.direccionGuardada.lng = results[0].geometry.location.L;
-                        $scope.direccionGuardada.street = direccionBuscar.value;
-                        var myLatlng = results[0].geometry.location;
-                        var mapOptions = {
-                            center: myLatlng,
-                            mapTypeId: google.maps.MapTypeId.ROADMAP
-                        };
-                        $scope.map.setCenter(myLatlng);
-                        // fitBounds acercará el mapa con el zoom adecuado de acuerdo a lo buscado
+                        for(var cont = 0; cont<results.length; cont++){
+                            var formattedAddress= JSON.stringify(results[cont].formatted_address);
+                            var positionJson = JSON.stringify(results[cont].geometry);
+                            $ionicPopup.alert({
+                                title: formattedAddress,
+                                template: positionJson
+                            });
+                        }
+                        $scope.direccionGuardada.lat = results[0].geometry.location.lat;
+                        $scope.direccionGuardada.lng = results[0].geometry.location.lng;
+                        
                         $scope.map.fitBounds(results[0].geometry.viewport);
-                        // Dibujamos un marcador con la ubicación del primer resultado obtenido
-                        var markerOptions = {
-                            position: myLatlng,
-                            draggable: true,
-                            title: results[0].formatted_address
-                        };
-                        var marker = new google.maps.Marker(markerOptions);
-                        google.maps.event.addListener(marker, 'dragend', function () {
-                            //console.log(marker.getPosition());
-                            var pos = marker.getPosition();
-                            $scope.direccionGuardada.lat = pos.G;
-                            $scope.direccionGuardada.lng = pos.K;
-                            console.log(pos);
-                        });
-                        marker.setMap($scope.map);
+                        
+                        $scope.ubicacionDelMapa();
+                        
                         $scope.setValuesResults(results);
                     } else {
                         // En caso de no haber resultados o que haya ocurrido un error
