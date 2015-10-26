@@ -1,7 +1,7 @@
 <ion-view cache-view="false" view-title="Carrito">
     <ion-content>
         <ion-list>
-            <ion-item class="item-text-wrap" ng-repeat="producto in productos| orderBy:'name' " style="padding: 10px 2px;">
+            <div class="item-text-wrap" ng-repeat="producto in productos| orderBy:'name' " style="padding: 10px 2px;">
                 <div class="list card" style="padding: .2em;">
                     <div class="item item-thumbnail-left">
                         <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}"">
@@ -31,31 +31,43 @@
                         </div>
                     </div>
 
+                    <div class="item" style="padding: 5px;">
+                        <div class="row">
+                            <div class="col col-33" style="margin-top: 10px;">
+                                Cantidad:
+                            </div>
+                            <div class="col">
+                                <button ng-click="producto.quantity=producto.quantity-1; mostrarTotal()"
+                                        ng-disabled="producto.quantity==1"
+                                        class="button button-clear button-block button-balanced"
+                                        style="margin: 0px;">
+                                    <i class="icon ion-minus-circled"></i>
+                                </button>
+                            </div>
+                            <div class="col">
+                                <input type="text" ng-model="producto.quantity"
+                                       style="width: 100%; border: 1px solid black; text-align:center; margin-top: 5px;"
+                                       readonly="readonly">
+                            </div>
+                            <div class="col">
+                                <button ng-click="producto.quantity=producto.quantity+1; mostrarTotal()"
+                                        class="button button-clear button-block button-balanced"
+                                        style="margin: 0px;">
+                                    <i class="icon ion-plus-circled"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="item">
                         <div class="row">
-                            <div class="col col-50">
-                                <div class="list padding-top">
-                                    <label class="item item-input item-select item-select-cantidad" style="border: none;">
-                                        <div class="input-label hideme-sm">
-                                            &nbsp;
-                                        </div>
-                                        <select style="height: 50px;" ng-change="mostrarTotal()" ng-model="producto.quantity" class="producto-cantidad">
-                                            <option selected>1</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col col-50 text-right">
-                                <br/>
+                            <div class="col col-offset-33 col-66 text-right">
                                 <label class="assertive-bg padding color-blanco" ng-show="producto.discount.short_name">{{producto.discount.short_name}}</label>
-                                <label class="balanced-bg padding color-blanco">{{producto.price * producto.quantity|currency:"$"}}</label>
+                                <label class="balanced-bg padding color-blanco">{{producto.price * producto.quantity |currency:"$"}}</label>
                             </div>
                         </div>
                     </div>
                 </div>
-            </ion-item>
+            </div>
             <ion-item>
                 <div class="row" ng-if="totales.descuento > 0">
                     <div class="col">

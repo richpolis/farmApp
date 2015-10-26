@@ -609,7 +609,6 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             $scope.mostrarTotal = function () {
                 $scope.totales = Carrito.getTotales();
-
             };
 
             $scope.removeProducto = function (producto) {
@@ -1118,6 +1117,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
         .controller('PedidosPeriodicosController', function ($scope, $timeout, $ionicPopup, PedidosPeriodicos, Loader) {
             PedidosPeriodicos.getPedidos().then(function(pedidos){
                 $scope.pedidos = pedidos;
+                console.log(pedidos);
             },function(err){
                 $ionicPopup.alert({
                     title: 'Error en pedidos periodicos!',
@@ -1132,6 +1132,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             $scope.cambioPedido = function(pedido){
                 PedidosPeriodicos.editPedido(pedido);
+                console.log(pedido);
             };
         })
 
