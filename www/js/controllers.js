@@ -375,7 +375,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.mapCreated = function(map){
 				console.log("Entro a crear el mapa");
                 $scope.map = map;
-                 Loader.showLoading('cargando informacion...');
+                Loader.showLoading('cargando informacion...');
                 if (!$scope.direccionGuardada.lat || $scope.direccionGuardada.lat == 0) {
                     $scope.centerOnMe();
                 } else {
@@ -458,22 +458,16 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     if (status == 'OK') {
                         // Si hay resultados encontrados, centramos y repintamos el mapa
                         // esto para eliminar cualquier pin antes puesto
-                        for(var cont = 0; cont<results.length; cont++){
-                            var formattedAddress= JSON.stringify(results[cont].formatted_address);
-                            var positionJson = JSON.stringify(results[cont].geometry);
-                            $ionicPopup.alert({
-                                title: formattedAddress,
-                                template: positionJson
-                            });
+                        if (results[0].geometry.bounds) {
+                            $scope.map.fitBounds(results[0].geometry.bounds);
+                            console.log(results[0].address_components);
+                        }else{
+                            $scope.direccionGuardada.lat = results[0].geometry.location.lat();
+                            $scope.direccionGuardada.lng = results[0].geometry.location.lng();
+                            $scope.map.fitBounds(results[0].geometry.viewport);
+                            $scope.ubicacionDelMapa();
+                            $scope.setValuesResults(results);
                         }
-                        $scope.direccionGuardada.lat = results[0].geometry.location.lat;
-                        $scope.direccionGuardada.lng = results[0].geometry.location.lng;
-                        
-                        $scope.map.fitBounds(results[0].geometry.viewport);
-                        
-                        $scope.ubicacionDelMapa();
-                        
-                        $scope.setValuesResults(results);
                     } else {
                         // En caso de no haber resultados o que haya ocurrido un error
                         // lanzamos un mensaje con el error
