@@ -6,6 +6,7 @@ platforms/
 plugins/
 bower_components/
 nbproject/
+xdk/
 .tmp
 .sass-cache
 *.swp
@@ -13,3 +14,8 @@ nbproject/
 *.log
 *.DS_Store
 .idea/
+*.xdk_bak
+*.xdke_bak
+*.xdk
+*.xdke
+.codio

@@ -15,21 +15,35 @@
             </ion-item>
             <ion-item class="tabs tabs-secondary" style="height: 70px;">
                 <div class="row">
-                    <div class="col col-50">
-                        <div class="list">
-                            <label class="item item-input item-select item-select-cantidad">
-                                <div class="input-label hideme-sm">
-                                    &nbsp;
-                                </div>
-                                <select ng-change="mostrarTotal()" ng-model="producto.quantity" class="producto-cantidad">
-                                    <option selected>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                </select>
-                            </label>
-                        </div>
+                    <div class="col col-33">
+                        Cantidad:
                     </div>
-                    <div class="col col-50 text-right">
+                    <div class="col">
+                        <button ng-click="producto.quantity=producto.quantity-1"
+                                ng-disabled="producto.quantity==1"
+                                class="button button-clear button-block button-balanced"
+                                style="margin: 0px;">
+                            <i class="icon ion-minus-circled"></i>
+                        </button>
+
+                    </div>
+                    <div class="col">
+                        <input type="text" ng-change="mostrarTotal()" ng-model="producto.quantity"
+                              style="width: 100%; border: 1px solid black; text-align:center; margin-top: 5px;"
+                               readonly="readonly">
+                    </div>
+                    <div class="col">
+                        <button ng-click="producto.quantity=producto.quantity+1"
+                                class="button button-clear button-block button-balanced"
+                                style="margin: 0px;">
+                            <i class="icon ion-plus-circled"></i>
+                        </button>
+                    </div>
+                </div>
+            </ion-item>
+            <ion-item>
+                <div class="row">
+                    <div class="col col-offset-50 col-50 text-right">
                         <label class="assertive-bg padding color-blanco" ng-show="producto.discount.short_name">{{producto.discount.short_name}}</label>
                         <label class="balanced-bg padding color-blanco">{{producto.price * producto.quantity |currency:"$"}}</label>
                     </div>

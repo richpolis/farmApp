@@ -2,22 +2,28 @@
   <ion-header-bar>
     <h1 class="title">Ubicacion en mapa</h1>
     <div class="buttons">
-      <button class="button button-clear" ng-click="closeMapa()">
+      <button class="button button-clear" ng-click="hideModalMap()">
         <i class="icon ion-close-round"></i>
       </button>
     </div>
   </ion-header-bar>
-  <ion-content>
-    <div class="list">
+  <div class="bar bar-subheader">
+    <div class="list" style="margin: 0px; padding: 0px;">
       <div class="item item-input-inset">
         <label class="item-input-wrapper">
-          <input type="text" name="direccionBuscar" id="direccionBuscar" placeholder="Ingresa la direccion">
+          <input id="direccionBuscar" type="text" placeholder="Buscar direccion" autocomplete="on">
         </label>
         <button class="button button-small" ng-click="buscarDireccion()">
-          Buscar
+          <i class="icon ion-search placeholder-icon"></i>
         </button>
       </div>
     </div>
-    <div id="mapa"></div>
+  </div>
+  <ion-content scroll="false">
+    <map on-create="mapCreated(map)"></map>
   </ion-content>
+  <ion-footer-bar class="bar-stable">
+    <a ng-click="centerOnMe()" class="button button-icon icon ion-navigate"></a>
+    <button class="button button-clear pull-left button-balanced" ng-click="confirmarSeleccionMapa()">Seleccionar</button>
+  </ion-footer-bar>
 </ion-modal-view>
