@@ -7,6 +7,7 @@ plugins/
 bower_components/
 nbproject/
 xdk/
+www/lib/
 .tmp
 .sass-cache
 *.swp

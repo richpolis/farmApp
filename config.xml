@@ -1,21 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?><widget xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" id="com.ionicframework.farmapp590361" version="0.0.2">
-  <name>farmApp</name>
-  <description>
-        An Ionic Framework and Cordova project.
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets"
+        xmlns:cdv="http://cordova.apache.org/ns/1.0"
+        id="com.ionicframework.farmapp590361" version="0.0.2">
+    <name>farmApp</name>
+    <description>
+        Un app venta mostrador para pedidos de farmaApp.
     </description>
-  <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
+    <author email="richpolis@gmail.com" href="http://farmaapp.mx/">
+      Richpolis Systems
     </author>
   <content src="index.html"/>
   <access origin="*"/>
   <access launch-external="yes" origin="tel:*"/>
   <allow-intent href="tel:*"/>
-  <access origin="https://polar-hollows-6621.herokuapp.com" subdomains="true"/>
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="android-minSdkVersion" value="16"/>
   <preference name="BackupWebStorage" value="none"/>
+  <preference name="HideKeyboardFormAccessoryBar" value="true"/>
+  <preference name="BackgroundColor" value="0xff2EC7C7"/>
+  <preference name="Orientation" value="portrait" />
   <feature name="StatusBar">
     <param name="ios-package" onload="true" value="CDVStatusBar"/>
   </feature>

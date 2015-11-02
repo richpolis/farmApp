@@ -18,11 +18,8 @@
                         <label class="item item-input">
                             <input type="tel" name="celular" ng-model="userData.cell" placeholder="Celular">
                         </label>
-                        <div class="item item-checkbox">
-                            <label class="checkbox">
-                                <input type="checkbox" ng-model="userData.inapam" name="inapam">
-                            </label>
-                            INAPAM
+                        <div class="item">
+                            <ion-toggle ng-model="userData.inapam" style="border: none; font-size: .9em;" toggle-class="toggle-calm">INAPAM</ion-toggle>
                         </div>
                         <label class="item">
                             <button class="button button-block button-balanced" type="submit">Actualizar</button>

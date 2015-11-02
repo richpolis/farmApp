@@ -50,34 +50,43 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
             $scope.password = "";
             $scope.user = User.getUser();
-            $scope.doLogin = function () {
+            function login(){
                 Loader.showLoading("Cargando información...");
                 User.login($scope.data.email, $scope.data.password)
-                        .then(function (token) {
-                            User.me().then(function (user) {
-                                Loader.hideLoading();
-                                $scope.user = user;
-                                $state.go('app.categorias');
-                            }, function (err) {
-                                Loader.hideLoading();
-                                // error case
-                                $ionicPopup.alert({
-                                    title: 'Error en recuperar datos!',
-                                    template: err.detail
-                                });
-                            });
-                        }, function (err) {
-                            Loader.hideLoading();
-                            // error case
-                            $ionicPopup.alert({
-                                title: 'Login error!',
-                                template: err.detail
-                            });
+                    .then(function (token) {
+                        get_me();
+                    }, function (err) {
+                        Loader.hideLoading();
+                        // error case
+                        alert("error en login " + JSON.stringify(err));
+
+                        $ionicPopup.alert({
+                            title: 'Login error!',
+                            template: err.detail
                         });
+                    });
+            }
+            function get_me(){
+                User.me().then(function (user) {
+                    Loader.hideLoading();
+                    $scope.user = user;
+                    $state.go('app.categorias');
+                }, function (err) {
+                    alert("error en user_me " + JSON.stringify(err));
+                    Loader.hideLoading();
+                    // error case
+                    $ionicPopup.alert({
+                        title: 'Error en recuperar datos!',
+                        template: err.detail
+                    });
+                });
+            }
+            $scope.doLogin = function () {
+                login();
             };
             $scope.getNameComplete = function () {
                 return User.getNameComplete();
-            }
+            };
 
             // Creamos un modal para recuperar la contraseña de un usuario
             $ionicModal.fromTemplateUrl('templates/recuperarModal.html', {
@@ -121,7 +130,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 var formulario = document.forms[0];
                 for (var i = 0; i < formulario.length; i++) {
                     if (formulario[i].type == 'text' || formulario[i].type == 'tel' || formulario[i].type == 'email' || formulario[i].type == 'password') {
-                        if (formulario[i].value == null || formulario[i].value.length == 0 || /^\s*$/.test(formulario[i].value)) {
+                        if (formulario[i].value === null || formulario[i].value.length == 0 || /^\s*$/.test(formulario[i].value)) {
                             $ionicPopup.alert({
                                 title: 'Error de llenado!',
                                 template: formulario[i].name + ' no puede estar vacío o contener sólo espacios en blanco'
@@ -192,7 +201,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
         })
 
         .controller('PerfilController', function ($scope, $ionicPopup, $cordovaGeolocation, $timeout,
-                                      $ionicLoading, $ionicModal, User, Direcciones, Pedidos, Loader) {
+                                      $ionicLoading, $ionicModal, User, Direcciones, Pedidos, Loader,
+                                       $cordovaCamera, $cordovaFile, FileService) {
 
             $scope.userData = User.getUser();
             $scope.direccionBuscar = "";
@@ -256,6 +266,152 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     });
                 });
             };
+
+            $scope.$watch('userData.inapam', function(){
+               if($scope.userData.inapam){
+                    Loader.showLoading("Abriendo para cargar imagen");
+                    $ionicModal.fromTemplateUrl('templates/inapamModal.html',{
+                        scope: $scope,
+                        animation: 'slide-in-up',
+                        focusFirstInput: true
+                    }).then(function(modal){
+                        Loader.hideLoading();
+                        $scope.modalInapam = modal;
+                        $scope.modalInapam.show();
+                    });
+
+                    $scope.hideInapamModal = function(){
+                        $scope.modalInapam.hide();
+                        $scope.modalInapam.remove();
+                        $scope.userData.inapam = false;
+                    };
+
+                    $scope.inapam = [];
+
+                    function optionsForType(indice) {
+                        var source;
+                        switch (indice) {
+                          case 0:
+                            source = Camera.PictureSourceType.CAMERA;
+                            break;
+                          case 1:
+                            source = Camera.PictureSourceType.PHOTOLIBRARY;
+                            break;
+                        }
+                        return {
+                          destinationType: Camera.DestinationType.FILE_URI,
+                          sourceType: source,
+                          allowEdit: false,
+                          encodingType: Camera.EncodingType.JPEG,
+                          popoverOptions: CameraPopoverOptions,
+                          saveToPhotoAlbum: false
+                        };
+                    }
+
+                    $scope.urlForImage = function(image){
+                        var url = FileService.urlForImage(image);
+                        alert(url);
+                        return url;
+                    };
+
+                    $scope.removeImage = function(){
+                        var name = $scope.inapam[0].substr($scope.inapam[0].lastIndexOf('/') + 1);
+                        $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                            .then(function (success) {
+                                // success
+                                alert("Archivo eliminado");
+                            }, function (error) {
+                                alert("No es posible eliminar el archivo");
+                            });
+                    };
+
+                    $scope.addImage = function(indice) {
+                         var options = optionsForType(indice);
+                         $cordovaCamera.getPicture(options).then(function(imageData) {
+                             onImageSuccess(imageData);
+                             function onImageSuccess(fileURI) {
+                                createFileEntry(fileURI);
+                             }
+                             function createFileEntry(fileURI) {
+                                 window.resolveLocalFileSystemURL(fileURI, copyFile, fail);
+                             }
+                             function copyFile(fileEntry) {
+                                 var name = fileEntry.fullPath.substr(fileEntry.fullPath.lastIndexOf('/') + 1);
+                                 var newName = makeid() + name;
+
+                                 window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem2) {
+                                     fileEntry.copyTo(
+                                        fileSystem2,
+                                        newName,
+                                        onCopySuccess,
+                                        fail
+                                     );
+                                 },fail);
+                             }
+                             function onCopySuccess(entry) {
+                                $scope.$apply(function () {
+                                    $scope.inapam.push(entry.nativeURL);
+                                });
+                             }
+                             function fail(error) {
+                                console.log("fail: " + error.code);
+                             }
+                             function makeid() {
+                                 var text = "";
+                                 var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+                                 for (var i=0; i < 5; i++) {
+                                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+                                 }
+                                 return text;
+                             }
+                         }, function(err) {
+                            console.log(err);
+                         });
+                    };
+
+                    function getImageUploadOptions(imageURI, params, headers) {
+                        var options = new FileUploadOptions();
+                        options.fileName = imageURI.substr(imageURI.lastIndexOf('/')+1);
+                        options.mimeType = "image/" + imageURI.substr(imageURI.lastIndexOf('.')+1);
+                        options.params = params;
+                        options.httpMethod = "POST";
+                        options.headers = headers;
+                        return options;
+                    }
+
+                    function savedFile(file, cb) {
+                        return function () {
+                            cb(file);
+                        };
+                    }
+
+                    $scope.confirmarFotoInapam = function(){
+                        var user = User.getUser();
+                        var token = User.getAuthToken();
+                        var params = {'user_id': user.id},
+                            headers =  { "Content-Type": "application/json","Authorization": "Token " + token };
+                        var image = $scope.inapam[0];
+                        var urlImage = FileService.getUrlForImage(image);
+                        ft.upload(urlImage,
+                        encodeURI("http://farmaapp.mx/api/inapam/imagenes/"),
+                        savedFile(image, function(file){
+                             var name = $scope.inapam[0].substr($scope.inapam[0].lastIndexOf('/') + 1);
+                                $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                                    .then(function (success) {
+                                        // success
+                                        alert("Su archivo ha sido enviado para evaluar");
+                                    }, function (error) {
+                                        alert("No es posible eliminar el archivo");
+                                    });
+                        })
+                        , function(){
+                            alert("Error al subir archivo")
+                        }, getImageUploadOptions(urlImage, params, headers));
+                    };
+
+               }
+            });
 
             $scope.recuperarDireccion = function () {
                 var select = document.getElementById('recuperar-direccion');
