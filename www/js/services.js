@@ -60,24 +60,24 @@ angular.module('farmApp.services', [])
                 };
 
                 function optionsForType(type) {
-                    var source;
-                    switch (type) {
-                        case 0:
-                            source = Camera.PictureSourceType.CAMERA;
-                            break;
-                        case 1:
-                            source = Camera.PictureSourceType.PHOTOLIBRARY;
-                            break;
-                }
-                return {
-                    destinationType: Camera.DestinationType.FILE_URI,
-                    sourceType: source,
-                    allowEdit: false,
-                    encodingType: Camera.EncodingType.JPEG,
-                    popoverOptions: CameraPopoverOptions,
-                    saveToPhotoAlbum: false
+                        var source;
+                        switch (type) {
+                            case 0:
+                                source = Camera.PictureSourceType.CAMERA;
+                                break;
+                            case 1:
+                                source = Camera.PictureSourceType.PHOTOLIBRARY;
+                                break;
+                    }
+                    return {
+                        destinationType: Camera.DestinationType.FILE_URI,
+                        sourceType: source,
+                        allowEdit: false,
+                        encodingType: Camera.EncodingType.JPEG,
+                        popoverOptions: CameraPopoverOptions,
+                        saveToPhotoAlbum: false
+                    };
                 };
-            };
 
             function saveMedia(type) {
                 return $q(function(resolve, reject) {
