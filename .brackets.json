@@ -1,6 +1,0 @@
-{
-    "jscodehints.detectedExclusions": [
-        "/home/richpolis/Proyectos/ionic/farmApp/platforms/android/build/intermediates/assets/debug/www/lib/ionic/js/ionic.bundle.js",
-        "/home/richpolis/Proyectos/ionic/farmApp/platforms/android/build/intermediates/assets/debug/www/lib/ionic/js/ionic.js"
-    ]
-}
