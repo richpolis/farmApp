@@ -1,6 +1,6 @@
 <ion-view cache-view="false" title="Mi cuenta">
 
-    <ion-tabs tabs-type="tabs-icon-only" class="tabs-striped tabs-background-balanced tabs-color-light">
+    <ion-tabs tabs-type="tabs-icon-only" class="tabs-striped tabs-bottom tabs-background-balanced tabs-color-light">
 
         <ion-tab title="Perfil" icon-on="ion-person" icon-off="ion-person">
             <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}}">
@@ -30,7 +30,7 @@
         </ion-tab>
 
         <ion-tab title="Direcciones" icon-on="ion-location" icon-off="ion-location">
-            <ion-content has-header="true" padding="true" scroll="false" style="margin-top: {{marginTop}}">
+            <ion-content has-header="true" padding="true" scroll="true" style="margin-top: {{marginTop}}">
                 <div class="list">
                     <label class="item item-input item-select" ng-if="direcciones.length > 0">
                         <div class="input-label">

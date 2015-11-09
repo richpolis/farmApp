@@ -1,29 +1,33 @@
 <ion-modal-view>
-  <ion-header-bar>
-    <h1 class="title">Ubicacion en mapa</h1>
-    <div class="buttons">
-      <button class="button button-clear" ng-click="hideModalMap()">
-        <i class="icon ion-close-round"></i>
-      </button>
-    </div>
-  </ion-header-bar>
-  <div class="bar bar-subheader">
-    <div class="list" style="margin: 0px; padding: 0px;">
-      <div class="item item-input-inset">
+    <ion-header-bar>
         <label class="item-input-wrapper">
-          <input id="direccionBuscar" type="text" placeholder="Buscar direccion" autocomplete="on">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <!--input id="direccionBuscar" 
+                   type="search" 
+                   placeholder="Buscar direccion" 
+                   autocomplete="off" 
+                   ng-model="direccionBuscar" 
+                   googleplace="" style="width: 100%; padding: 0px 10px;"/-->
+            <ion-google-place ng-model="direccionBuscar"></ion-google-place>
         </label>
-        <button class="button button-small" ng-click="buscarDireccion()">
-          <i class="icon ion-search placeholder-icon"></i>
+        <button class="button button-balanced" ng-click="buscarDireccion()" ng-disabled="direccionBuscar.length==0">
+            Buscar
         </button>
-      </div>
-    </div>
-  </div>
-  <ion-content scroll="false">
-    <map on-create="mapCreated(map)"></map>
-  </ion-content>
-  <ion-footer-bar class="bar-stable">
-    <a ng-click="centerOnMe()" class="button button-icon icon ion-navigate"></a>
-    <button class="button button-clear pull-left button-balanced" ng-click="confirmarSeleccionMapa()">Seleccionar</button>
-  </ion-footer-bar>
+    </ion-header-bar>
+    <ion-content scroll="false">
+        <map on-create="mapCreated(map)"></map>
+    </ion-content>
+    <ion-footer-bar class="bar-stable">
+        <div class="row text-center" style="padding: 0px;">
+            <div class="col">
+                <a ng-click="hideModalMap()" class="button button-clear button-assertive button-icon icon ion-close-circled"></a>
+            </div>
+            <div class="col">
+                <a ng-click="centerOnMe()" class="button button-clear button-balanced button-icon icon ion-navigate"></a>
+            </div>
+            <div class="col">
+                <a ng-click="confirmarSeleccionMapa()" class="button button-clear button-balanced button-icon icon ion-checkmark-circled"></a>
+            </div>
+        </div>
+    </ion-footer-bar>
 </ion-modal-view>
