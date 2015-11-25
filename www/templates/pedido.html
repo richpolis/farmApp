@@ -50,8 +50,7 @@
                     <div class="input-label">
                         Colonia
                     </div>
-                    <select ng-model="direccionGuardada.colony">
-                        <option ng-repeat="colonia in colonias" value="{{colonia}}" selected>{{colonia}}</option>
+                    <select ng-model="direccionGuardada.colony"  ng-options="colonia for colonia in colonias">
                     </select>
                 </label>
                 <label class="item">

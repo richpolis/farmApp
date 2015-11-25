@@ -6,7 +6,7 @@
 // 'farmApp.controllers' is found in controllers.js
 angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives'])
 
-        .run(function ($ionicPlatform) {
+        .run(function ($ionicPlatform, $rootScope, $timeout) {
             $ionicPlatform.ready(function () {
                 // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
                 // for form inputs)
@@ -21,6 +21,17 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives'])
                 }
 
                 Conekta.setPublishableKey('key_FrzHZPkJxzRSbUNFcnpGyYw');
+                
+                window.plugin.notification.local.onadd = function (id, state, json) {
+                    var notification = {
+                        id: id,
+                        state: state,
+                        json: json
+                    };
+                    $timeout(function() {
+                        $rootScope.$broadcast("$cordovaLocalNotification:added", notification);
+                    });
+                };
             });
         })
 
@@ -166,6 +177,15 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives'])
                             'menuContent': {
                                 templateUrl: 'templates/recetas.html',
                                 controller: 'ImageController'
+                            }
+                        }
+                    })
+                    .state('app.notificaciones', {
+                        url: '/notificaciones',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/notificaciones.html',
+                                controller: 'NotificacionesController'
                             }
                         }
                     })

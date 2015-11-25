@@ -1,0 +1,81 @@
+<ion-modal-view>
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">Notificaciones</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="closeModalNotificacion()">
+                <i class="icon ion-close-round"></i>
+            </button>
+        </div>
+    </ion-header-bar>
+    <ion-content>
+        <div class="list">
+            <label class="item item-input">
+                <input type="text" ng-model="objNotificacion.title" value="" placeholder="Recordatorio">
+            </label>
+            <label class="item item-input">
+                <textarea ng-model="objNotificacion.message" placeholder="Notas"></textarea>
+            </label>
+            <div class="item item-input-inset">
+                <div class="row">
+                    <label class="item-input-wrapper col col-75">
+                        <input type="text" ng-model="objNotificacion.date" placeholder="Fecha"
+                               style="width: 100%; border: 1px solid black; text-align:center; margin-top: 5px;"
+                               readonly="readonly">
+                    </label>
+                    <button class="button button-small col" ng-click="addDate()">
+                        Fecha
+                    </button>
+                </div>    
+            </div>
+            <div class="item item-input-inset">
+                <div class="row">
+                    <label class="item-input-wrapper col col-75">
+                        <input type="text" ng-model="objNotificacion.time" placeholder="Hora"
+                               style="width: 100%; border: 1px solid black; text-align:center; margin-top: 5px;"
+                               readonly="readonly">
+                    </label>
+                    <button class="button button-small col" ng-click="addTime()">
+                        Hora
+                    </button>
+                </div>    
+            </div>
+            <label class="item item-input item-select">
+                <div class="input-label">
+                    Repetir
+                </div>
+                <select ng-model="objNotificacion.repetir" ng-options="sel for sel in ['Hora', 'Dia', 'Semana', 'Mes']">
+                </select>
+            </label>
+            <div class="item">
+                <div class="row">
+                    <div class="col col-33">
+                        Cada
+                    </div>
+                    <div class="col">
+                        <button ng-click="objNotificacion.intervalo = objNotificacion.intervalo - 1"
+                                ng-disabled="objNotificacion.intervalo == 1"
+                                class="button button-clear button-block button-balanced"
+                                style="margin: 0px;">
+                            <i class="icon ion-minus-circled"></i>
+                        </button>
+                    </div>
+                    <div class="col">
+                        <input type="text" ng-model="objNotificacion.intervalo"
+                               style="width: 100%; border: 1px solid black; text-align:center; margin-top: 5px;"
+                               readonly="readonly">
+                    </div>
+                    <div class="col">
+                        <button ng-click="objNotificacion.intervalo = objNotificacion.intervalo + 1"
+                                class="button button-clear button-block button-balanced"
+                                style="margin: 0px;">
+                            <i class="icon ion-plus-circled"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <label class="item">
+                <button class="button button-block button-balanced" ng-click="add()">Agregar recordatorio</button>
+            </label>
+        </div>
+    </ion-content>
+</ion-modal-view>

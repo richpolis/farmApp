@@ -471,7 +471,8 @@ angular.module('farmApp.services', [])
                         "colony": direccion.colony,
                         "delegation_municipaly": direccion.delegation_municipaly,
                         "lat": direccion.lat,
-                        "lng": direccion.lng
+                        "lng": direccion.lng,
+                        "active": direccion.active
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -503,7 +504,8 @@ angular.module('farmApp.services', [])
                         "colony": direccion.colony,
                         "delegation_municipaly": direccion.delegation_municipaly,
                         "lat": direccion.lat,
-                        "lng": direccion.lng
+                        "lng": direccion.lng,
+                        "active": direccion.active
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -549,7 +551,8 @@ angular.module('farmApp.services', [])
                     "colony": "",
                     "delegation_municipaly": "",
                     lat: "",
-                    lng: ""
+                    lng: "",
+                    "active": true
                 };
             };
             return {
@@ -1271,6 +1274,47 @@ angular.module('farmApp.services', [])
             };
             return {
                 getTarjetaToken: get_tarjeta_token
+            };
+        })
+        .factory('NotificacionLocal',function($cordovaLocalNotification){
+            var notificaciones = [];
+            var contNotificacion = 0;
+            notificaciones =  JSON.parse(window.localStorage['notificaciones'] || '[]');
+            contNotificacion =  JSON.parse(window.localStorage['contNotificacion'] || '0');
+            
+            var add_notificacion = function(notificacion) {
+                notificacion.autoCancel = true;
+                contNotificacion++;
+                notificacion.id = contNotificacion;
+                notificacion.date = notificacion.date + "T" + notificacion.time;
+                $cordovaLocalNotification.add(notificacion).then(function () {
+                    console.log("The notification has been set");
+                });
+                notificaciones.push(notificacion);
+                window.localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
+                window.localStorage.setItem('contNotificacion', JSON.stringify(contNotificacion));
+            };
+            
+            var get_notificaciones = function(){
+                return notificaciones;
+            };
+            
+            var get_notificacion_vacia = function(){
+                date = new Date();
+                return {
+                    date: date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate(),
+                    time: (date.getHours()<=9?"0":"") + date.getHours() + ":" + (date.getMinutes()<=9?"0":"") + date.getMinutes() + ":00" , 
+                    message: "",
+                    title: "",
+                    repetir: "Hora",
+                    intervalo: 8
+                };
+            };
+            
+            return {
+                add: add_notificacion,
+                get: get_notificaciones,
+                getEmpty: get_notificacion_vacia
             };
         })
         ;

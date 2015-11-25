@@ -39,7 +39,8 @@ angular.module('farmApp.directives', [])
             '$timeout',
             '$rootScope',
             '$document',
-            function ($ionicTemplateLoader, $ionicBackdrop, $ionicPlatform, $q, $timeout, $rootScope, $document) {
+            '$http',
+            function ($ionicTemplateLoader, $ionicBackdrop, $ionicPlatform, $q, $timeout, $rootScope, $document,$http) {
                 return {
                     require: '?ngModel',
                     restrict: 'E',
@@ -61,7 +62,7 @@ angular.module('farmApp.directives', [])
                             '<div class="bar bar-header item-input-inset">',
                             '<label class="item-input-wrapper">',
                             '<i class="icon ion-ios7-search placeholder-icon"></i>',
-                            '<input class="google-place-search" type="search" ng-model="searchQuery" placeholder="' + (attrs.searchPlaceholder || 'Enter an address, place or ZIP code') + '">',
+                            '<input class="google-place-search" type="search" ng-model="searchQuery" placeholder="' + (attrs.searchPlaceholder || 'Ingresa la direccion, el lugar o codigo postal') + '">',
                             '</label>',
                             '<button class="button button-clear">',
                             attrs.labelCancel || 'Cancel',
@@ -70,7 +71,7 @@ angular.module('farmApp.directives', [])
                             '<ion-content class="has-header has-header">',
                             '<ion-list>',
                             '<ion-item ng-repeat="location in locations" type="item-text-wrap" ng-click="selectLocation(location)">',
-                            '{{location.formatted_address}}',
+                            '{{location.description}}',
                             '</ion-item>',
                             '</ion-list>',
                             '</ion-content>',
@@ -87,37 +88,55 @@ angular.module('farmApp.directives', [])
                             var searchInputElement = angular.element(el.element.find('input'));
 
                             scope.selectLocation = function (location) {
-                                ngModel.$setViewValue(location);
-                                ngModel.$render();
-                                el.element.css('display', 'none');
-                                $ionicBackdrop.release();
+                                console.log("Localizacion");
+                                console.log(location);
+                                var req = scope.geocodeOptions || {};
+                                req.address = location.description;
+                                geocoder.geocode(req, function (results, status) {
+                                    if (status == google.maps.GeocoderStatus.OK) {
 
-                                if (unbindBackButtonAction) {
-                                    unbindBackButtonAction();
-                                    unbindBackButtonAction = null;
-                                }
+                                        console.log("Resultados");
+                                        console.log(results[0]);    
+
+
+                                        ngModel.$setViewValue(results[0]);
+                                        ngModel.$render();
+                                        el.element.css('display', 'none');
+                                        $ionicBackdrop.release();
+
+                                        if (unbindBackButtonAction) {
+                                            unbindBackButtonAction();
+                                            unbindBackButtonAction = null;
+                                        }
+                                    } else {
+                                        // @TODO: Figure out what to do when the geocoding fails
+                                    }
+                                });
                             };
 
                             scope.$watch('searchQuery', function (query) {
                                 if (searchEventTimeout)
                                     $timeout.cancel(searchEventTimeout);
-                                searchEventTimeout = $timeout(function () {
+                                    searchEventTimeout = $timeout(function () {
                                     if (!query)
                                         return;
                                     if (query.length < 3)
                                         ;
-
-                                    var req = scope.geocodeOptions || {};
-                                    req.address = query;
-                                    geocoder.geocode(req, function (results, status) {
-                                        if (status == google.maps.GeocoderStatus.OK) {
-                                            scope.$apply(function () {
-                                                scope.locations = results;
-                                            });
-                                        } else {
-                                            // @TODO: Figure out what to do when the geocoding fails
+                                        
+                                    var displaySuggestions = function (predictions, status) {
+                                        if (status != google.maps.places.PlacesServiceStatus.OK) {
+                                            alert(status);
+                                            return;
                                         }
-                                    });
+
+                                        scope.$apply(function () {
+                                            scope.locations = predictions;
+                                        });
+                                    };
+
+                                    var service = new google.maps.places.AutocompleteService();
+                                    service.getQueryPredictions({input: query}, displaySuggestions);    
+                                    
                                 }, 350); // we're throttling the input by 350ms to be nice to google's API
                             });
 
@@ -214,4 +233,21 @@ angular.module('farmApp.directives', [])
                     });
                 }
             };
-        });
+        })
+        .directive('disableTap', function($timeout) {
+            return {
+              link: function() {
+                $timeout(function() {
+                  container = document.getElementsByClassName('pac-container');
+                  // disable ionic data tab
+                  angular.element(container).attr('data-tap-disabled', 'true');
+                  // leave input field if google-address-entry is selected
+                  angular.element(container).on("click", function(){
+                      document.getElementById('direccionBuscar').blur();
+                  });
+
+                },500);
+
+              }
+            };
+          });

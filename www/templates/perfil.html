@@ -1,7 +1,5 @@
 <ion-view cache-view="false" title="Mi cuenta">
-
     <ion-tabs tabs-type="tabs-icon-only" class="tabs-striped tabs-bottom tabs-background-balanced tabs-color-light">
-
         <ion-tab title="Perfil" icon-on="ion-person" icon-off="ion-person">
             <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}}">
                 <form id="formRegister" ng-submit="doRegister()">
@@ -30,7 +28,7 @@
         </ion-tab>
 
         <ion-tab title="Direcciones" icon-on="ion-location" icon-off="ion-location">
-            <ion-content has-header="true" padding="true" scroll="true" style="margin-top: {{marginTop}}">
+            <ion-content has-header="true" padding="true" scroll="true" style="margin-top: {{marginTop}};margin-bottom: {{marginTop}};">
                 <div class="list">
                     <label class="item item-input item-select" ng-if="direcciones.length > 0">
                         <div class="input-label">
@@ -78,14 +76,16 @@
                         <label class="item item-input" ng-show="colonias.length==0">
                             <input type="text" name="colonia" ng-model="direccionGuardada.colony" placeholder="Colonia">
                         </label>
-                        <label class="item item-input item-select"  ng-if="colonias.length>1">
+                        <label class="item item-input item-select" ng-show="colonias.length>1">
                             <div class="input-label">
                                 Colonia
                             </div>
-                            <select ng-model="direccionGuardada.colony">
-                                <option ng-repeat="colonia in colonias" value="{{colonia}}" selected>{{colonia}}</option>
+                            <select ng-model="direccionGuardada.colony"  ng-options="colonia for colonia in colonias">
                             </select>
                         </label>
+                        <div class="item">
+                            <ion-toggle ng-model="direccionGuardada.active" style="border: none; font-size: .9em;" toggle-class="toggle-calm">Utilizar direccion para envios?</ion-toggle>
+                        </div>
                         <label class="item">
                             <button class="button button-block button-balanced" type="submit">
                                 <span  ng-show="!direccionGuardada.id">Guardar dirección</span>
@@ -98,8 +98,8 @@
             </ion-content>
         </ion-tab>
         <ion-tab title="Ventas" icon-on="ion-ios-cart-outline" icon-off="ion-ios-cart-outline">
-            <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}}">
-                <ion-list ng-repeat="pedido in pedidos">
+            <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}};margin-bottom: {{marginTop}};">
+                <ion-list ng-repeat="pedido in pedidos | orderBy:'created':true">
                     <ion-item class="item-divider">
                         {{pedido.created | date }}
                         <span class="item-note">

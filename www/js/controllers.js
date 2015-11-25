@@ -213,6 +213,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.direcciones = [];
             $scope.colonias = [];
             $scope.pedidos = [];
+            $scope.inapam = JSON.parse(window.localStorage['inapam'] || '[]');
             Direcciones.getDirecciones().then(function (direcciones) {
                 $scope.direcciones = direcciones;
             }, function (err) {
@@ -286,7 +287,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         $scope.userData.inapam = false;
                     };
 
-                    $scope.inapam = JSON.parse(window.localStorage['inapam'] || '[]');
+                    
 
                     function optionsForType(indice) {
                         var source;
@@ -310,7 +311,6 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
                     $scope.urlForImage = function (image) {
                         var url = FileService.urlForImage(image);
-                        alert(url);
                         return url;
                     };
 
@@ -374,11 +374,13 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
                     function getImageUploadOptions(imageURI, params, headers) {
                         var options = new FileUploadOptions();
+                        options.fileKey = "inapam";
                         options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
                         options.mimeType = "image/" + imageURI.substr(imageURI.lastIndexOf('.') + 1);
                         options.params = params;
                         options.httpMethod = "POST";
                         options.headers = headers;
+                        alert(JSON.stringify(options));
                         return options;
                     }
 
@@ -391,13 +393,14 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     $scope.confirmarFotoInapam = function () {
                         var user = User.getUser();
                         var token = User.getAuthToken();
-                        var params = {'user_id': user.id},
+                        var params = {"active": false },
                         headers = {"Content-Type": "application/json", "Authorization": "Token " + token};
                         var image = $scope.inapam[0];
                         var urlImage = $scope.inapam[0];
                         var ft = new FileTransfer();
+                        var options = getImageUploadOptions(urlImage, params, headers);
                         ft.upload(urlImage,
-                                encodeURI("http://farmaapp.mx/api/inapam/imagenes/"),
+                                encodeURI("http://farmaapp.mx/api/images/inapam/"),
                                 savedFile(image, function (file) {
                                     var name = $scope.inapam[0].substr($scope.inapam[0].lastIndexOf('/') + 1);
                                     $cordovaFile.removeFile(cordova.file.dataDirectory, name)
@@ -407,10 +410,11 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                                             }, function (error) {
                                                 alert("No es posible eliminar el archivo");
                                             });
-                                })
-                                , function () {
-                                    alert("Error al subir archivo")
-                                }, getImageUploadOptions(urlImage, params, headers));
+                                }), 
+                                function (err) {
+                                    alert("Error al subir archivo");
+                                    alert(JSON.stringify(err));
+                                }, options);
                     };
 
                 }
@@ -422,6 +426,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     for (var cont = 0; cont <= $scope.direcciones.length; cont++) {
                         if ($scope.direcciones[cont].street == select.value) {
                             $scope.direccionGuardada = $scope.direcciones[cont];
+                            $scope.colonias = [];
                             break;
                         }
                     }
@@ -452,6 +457,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         }
                     }
                 } else {
+                    confirmarUtilizarDireccionEnvio();
                     Direcciones.addDireccion($scope.direccionGuardada).then(function (direccion) {
                         $scope.direcciones.push(direccion);
                         $scope.direccionGuardada = Direcciones.getDireccionVacia();
@@ -495,6 +501,22 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 var direccionBuscar = document.getElementById('direccionBuscar');
                 return direccionBuscar.value.length > 0;
             }
+            
+            function confirmarUtilizarDireccionEnvio () {
+                var confirmPopup = $ionicPopup.confirm({
+                    title: 'Confirmar utilizar direccion',
+                    template: 'Deseas guardar la direccion para proximas entregas?',
+                    cancelText: "No",
+                    okText: "Si"
+                });
+                confirmPopup.then(function (res) {
+                    if (res) {
+                        $scope.direccionGuardada.active = true;
+                    } else {
+                        $scope.direccionGuardada.active = false;
+                    }
+                });
+            };
 
             $scope.confirmarSeleccionMapa = function () {
                 var confirmPopup = $ionicPopup.confirm({
@@ -606,6 +628,12 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 }, 2000);
             };
 
+            $scope.buscarDireccionEn = function(){
+                $timeout(function(){
+                    $scope.buscarDireccion();
+                },1000);
+            };
+
             $scope.buscarDireccion = function () {
                 var geocoder = new google.maps.Geocoder();
                 if ($scope.hasDireccionbuscar()) {
@@ -614,21 +642,28 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     alert("Favor de ingresar una direccion para buscar");
                     return;
                 }
+
+                console.log("Direccion Buscar:" + direccionBuscar.value);
+
                 geocoder.geocode({'address': direccionBuscar.value}, function (results, status) {
                     // Verificamos el estatus
                     if (status == 'OK') {
                         // Si hay resultados encontrados, centramos y repintamos el mapa
                         // esto para eliminar cualquier pin antes puesto
-                        if (results[0].geometry.bounds) {
-                            $scope.map.fitBounds(results[0].geometry.bounds);
-                            console.log(results[0].address_components);
-                        } else {
+
+                        console.log(results);
+                        if(results[0].geometry.location){
                             $scope.direccionGuardada.lat = results[0].geometry.location.lat();
                             $scope.direccionGuardada.lng = results[0].geometry.location.lng();
                             //$scope.map.fitBounds(results[0].geometry.viewport);
                             $scope.ubicacionDelMapa();
                             $scope.setValuesResults(results);
-                        }
+                        }else if (results[0].geometry.bounds) {
+                            $scope.map.fitBounds(results[0].geometry.bounds);
+                            console.log(results[0].address_components);
+                        } else{
+                            alert("No fue encontrada la localizacion");  
+                        } 
                     } else {
                         // En caso de no haber resultados o que haya ocurrido un error
                         // lanzamos un mensaje con el error
@@ -839,7 +874,12 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.direcciones = [];
             $scope.colonias = [];
             Direcciones.getDirecciones().then(function (direcciones) {
-                $scope.direcciones = direcciones;
+                $scope.direcciones = [];
+                for(var cont = 0; cont < direcciones.length; cont++){
+                    if(direcciones[cont].active==true){
+                        $scope.direcciones.push(direcciones[cont]);
+                    }
+                }
                 if ($scope.direcciones.length == 1) {
                     var select = document.getElementById('recuperar-direccion');
                     select.value = $scope.direcciones[0].street;
@@ -856,7 +896,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 var productos = Carrito.getProductos();
                 var encontrado = false;
                 for (var cont = 0; cont < productos.length; cont++) {
-                    if (productos[cont].require_prescription) {
+                    if (productos[cont].recipe > 1 ) {
                         encontrado = true;
                         break
                     }
@@ -875,6 +915,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     for (var cont = 0; cont <= $scope.direcciones.length; cont++) {
                         if ($scope.direcciones[cont].street == select.value) {
                             $scope.direccionGuardada = $scope.direcciones[cont];
+                            $scope.colonias = [];
                             break;
                         }
                     }
@@ -905,6 +946,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         }
                     }
                 } else {
+                    confirmarUtilizarDireccionEnvio();
                     Direcciones.addDireccion($scope.direccionGuardada).then(function (direccion) {
                         Carrito.setDireccion(direccion);
                         $scope.colonias = [];
@@ -947,7 +989,23 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 var direccionBuscar = document.getElementById('direccionBuscar');
                 return direccionBuscar.value.length > 0;
             }
-
+            
+            function confirmarUtilizarDireccionEnvio () {
+                var confirmPopup = $ionicPopup.confirm({
+                    title: 'Confirmar utilizar direccion',
+                    template: 'Deseas guardar la direccion para proximas entregas?',
+                    cancelText: "No",
+                    okText: "Si"
+                });
+                confirmPopup.then(function (res) {
+                    if (res) {
+                        $scope.direccionGuardada.active = true;
+                    } else {
+                        $scope.direccionGuardada.active = false;
+                    }
+                });
+            };
+            
             $scope.confirmarSeleccionMapa = function () {
                 var confirmPopup = $ionicPopup.confirm({
                     title: 'Confirmar direccion',
@@ -1063,7 +1121,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 if ($scope.hasDireccionbuscar()) {
                     var direccionBuscar = document.getElementById('direccionBuscar');
                 } else {
-                    alert("Favor de ingresar una direccion para buscar");
+                    //alert("Favor de ingresar una direccion para buscar");
                     return;
                 }
                 geocoder.geocode({'address': direccionBuscar.value}, function (results, status) {
@@ -1071,16 +1129,19 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     if (status == 'OK') {
                         // Si hay resultados encontrados, centramos y repintamos el mapa
                         // esto para eliminar cualquier pin antes puesto
-                        if (results[0].geometry.bounds) {
-                            $scope.map.fitBounds(results[0].geometry.bounds);
-                            console.log(results[0].address_components);
-                        } else {
+                        console.log(results);
+                        if(results[0].geometry.location){
                             $scope.direccionGuardada.lat = results[0].geometry.location.lat();
                             $scope.direccionGuardada.lng = results[0].geometry.location.lng();
                             //$scope.map.fitBounds(results[0].geometry.viewport);
                             $scope.ubicacionDelMapa();
                             $scope.setValuesResults(results);
-                        }
+                        }else if (results[0].geometry.bounds) {
+                            $scope.map.fitBounds(results[0].geometry.bounds);
+                            console.log(results[0].address_components);
+                        } else{
+                            alert("No fue encontrada la localizacion");  
+                        } 
                     } else {
                         // En caso de no haber resultados o que haya ocurrido un error
                         // lanzamos un mensaje con el error
@@ -1241,7 +1302,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     User.enviarCalificacion($scope.calificacion);
                 }
                 $scope.pedidoRealizado.hide();
-                window.location.href = "/";
+                window.location.href="/categorias";
             };
 
             $scope.ratingArr = [{
@@ -1288,9 +1349,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     });
                 });
             };
-
         })
-
         .controller('PedidosPeriodicosController', function ($scope, $timeout, $ionicPopup, PedidosPeriodicos, Loader) {
             PedidosPeriodicos.getPedidos().then(function (pedidos) {
                 $scope.pedidos = pedidos;
@@ -1312,7 +1371,6 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 console.log(pedido);
             };
         })
-
         .controller('ContactoController', function ($scope, $state, $ionicPopup, $cordovaEmailComposer) {
             $scope.contactoData = {
                 name: '',
@@ -1329,7 +1387,6 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 });
             };
         })
-
         .controller('PreguntasController', function ($scope, $ionicPopup, Preguntas) {
             $scope.preguntas = [];
             Preguntas.getPreguntas().then(function (preguntas) {
@@ -1340,5 +1397,75 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     template: err
                 });
             })
+        })
+        .controller('NotificacionesController', function ($scope, $ionicModal,
+        $cordovaLocalNotification, $cordovaDatePicker, NotificacionLocal) {
+
+            $scope.notificaciones = NotificacionLocal.get();
+            $scope.objNotificacion = NotificacionLocal.getEmpty();
+
+            $scope.add = function() {
+                NotificacionLocal.add($scope.objNotificacion);
+                $scope.notificaciones = NotificacionLocal.get();  
+                $scope.objNotificacion = NotificacionLocal.getEmpty();                
+            };
+
+            $scope.isScheduled = function() {
+                $cordovaLocalNotification.isScheduled("1234").then(function(isScheduled) {
+                    alert("Notification 1234 Scheduled: " + isScheduled);
+                });
+            };
+            
+            $scope.$on("$cordovaLocalNotification:added", function(id, state, json) {
+                alert("Added a notification");
+            });
+
+            $scope.$on('$cordovaLocalNotification:schedule', function(id, state, json) {
+                alert("Schedule the notification");
+            });
+
+            var options = {
+                date: new Date(),
+                mode: 'date', // or 'time'
+                minDate: new Date() - 10000,
+                allowOldDates: true,
+                allowFutureDates: false,
+                doneButtonLabel: 'DONE',
+                doneButtonColor: '#F2F3F4',
+                cancelButtonLabel: 'CANCEL',
+                cancelButtonColor: '#000000'
+              };
+
+            // Crear un formulario modal de notificacion
+            $ionicModal.fromTemplateUrl('templates/formNotificacion.html', {
+                scope: $scope
+            }).then(function (modalNotificacion) {
+                $scope.modalNotificacion = modalNotificacion;
+            });
+
+            $scope.closeModalNotificacion = function () {
+                $scope.modalNotificacion.hide();
+            };
+
+            $scope.addNotificacion = function () {
+                $scope.objNotificacion = NotificacionLocal.getEmpty();
+                $scope.modalNotificacion.show();
+            };
+
+            $scope.addDate = function(){
+                options.mode = 'date';
+                options.date = new Date($scope.objNotificacion.date);
+                $cordovaDatePicker.show(options).then(function(date){
+                    $scope.objNotificacion.date = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
+                });
+            };
+
+            $scope.addTime = function(){
+                options.mode = 'time';
+                options.date = new Date($scope.objNotificacion.time);
+                $cordovaDatePicker.show(options).then(function(time){
+                    $scope.objNotificacion.time = (time.getHours()<=9?"0":"") + time.getHours() + ":" + (time.getMinutes()<=9?"0":"") + time.getMinutes() + ":00";
+                });
+            };
         })
         ;

@@ -2,13 +2,7 @@
     <ion-header-bar>
         <label class="item-input-wrapper">
             <i class="icon ion-ios-search placeholder-icon"></i>
-            <!--input id="direccionBuscar" 
-                   type="search" 
-                   placeholder="Buscar direccion" 
-                   autocomplete="off" 
-                   ng-model="direccionBuscar" 
-                   googleplace="" style="width: 100%; padding: 0px 10px;"/-->
-            <ion-google-place ng-model="direccionBuscar"></ion-google-place>
+            <ion-google-place id="direccionBuscar" ng-model="direccionBuscar" ng-change="buscarDireccionEn()"></ion-google-place>
         </label>
         <button class="button button-balanced" ng-click="buscarDireccion()" ng-disabled="direccionBuscar.length==0">
             Buscar

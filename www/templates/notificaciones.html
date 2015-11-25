@@ -1,0 +1,22 @@
+<ion-view cache-view="false" view-title="Notificaciones">
+    <ion-content class="has-header padding">
+        <div class="list card" ng-repeat="notificacion in notificaciones">
+            <div class="item">
+                <h2>{{notificacion.title}}</h2>
+                <p>{{notificacion.message}}</p>
+              </div>
+
+              <div class="item">
+                <p>{{notificacion.date|date}}</p>
+              </div>
+
+              <a class="item item-icon-left assertive" href="#">
+                <i class="icon ion-tash"></i>
+                Eliminar
+              </a>
+        </div>
+        <button class="button button-full button-balanced" ng-click="addNotificacion()">
+            Agregar recordatorio
+        </button>
+    </ion-content>
+</ion-view>
