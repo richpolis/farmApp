@@ -1,27 +1,29 @@
 <ion-modal-view>
-    <ion-header-bar>
-        <label class="item-input-wrapper">
-            <i class="icon ion-ios-search placeholder-icon"></i>
-            <ion-google-place id="direccionBuscar" ng-model="direccionBuscar" ng-change="buscarDireccionEn()"></ion-google-place>
-        </label>
-        <button class="button button-balanced" ng-click="buscarDireccion()" ng-disabled="direccionBuscar.length==0">
-            Buscar
-        </button>
+    <ion-header-bar class="bar-stable">
+        <h1 class="title">Mi ubicaci&oacute;n</h1>
+        <div class="buttons">
+            <button class="button button-clear" ng-click="hideModalMap()">
+                <i class="icon ion-close-round"></i>
+            </button>
+        </div>
     </ion-header-bar>
     <ion-content scroll="false">
         <map on-create="mapCreated(map)"></map>
+        <div class="message-over-map">
+            <p>
+                Puedes arrastrar el marcador para tener una ubicaci&oacute;n mas precisa y podras editar la direccion en la pantalla siguiente. 
+            </p>
+        </div>
     </ion-content>
     <ion-footer-bar class="bar-stable">
         <div class="row text-center" style="padding: 0px;">
             <div class="col">
-                <a ng-click="hideModalMap()" class="button button-clear button-assertive button-icon icon ion-close-circled"></a>
+                <a ng-click="centerOnMe()" class="button button-clear button-balanced icon ion-navigate"></a>
             </div>
             <div class="col">
-                <a ng-click="centerOnMe()" class="button button-clear button-balanced button-icon icon ion-navigate"></a>
-            </div>
-            <div class="col">
-                <a ng-click="confirmarSeleccionMapa()" class="button button-clear button-balanced button-icon icon ion-checkmark-circled"></a>
+                <a ng-click="confirmarSeleccionMapa()" class="button button-clear button-balanced icon ion-checkmark-circled"></a>
             </div>
         </div>
+
     </ion-footer-bar>
 </ion-modal-view>

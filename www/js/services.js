@@ -19,7 +19,7 @@ angular.module('farmApp.services', [])
                     }
                 };
         }])
-        .factory('FileService', function() {
+        .factory('FileService', function($cordovaFile) {
             var images;
             var IMAGE_STORAGE_KEY = 'images';
 
@@ -1282,11 +1282,30 @@ angular.module('farmApp.services', [])
             notificaciones =  JSON.parse(window.localStorage['notificaciones'] || '[]');
             contNotificacion =  JSON.parse(window.localStorage['contNotificacion'] || '0');
             
+            var find_notificacion = function(notificacionId){
+                var obj = null;
+                for(var i = 0; i<=notificaciones.length; i++){
+                    if(notificaciones[i].id == notificacionId){
+                        obj = notificaciones[i];
+                        break;
+                    }
+                }
+                return obj;
+            };
+            
             var add_notificacion = function(notificacion) {
+                var fecha = new Date();
+                var hora = notificacion.tiempo.hora;
+                if(notificacion.tiempo.horario=="pm"){
+                    hora += 12;
+                }
+                fecha.setHours(hora);
+                fecha.setMinutes(notificacion.tiempo.minutos);
                 notificacion.autoCancel = true;
                 contNotificacion++;
                 notificacion.id = contNotificacion;
-                notificacion.date = notificacion.date + "T" + notificacion.time;
+                notificacion.date = fecha;
+                notificacion.intervalo = getIntervaloString(notificacion);
                 $cordovaLocalNotification.add(notificacion).then(function () {
                     console.log("The notification has been set");
                 });
@@ -1302,18 +1321,61 @@ angular.module('farmApp.services', [])
             var get_notificacion_vacia = function(){
                 date = new Date();
                 return {
-                    date: date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate(),
-                    time: (date.getHours()<=9?"0":"") + date.getHours() + ":" + (date.getMinutes()<=9?"0":"") + date.getMinutes() + ":00" , 
+                    date: date,
+                    tiempo: {
+                        hora: '00',
+                        minutos: '00',
+                        horario: 'am'
+                    }, 
                     message: "",
                     title: "",
-                    repetir: "Hora",
-                    intervalo: 8
+                    repetir: {
+                        todosLosDias: false,
+                        domingo: false, 
+                        sabado: false, 
+                        lunes: false, 
+                        martes: false,
+                        miercoles: false,
+                        jueves: false, 
+                        viernes: false
+                    },
+                    intervalo: ""
                 };
             };
+            
+            function getIntervaloString(notificacion){
+                var cadena = "";
+                if(notificacion.repetir.todosLosDias){
+                    return "Todos los Dias";
+                }
+                if(notificacion.repetir.domingo){
+                    cadena += "Domingo ";
+                }
+                if(notificacion.repetir.sabado){
+                    cadena += "Sabado ";
+                }
+                if(notificacion.repetir.lunes){
+                    cadena += "Lunes ";
+                }
+                if(notificacion.repetir.martes){
+                    cadena += "Martes ";
+                }
+                if(notificacion.repetir.miercoles){
+                    cadena += "Miercoles ";
+                }
+                if(notificacion.repetir.jueves){
+                    cadena += "Jueves ";
+                }
+                if(notificacion.repetir.viernes){
+                    cadena += "Viernes ";
+                }
+                return cadena;
+            }
             
             return {
                 add: add_notificacion,
                 get: get_notificaciones,
+                find: find_notificacion,
                 getEmpty: get_notificacion_vacia
             };
         })

@@ -189,6 +189,24 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives'])
                             }
                         }
                     })
+                    .state('app.addNotificacion', {
+                        url: '/add/notificacion',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/formNotificacion.html',
+                                controller: 'FormNotificacionController'
+                            }
+                        }
+                    })
+                    .state('app.viewNotificacion', {
+                        url: '/notificaciones/:notificacionId',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/notificacion.html',
+                                controller: 'NotificacionController'
+                            }
+                        }
+                    })
                     ;
             // if none of the above states are matched, use this as the fallback
             $urlRouterProvider.otherwise('/inicio');
