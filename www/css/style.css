@@ -159,6 +159,20 @@ map {
 }
 
 
+.message-over-map{
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    height: 70px;
+    font-size: .9em;
+    background-color: #ffffff;
+    color: black;
+    padding: 5px;
+    width: 87%;
+    text-align: center;
+}
+
+
 input.ion-google-place[readonly]{
     background-color: transparent;
     cursor: text;

@@ -13,9 +13,8 @@
             Gracias {{user.first_name}} {{user.last_name}}
             <br/>
             <br/>
-            Tu pedido ha sido enviado, recibirás <br/>
-            una notificación cuando el repartidor <br/>
-            este en tu puerta<br/>
+            Tu orden (#{{venta.id}}) está siendo procesada<br/>
+             te notificaremos en cuanto sea enviada.<br/>
             <i class="icon ion-android-happy" style="font-size: 6em;"></i>
         </p>
         <p class="text-center">
@@ -26,12 +25,19 @@
                     <i style="font-size: 32px;" class="icon balanced {{r.icon}}" ng-click="setRating(r.value)"></i>
                 </a>
             </div>
+            <div class="balanced padding">
+                <textarea ng-model="ranking.comentario" style="width: 100%; height: 100px;border: 2px solid #2EC7C7; padding: 10px;"></textarea>
+            </div>
         </p>
     </ion-content>
     <ion-footer-bar style="position: absolute; bottom: 30px;">
         <button style="font-size: 1.5em; height: 3em; " class="button button-block button-balanced"
-                ng-click="closePedidoRealizado()">
+                ng-click="closePedidoRealizado()" ng-show="ranking.calificacion == 0">
             Cerrar
+        </button>
+        <button style="font-size: 1.5em; height: 3em; " class="button button-block button-balanced"
+                ng-click="closePedidoRealizado()" ng-show="ranking.calificacion > 0">
+            Enviar calificación y comentario
         </button>
     </ion-footer-bar>
 </ion-modal-view>

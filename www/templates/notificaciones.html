@@ -1,22 +1,19 @@
-<ion-view cache-view="false" view-title="Notificaciones">
+<ion-view cache-view="false" view-title="Recordatorios">
     <ion-content class="has-header padding">
-        <div class="list card" ng-repeat="notificacion in notificaciones">
-            <div class="item">
-                <h2>{{notificacion.title}}</h2>
-                <p>{{notificacion.message}}</p>
-              </div>
-
-              <div class="item">
-                <p>{{notificacion.date|date}}</p>
-              </div>
-
-              <a class="item item-icon-left assertive" href="#">
-                <i class="icon ion-tash"></i>
-                Eliminar
-              </a>
-        </div>
-        <button class="button button-full button-balanced" ng-click="addNotificacion()">
+        <a class="button button-full button-balanced" href="#/app/add/notificacion">
             Agregar recordatorio
-        </button>
+        </a>
+        <div class="list">
+            <div class="item item-toggle" ng-repeat="notificacion in notificaciones">
+                <h2>{{notificacion.tiempo.hora}} : {{notificacion.tiempo.minutos}} {{notificacion.tiempo.horario}}</h2>
+                <p>{{notificacion.intervalo}}</p>
+                <label class="toggle toggle-assertive">
+                    <input type="checkbox" ng-model="notificacion.autoCancel">
+                    <div class="track">
+                        <div class="handle"></div>
+                    </div>
+                </label>
+            </div>
+        </div>
     </ion-content>
 </ion-view>

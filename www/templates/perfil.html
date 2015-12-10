@@ -16,8 +16,18 @@
                         <label class="item item-input">
                             <input type="tel" name="celular" ng-model="userData.cell" placeholder="Celular">
                         </label>
-                        <div class="item">
+                        <div class="item" ng-show="inapam.length==0">
                             <ion-toggle ng-model="userData.inapam" style="border: none; font-size: .9em;" toggle-class="toggle-calm">INAPAM</ion-toggle>
+                        </div>
+                        <div class="card" ng-repeat="imageUrl in inapam" ng-show="inapam.length>0">
+                            <div class="item item-text-wrap">
+                                <img ng-src="{{imageUrl}}"
+                                     style="height:200px; padding: 5px 5px 5px 5px;"/>
+                            </div>
+                            <a class="item item-icon-left assertive" href="#" ng-click="removeImage()">
+                                <i class="icon ion-trash-a"></i>
+                                Eliminar
+                            </a>
                         </div>
                         <label class="item">
                             <button class="button button-block button-balanced" type="submit">Actualizar</button>
