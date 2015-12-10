@@ -6,16 +6,17 @@
                 <div class="input-label">
                   Filtrar
                 </div>
-                <select class="balanced">
+                <select class="balanced" ng-model="ordenar">
                   <!--option>Mas vendidos</option-->
-                  <option selected>A-Z</option>
+                  <option value="name" selected>A-Z</option>
+                  <option value="inventory">Por inventario</option>
                 </select>
             </label>
             <label class="item item-input"  ng-show="productos.length > 0">
                 <i class="icon ion-search placeholder-icon"></i>
                 <input type="text" placeholder="buscar" ng-model="buscar">
             </label>
-            <ion-item ng-repeat="producto in productos| orderBy:'name' | filter:buscar "
+            <ion-item ng-repeat="producto in productos | filter:buscar | orderBy:ordenar "
                       class="item-thumbnail-left" href="#/app/producto/{{producto.id}}">
                 <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}">
                 <h2>{{producto.name}}</h2>

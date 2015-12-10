@@ -4,9 +4,9 @@
 // 'farmApp' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'farmApp.controllers' is found in controllers.js
-angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives'])
+angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','farmApp.services'])
 
-        .run(function ($ionicPlatform, $rootScope, $timeout) {
+        .run(function ($ionicPlatform, $rootScope, $timeout, PushNotifications) {
             $ionicPlatform.ready(function () {
                 // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
                 // for form inputs)
@@ -32,6 +32,18 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives'])
                         $rootScope.$broadcast("$cordovaLocalNotification:added", notification);
                     });
                 };
+                
+                PushNotifications.setGcmSenderId('1012709617565');
+                PushNotifications
+                  .ensureRegistration(function(regInfo) {
+                    console.log("Registrado!", regInfo.source, regInfo.token);
+                  }, function() {
+                    console.log("Error al registrar");
+                  })
+                  .onMessage(function(message) {
+                    console.log("New push notification", message);
+                  });
+
             });
         })
 

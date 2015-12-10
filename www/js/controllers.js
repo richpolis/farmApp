@@ -43,7 +43,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
 
         })
-        .controller('LoginController', function ($scope, $ionicPopup, $ionicModal, $state, User, Loader) {
+        .controller('LoginController', function ($scope, $ionicPopup, $ionicModal, 
+                    $state, User, Loader, RecuperarPassword) {
             $scope.data = {
                 email: '',
                 password: ''
@@ -57,9 +58,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                             get_me();
                         }, function (err) {
                             Loader.hideLoading();
-                            // error case
                             alert("error en login " + JSON.stringify(err));
-
                             $ionicPopup.alert({
                                 title: 'Login error!',
                                 template: err.detail
@@ -109,13 +108,16 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             // Perform the login action when the user submits the login form
             $scope.doRecuperar = function () {
-                console.log('Doing recuperar, aun en desarrollo', $scope.recuperarData);
-
-                // Simulate a login delay. Remove this and replace with your login
-                // code if using a login system
-                $timeout(function () {
+                RecuperarPassword.recuperarPassword($scope.recuperarData).then(function(data){
+                    $ionicPopup.alert({
+                        title: 'Recuperar contraseña!',
+                        template: 'Se ha enviado a su correo una solicitud de restablecer contraseña'
+                    });
                     $scope.closeFormRecuperar();
-                }, 1000);
+                },function(err){
+                    alert("Error: " + JSON.stringify(err));
+                });
+                
             };
 
             $scope.backInicio = function () {
@@ -386,17 +388,23 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     $scope.confirmarFotoInapam = function () {
                         var user = User.getUser();
                         var token = User.getAuthToken();
-                        var params = {"active": false },
-                        headers = {"Content-Type": "application/json", "Authorization": "Token " + token};
+                        var params = { "active":false }, 
+                            headers = {
+                                
+                                "Authorization": "Token " + token
+                            };
                         var urlImage = $scope.inapam[0];
                         var url = "http://farmaapp.mx/api/images/inapam/";
                         var options = getImageUploadOptions(urlImage, params, headers);
                         $cordovaFileTransfer.upload(url, urlImage, options).then(function (result) {
                             //console.log("SUCCESS: " + JSON.stringify(result.response));
                             alert("SUCCESS: " + JSON.stringify(result.response));
+                            $scope.hideInapamModal();
+                            
                         }, function (err) {
                             //console.log("ERROR: " + JSON.stringify(err));
                             alert("ERROR: " + JSON.stringify(err));
+                            $scope.removeImage();
                         }, function (progress) {
                             // PROGRESS HANDLING GOES HERE
                         });
@@ -704,6 +712,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 $scope.categorias = categorias;
             }, function (err) {
                 Loader.hideLoading();
+                alert("Error: " + JSON.stringify(err));
                 $ionicPopup.alert({
                     title: 'Error en categorias!',
                     template: err.detail
@@ -711,7 +720,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 if (err.detail == "Token inválido.") {
                     window.localStorage.removeItem('user');
                     window.localStorage.removeItem('access_token');
-                    window.location.href = "/app/categorias";
+                    window.location.href = "./main.html";
                 }
             });
 
@@ -740,8 +749,10 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
         })
         .controller('ProductosController', function ($scope, $timeout, $stateParams, $ionicPopup, $state, Categorias, Productos) {
-
+            
             $scope.title = "Productos";
+            $scope.ordenar = 'name';
+            
             Categorias.getCategoria($stateParams.categoriaId).then(function (categoria) {
                 $scope.categoria = categoria;
                 $timeout(function () {
@@ -765,6 +776,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 }
                 $scope.productos = products;
             }, function (err) {
+                console.log(err);
                 $ionicPopup.alert({
                     title: 'Error en productos!',
                     template: err.detail
@@ -917,7 +929,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 var productos = Carrito.getProductos();
                 var encontrado = false;
                 for (var cont = 0; cont < productos.length; cont++) {
-                    if (productos[cont].recipe > 1 ) {
+                    if (productos[cont].recipe > 2 ) {
                         encontrado = true;
                         break
                     }
@@ -1257,13 +1269,16 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
         .controller('PagoController', function ($scope, $ionicPopup, $state, $ionicModal, $cordovaCamera,
                 User, Carrito, FileService, ImageService, UIConekta, Loader) {
+            
             $scope.tarjeta = Carrito.getTarjeta();
             $scope.user = User.getUser();
             $scope.venta = Carrito.getVenta();
             $scope.productos = Carrito.getProductos();
             $scope.images = FileService.images();
+            
             $scope.doPago = function () {
                 var tarjeta = $scope.tarjeta;
+                debugger;
                 if (tarjeta.token) {
                     enviarPedido();
                 } else if (tarjeta.card.number) {
@@ -1334,8 +1349,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 $scope.venta = Carrito.getVenta();
                 var cont = images.length;
                 Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
-                var params = {'venta': $scope.venta.id},
-                headers = {"Content-Type": "application/json", "Authorization": "Token " + User.getAuthToken()};
+                var params = {"venta": $scope.venta.id},
+                headers = {"Authorization": "Token " + User.getAuthToken()};
                 ImageService.upload($scope.images, params, headers, function (result) {
                     console.log("SUCCESS: " + JSON.stringify(result.response));
                     cont--;
@@ -1365,11 +1380,11 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             // Accion para cerrar el pedidoRealizado
             $scope.closePedidoRealizado = function () {
-                if ($scope.calificacion > 0) {
-                    User.enviarCalificacion($scope.calificacion);
+                if ($scope.ranking.calificacion > 0) {
+                    User.enviarCalificacion($scope.ranking);
                 }
                 $scope.pedidoRealizado.hide();
-                window.location.href="/categorias";
+                window.location.href="./main.html";
             };
 
             $scope.ratingArr = [{
@@ -1389,10 +1404,13 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     icon: 'ion-ios-star-outline'
                 }];
 
-            $scope.calificacion = 0;
+            $scope.ranking = {
+                'calificacion': 0,
+                'comentario': "",
+            };
 
             $scope.setRating = function (val) {
-                $scope.calificacion = val;
+                $scope.ranking.calificacion = val;
                 var rtgs = $scope.ratingArr;
                 for (var i = 0; i < rtgs.length; i++) {
                     if (i < val) {
@@ -1438,7 +1456,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 console.log(pedido);
             };
         })
-        .controller('ContactoController', function ($scope, $state, $ionicPopup, $cordovaEmailComposer) {
+        .controller('ContactoController', function ($scope, $state, $ionicPopup, Contacto) {
             $scope.contactoData = {
                 name: '',
                 email: '',
@@ -1448,9 +1466,14 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
 
             $scope.doContacto = function () {
-                $ionicPopup.alert({
-                    title: 'Enviando...',
-                    template: 'Gracias por enviar tus comentarios'
+                Contacto.contacto($scope.contactoData).then(function(data){
+                    $ionicPopup.alert({
+                        title: 'Enviando...',
+                        template: 'Gracias por enviar tus comentarios'
+                    });
+                }, function(err){
+                    console.log(err);
+                    alert("Error: " + JSON.stringify(err));
                 });
             };
         })

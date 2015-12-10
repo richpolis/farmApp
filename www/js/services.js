@@ -379,7 +379,7 @@ angular.module('farmApp.services', [])
                     user.schedules_orders = pedidos;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
-                enviarCalificacion: function(calificacion){
+                enviarCalificacion: function(ranking){
                     var configHttp = {
                         method: "POST",
                         url: URL_BASE.urlBase + API_PATH.ratings,
@@ -387,7 +387,8 @@ angular.module('farmApp.services', [])
                             "Content-Type": "application/json",
                             "Authorization": "Token " + accessToken.auth_token
                         },
-                        data: {"user": user.id, "rating": calificacion }
+                        data: {"user": user.id, "rating": ranking.calificacion,
+                        "comment": ranking.comentario }
                     };
                     console.log(configHttp);
                     return $q(function (resolve, reject) {
@@ -1276,6 +1277,62 @@ angular.module('farmApp.services', [])
                 getTarjetaToken: get_tarjeta_token
             };
         })
+        .factory('Contacto',function($q, $http, URL_BASE, API_PATH){
+            var enviar_contacto = function(object) {
+                var configHttp = {
+                    method: "POST",
+                    url: URL_BASE.urlBase + API_PATH.contacto,
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    data: {
+                        "name": object.name, 
+                        "email": object.email, 
+                        "phone": object.phone,
+                        "subject": object.subject,
+                        "message": object.message
+                    }
+                };
+                console.log(configHttp);
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            return {
+              contacto:enviar_contacto
+            };
+        })
+        .factory('RecuperarPassword',function($q, $http, URL_BASE, API_PATH){
+            var recuperar_password = function(object) {
+                var configHttp = {
+                    method: "POST",
+                    url: URL_BASE.urlBase + API_PATH.recover_password,
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    data: {"email": object.email}
+                };
+                console.log(configHttp);
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            return {
+              recuperarPassword:recuperar_password
+            };
+        })
         .factory('NotificacionLocal',function($cordovaLocalNotification){
             var notificaciones = [];
             var contNotificacion = 0;
@@ -1379,4 +1436,131 @@ angular.module('farmApp.services', [])
                 getEmpty: get_notificacion_vacia
             };
         })
+        .factory("PushNotifications", function($cordovaPush, $rootScope){
+
+            var msgCallback;
+            var regCallback;
+            var errorCallback;
+            var gcmSenderId;
+
+            var service = {
+              setGcmSenderId: setGcmSenderId,
+              ensureRegistration: ensureRegistration,
+              getToken: getToken,
+              onMessage: onMessage
+            }
+
+            return service;
+
+            function setToken(token) {
+              window.localStorage.setItem('pushToken', token);
+            }
+
+            function setGcmSenderId(senderId) {
+              gcmSenderId = senderId;
+            }
+
+            function getToken() {
+              return window.localStorage.getItem('pushToken', '');
+            }
+
+            function onMessage(cb) {
+              msgCallback = cb;
+            }
+
+            // returns an object to the callback with source and token properties
+            function ensureRegistration(cb, errorCb) {
+              regCallback = cb;
+              errorCallback = errorCb;
+
+              document.addEventListener("deviceready", function(){
+                if (ionic.Platform.isAndroid()) {
+                  registerAndroid();
+                  $rootScope.$on('$cordovaPush:notificationReceived', androidPushReceived);
+                }
+                if (ionic.Platform.isIOS()) {
+                  registerIOS();
+                  $rootScope.$on('$cordovaPush:notificationReceived', iosPushReceived);
+                }
+              });
+
+              return this;
+            }
+
+            function registerIOS() {
+              var config = {
+                "badge": true,
+                "sound": true,
+                "alert": true,
+              };
+
+              $cordovaPush.register(config).then(function(result) {
+                setToken(result.deviceToken);
+                if (regCallback !== undefined) {
+                  regCallback({
+                    source: 'ios',
+                    token: result.deviceToken
+                  });
+                }
+              }, function(err) {
+                if (errorCallback !== undefined) {
+                  errorCallback(err);
+                }
+                console.log("Registration error on IOS: ", err)
+              });
+
+            }
+
+            // Inits the Android registration
+            // NOTICE: This will not set the token inmediatly, it will come
+            // on the androidPushReceived
+            function registerAndroid() {
+              var config = {
+                "senderID": gcmSenderId
+              };
+
+              // PushPlugin's telerik only register if necesary or when upgrading app
+              $cordovaPush.register(config).then(function(result) {
+                console.log("Registration requested!");
+              }, function(err) {
+                console.log("Error registering on Android", err);
+              });
+
+
+            }
+
+            // Process incoming push messages from android
+            function androidPushReceived(event, notification) {
+              switch(notification.event) {
+                case 'registered':
+                  if (notification.regid.length > 0 ) {
+                    setToken(notification.regid);
+                    if (regCallback !== undefined) {
+                      regCallback({
+                        source: 'android',
+                        token: notification.regid
+                      })
+                    }
+                  }
+                  break;
+
+                case 'message':
+                  if (msgCallback !== undefined) { msgCallback(notification) }
+                  break;
+
+                case 'error':
+                  console.log('GCM error = ' + notification.msg);
+                  break;
+
+                default:
+                  console.log('An unknown GCM event has occurred');
+                  break;
+              };
+            }
+
+            function iosPushReceived(event, notification) {
+              if (msgCallback !== undefined) { msgCallback(notification) }
+            }
+
+          })
         ;
