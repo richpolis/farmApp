@@ -924,22 +924,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 });
             });
 
-
-            $scope.doPedido = function () {
-                var productos = Carrito.getProductos();
-                var encontrado = false;
-                for (var cont = 0; cont < productos.length; cont++) {
-                    if (productos[cont].recipe > 2 ) {
-                        encontrado = true;
-                        break
-                    }
-                }
-                if (!encontrado) {
-                    $state.go('app.pago');
-                } else {
-                    $state.go('app.recetas');
-                }
-
+            $scope.goToNotes = function(){
+                $state.go('app.notas');
             };
 
             $scope.recuperarDireccion = function () {
@@ -968,7 +954,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                             Direcciones.updateDireccion(cont, $scope.direccionGuardada).then(function (direccion) {
                                 Carrito.setDireccion(direccion);
                                 $scope.colonias = [];
-                                $scope.doPedido();
+                                $scope.goToNotes();
                             }, function (err) {
                                 $ionicPopup.alert({
                                     title: 'Error en actualizar direccion!',
@@ -983,7 +969,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     Direcciones.addDireccion($scope.direccionGuardada).then(function (direccion) {
                         Carrito.setDireccion(direccion);
                         $scope.colonias = [];
-                        $scope.doPedido();
+                        $scope.goToNotes();
                     }, function (err) {
                         $ionicPopup.alert({
                             title: 'Error en agregar direccion!',
@@ -1230,6 +1216,31 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     }
                 });
                 google.maps.event.trigger($scope.map, 'resize');
+            };
+        })
+
+        .controller('NotasObservacionesController', function($scope, $state, Carrito){
+            $scope.pedido = Carrito.getVenta();
+
+            function doPedido () {
+                var productos = Carrito.getProductos();
+                var encontrado = false;
+                for (var cont = 0; cont < productos.length; cont++) {
+                    if (productos[cont].recipe > 2 ) {
+                        encontrado = true;
+                        break;
+                    }
+                }
+                if (!encontrado) {
+                    $state.go('app.pago');
+                } else {
+                    $state.go('app.recetas');
+                }
+            };
+
+            $scope.doNotas = function(){
+                Carrito.setNotas($scope.pedido.notes);
+                doPedido();
             };
         })
 

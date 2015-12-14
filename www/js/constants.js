@@ -1,6 +1,6 @@
 angular.module('farmApp')
 .constant('URL_BASE', {
-    urlBase: 'http://farmaapp.mx/',
+    urlBase: 'http://localhost:8000/',
     urlConekta: 'https://api.conekta.io/charges'
 })
 .constant('AUTH_PATH', {
