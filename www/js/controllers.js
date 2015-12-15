@@ -390,11 +390,10 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         var token = User.getAuthToken();
                         var params = { "active":false }, 
                             headers = {
-                                
                                 "Authorization": "Token " + token
                             };
                         var urlImage = $scope.inapam[0];
-                        var url = "http://farmaapp.mx/api/images/inapam/";
+                        var url = "http://farmaapp.mx/images/inapam/";
                         var options = getImageUploadOptions(urlImage, params, headers);
                         $cordovaFileTransfer.upload(url, urlImage, options).then(function (result) {
                             //console.log("SUCCESS: " + JSON.stringify(result.response));
