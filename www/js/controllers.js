@@ -388,8 +388,9 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     $scope.confirmarFotoInapam = function () {
                         var user = User.getUser();
                         var token = User.getAuthToken();
-                        var params = { "active":false }, 
+                        var params = { "active":false , "usuario": user.id },
                             headers = {
+                                "Accept": "application/json",
                                 "Authorization": "Token " + token
                             };
                         var urlImage = $scope.inapam[0];
