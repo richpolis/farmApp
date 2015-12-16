@@ -204,7 +204,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
         .controller('PerfilController', function ($scope, $ionicPopup, $cordovaGeolocation, $timeout,
                 $ionicLoading, $ionicModal, User, Direcciones, Pedidos, Loader,
-                $cordovaCamera, $cordovaFile, FileService, $cordovaFileTransfer) {
+                $cordovaCamera, $cordovaFile, FileService, $cordovaFileTransfer, URL_BASE, API_PATH) {
 
             $scope.userData = User.getUser();
             $scope.direccionBuscar = "";
@@ -381,7 +381,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         options.params = params;
                         options.httpMethod = "POST";
                         options.headers = headers;
-                        alert(JSON.stringify(options));
+                        //alert(JSON.stringify(options));
                         return options;
                     }
 
@@ -394,19 +394,22 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                                 "Authorization": "Token " + token
                             };
                         var urlImage = $scope.inapam[0];
-                        var url = "http://farmaapp.mx/images/inapam/";
+                        var url = URL_BASE.urlBase + API_PATH.images_inapam;
                         var options = getImageUploadOptions(urlImage, params, headers);
                         $cordovaFileTransfer.upload(url, urlImage, options).then(function (result) {
+                            Loader.hideLoading();
                             //console.log("SUCCESS: " + JSON.stringify(result.response));
-                            alert("SUCCESS: " + JSON.stringify(result.response));
+                            //alert("SUCCESS: " + JSON.stringify(result.response));
+                            alert("Gracias, por enviarnos su imagen, en breve sera revisada.");
                             $scope.hideInapamModal();
                             
                         }, function (err) {
+                            Loader.hideLoading();
                             //console.log("ERROR: " + JSON.stringify(err));
                             alert("ERROR: " + JSON.stringify(err));
                             $scope.removeImage();
                         }, function (progress) {
-                            // PROGRESS HANDLING GOES HERE
+                            Loader.showLoading("Subiendo imagen: " + (progress) + "%");
                         });
                     };
 
@@ -1361,7 +1364,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 var cont = images.length;
                 Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
                 var params = {"venta": $scope.venta.id},
-                headers = {"Authorization": "Token " + User.getAuthToken()};
+                headers = {"Accept":"application/json","Authorization": "Token " + User.getAuthToken()};
                 ImageService.upload($scope.images, params, headers, function (result) {
                     console.log("SUCCESS: " + JSON.stringify(result.response));
                     cont--;

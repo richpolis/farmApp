@@ -100,6 +100,7 @@ angular.module('farmApp.services', [])
 
             function getImageUploadOptions(imageURI, params, headers) {
                 var options = new FileUploadOptions();
+                options.fileKey = "receta";
                 options.fileName = imageURI.substr(imageURI.lastIndexOf('/')+1);
                 options.mimeType = "image/" + imageURI.substr(imageURI.lastIndexOf('.')+1);
                 options.params = params;

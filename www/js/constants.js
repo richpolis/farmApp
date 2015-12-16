@@ -1,6 +1,6 @@
 angular.module('farmApp')
 .constant('URL_BASE', {
-    urlBase: 'http://localhost:8000/',
+    urlBase: 'http://farmaapp.mx/',
     urlConekta: 'https://api.conekta.io/charges'
 })
 .constant('AUTH_PATH', {
@@ -20,7 +20,8 @@ angular.module('farmApp')
     ventas: 'api/ventas/',
     detalle_ventas: 'api/detalle/ventas/',
     pedidos_periodicos: 'api/pedidos/periodicos/',
-    images_ventas: 'api/images/ventas/',
+    images_ventas: 'images/ventas/',
+    images_inapam: 'images/inapam/',
     ratings: 'api/ratings/',
     contacto: 'contacto/',
     recover_password: 'solicitud/recuperar/password/'
