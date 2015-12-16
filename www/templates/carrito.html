@@ -70,7 +70,7 @@
                     </div>
                 </div>
             </div>
-            <ion-item>
+            <ion-item style="background-color: #2EC7C7; color: white;">
                 <div class="row" ng-if="totales.descuento > 0">
                     <div class="col">
                         Subtotal:
@@ -97,7 +97,8 @@
                 </div>
             </ion-item>
         </ion-list>
-        <a href="#/app/pedido" class="button button-block button-balanced" ng-if="productos.length>0">Hacer pedido</a>
+        <p class="text-center balanced" ng-if="productos.length>0">El 2% del total se destinará a la fundación tal</p>
+        <a href="#/app/pedido" class="button button-block button-assertive" ng-if="productos.length>0">Hacer pedido</a>
         <a href="#/app/categorias" class="button button-block button-balanced button-clear">Seguir comprando</a>
     </ion-content>
 </ion-view>

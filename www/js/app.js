@@ -174,6 +174,15 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
                             }
                         }
                     })
+                    .state('app.notas', {
+                        url: '/notas',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/notas_observaciones.html',
+                                controller: 'NotasObservacionesController'
+                            }
+                        }
+                    })
                     .state('app.pago', {
                         url: '/pago',
                         views: {

@@ -907,6 +907,11 @@ angular.module('farmApp.services', [])
                         return Direcciones.getDireccionVacia();
                     }
                 },
+                setNotas: function(notas){
+                   venta = this.getVenta();
+                   venta.notes = notas;
+                   window.localStorage.setItem('venta', JSON.stringify(venta));
+                },
                 setTarjeta: function(tarj){
                     tarjeta = tarj;
                     window.localStorage.setItem('tarjeta', JSON.stringify(tarjeta));
@@ -962,7 +967,8 @@ angular.module('farmApp.services', [])
                             "Content-Type": "application/json",
                             "Authorization": "Token " + token
                         },
-                        data: { direction: direccion.id, status: 0, scheduled_order: false, delivered: false }
+                        data: { direction: direccion.id, status: 0, scheduled_order: false,
+                                delivered: false, notes: venta.notes }
                     };
                     return $q(function (resolve, reject) {
                         $http(configHttp)
