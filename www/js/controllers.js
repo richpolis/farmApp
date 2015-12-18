@@ -1292,7 +1292,6 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             
             $scope.doPago = function () {
                 var tarjeta = $scope.tarjeta;
-                debugger;
                 if (tarjeta.token) {
                     enviarPedido();
                 } else if (tarjeta.card.number) {
@@ -1361,23 +1360,23 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
             function transferirImagenes() {
                 $scope.venta = Carrito.getVenta();
-                var cont = images.length;
-                Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
+                var cuantas = $scope.images.length, cont=0;
+                Loader.showLoading('Subiendo: ' + cont + "/" + $scope.images.length);
                 var params = {"venta": $scope.venta.id},
                 headers = {"Accept":"application/json","Authorization": "Token " + User.getAuthToken()};
                 ImageService.upload($scope.images, params, headers, function (result) {
                     console.log("SUCCESS: " + JSON.stringify(result.response));
-                    cont--;
-                    if (cont <= 0) {
-                        Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
+                    cont++;
+                    if (cont <= cuantas) {
+                        Loader.showLoading('Subiendo: ' + cont + "/" + cuantas);
                     } else {
                         $scope.showPedidoRealizado();
                     }
                 }, function (err) {
                     console.log("ERROR: " + JSON.stringify(err));
-                    cont--;
-                    if (cont <= 0) {
-                        Loader.showLoading('Subiendo: ' + cont + "/" + images.length);
+                    cont++;
+                    if (cont <= cuantas) {
+                        Loader.showLoading('Subiendo: ' + cont + "/" + cuantas);
                     } else {
                         $scope.showPedidoRealizado();
                     }

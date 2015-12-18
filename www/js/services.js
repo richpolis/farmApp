@@ -106,9 +106,6 @@ angular.module('farmApp.services', [])
                 options.params = params;
                 options.httpMethod = "POST";
                 options.headers = headers;
-                /*uploadOptions.headers = {
-                    Connection:"close"
-                };*/
                 return options;
             }
 
@@ -126,7 +123,7 @@ angular.module('farmApp.services', [])
                         var image = images[i];
                         var urlImage = FileService.getUrlForImage(image);
                         ft.upload(urlImage,
-                            encodeURI(BASE_URL.urlBase + API_PATH.images_ventas),
+                            encodeURI(URL_BASE.urlBase + API_PATH.images_ventas),
                             savedFile(image, onSuccess), onError, getImageUploadOptions(urlImage, params, headers));
                     }
                 }
@@ -407,7 +404,6 @@ angular.module('farmApp.services', [])
         .factory('Direcciones', function ($http, $timeout, $q, User, URL_BASE, API_PATH) {
             var direcciones = [];
             var peticionDirecciones = false;
-            var token = User.getAuthToken();
             //direcciones = JSON.parse(window.localStorage['direcciones'] || '[]');
             direcciones = User.getDirecciones();
             var get_direcciones = function () {
@@ -417,7 +413,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.direcciones,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -462,7 +458,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.direcciones,
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
                         "location": direccion.location,
@@ -495,7 +491,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.direcciones  + direccion.id + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
                         "location": direccion.location,
@@ -528,7 +524,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.direcciones  + direccion.id + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -575,7 +571,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.ventas,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -601,7 +597,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.preguntas,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -642,7 +638,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.categorias,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     console.log(configHttp);
@@ -675,7 +671,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.categorias  + id + "/",
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -719,7 +715,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.productos,
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     params: { category: categoriaId }
                 };
@@ -741,7 +737,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.productos +  productoId + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -813,7 +809,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.productos ,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         params: { q: query.producto }
                     };
@@ -854,7 +850,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + AUTH_PATH.register_user_conekta ,
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: { conektaTokenId: tarjeta.token.id }
                 };
@@ -966,7 +962,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.ventas ,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         data: { direction: direccion.id, status: 0, scheduled_order: false,
                                 delivered: false, notes: venta.notes }
@@ -989,7 +985,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.ventas + venta.id + "/",
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         data: {  status: 1 }
                     };
@@ -1012,7 +1008,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.detalle_ventas ,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         data: { sale: venta.id, product: productos[indice].id, quantity: productos[indice].quantity }
                     };
@@ -1041,7 +1037,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.images_ventas ,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         data: { sale: venta.id, image_recipe: urlImage }
                     };
@@ -1080,7 +1076,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.usuarios,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -1105,7 +1101,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.pedidos_periodicos ,
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
                         product: producto.id,
@@ -1131,7 +1127,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.pedidos_periodicos + pedido.id + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
                         product: pedido.product.id,
@@ -1158,7 +1154,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.pedidos_periodicos + pedido.id + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     }
                 };
                 return $q(function (resolve, reject) {
