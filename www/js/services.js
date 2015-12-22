@@ -47,7 +47,7 @@ angular.module('farmApp.services', [])
                 }
             }
         })
-        .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile, URL_BASE, API_PATH) {
+        .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile, URL_BASE, API_PATH, Loader) {
 
                 function makeid() {
                     var text = '';
@@ -119,13 +119,16 @@ angular.module('farmApp.services', [])
                 handleMediaDialog: saveMedia,
                 upload: function (images, params, headers, onSuccess, onError) {
                     var ft =  new FileTransfer();
+                    Loader.showLoading("Cargando imagenes de receta");
                     for (var i = 0; i < images.length; i++) {
+                        Loader.showLoading("Cargando " + i + "/" + images.length);
                         var image = images[i];
                         var urlImage = FileService.getUrlForImage(image);
                         ft.upload(urlImage,
                             encodeURI(URL_BASE.urlBase + API_PATH.images_ventas),
                             savedFile(image, onSuccess), onError, getImageUploadOptions(urlImage, params, headers));
                     }
+                    Loader.hideLoading();
                 }
             }
         })
@@ -392,6 +395,64 @@ angular.module('farmApp.services', [])
                     return $q(function (resolve, reject) {
                         $http(configHttp)
                                 .success(function (data) {
+                                    resolve(data);
+                                })
+                                .error(function (err) {
+                                    reject(err);
+                                });
+                    });
+                },
+                hasTokenPhone: function(){
+                    var tokenPhone = this.getTokenPhone();
+                    return tokenPhone.id != 0;
+                },
+                getTokenPhone: function () {
+                    if(user.token_phone.length && user.token_phone.length > 0){
+                        return user.token_phone[0];
+                    }else{
+                        return {id: 0, token:''};
+                    }
+                },
+                addTokenPhone: function (token) {
+                    var configHttp = {
+                        method: "POST",
+                        url: URL_BASE.urlBase + API_PATH.tokens_phone,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + accessToken.auth_token
+                        },
+                        data: {"token": token}
+                    };
+                    console.log(configHttp);
+                    return $q(function (resolve, reject) {
+                        $http(configHttp)
+                                .success(function (data) {
+                                    user.token_phone.push(data);
+                                    window.localStorage.setItem('user', JSON.stringify(user));
+                                    resolve(data);
+                                })
+                                .error(function (err) {
+                                    reject(err);
+                                });
+                    });
+                },
+                updateTokenPhone: function(token){
+                    var tokenPhone = this.getTokenPhone();
+                    var configHttp = {
+                        method: "PUT",
+                        url: URL_BASE.urlBase + API_PATH.tokens_phone + tokenPhone.id + "/",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + accessToken.auth_token
+                        },
+                        data: {"token": token}
+                    };
+                    console.log(configHttp);
+                    return $q(function (resolve, reject) {
+                        $http(configHttp)
+                                .success(function (data) {
+                                    user.token_phone[0] = data;
+                                    window.localStorage.setItem('user', JSON.stringify(user));
                                     resolve(data);
                                 })
                                 .error(function (err) {

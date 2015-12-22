@@ -4,46 +4,25 @@
 // 'farmApp' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'farmApp.controllers' is found in controllers.js
-angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','farmApp.services'])
+angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push', 
+                           'farmApp.controllers','farmApp.directives',
+                           'farmApp.services'])
 
-        .run(function ($ionicPlatform, $rootScope, $timeout, PushNotifications) {
+        .run(function ($ionicPlatform, $rootScope, $timeout) {
             $ionicPlatform.ready(function () {
                 // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
                 // for form inputs)
                 if (window.cordova && window.cordova.plugins.Keyboard) {
                     cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
                     cordova.plugins.Keyboard.disableScroll(true);
-
                 }
                 if (window.StatusBar) {
                     // org.apache.cordova.statusbar required
                     StatusBar.styleDefault();
                 }
-
                 Conekta.setPublishableKey('key_FrzHZPkJxzRSbUNFcnpGyYw');
                 
-                window.plugin.notification.local.onadd = function (id, state, json) {
-                    var notification = {
-                        id: id,
-                        state: state,
-                        json: json
-                    };
-                    $timeout(function() {
-                        $rootScope.$broadcast("$cordovaLocalNotification:added", notification);
-                    });
-                };
-                
-                PushNotifications.setGcmSenderId('1012709617565');
-                PushNotifications
-                  .ensureRegistration(function(regInfo) {
-                    console.log("Registrado!", regInfo.source, regInfo.token);
-                  }, function() {
-                    console.log("Error al registrar");
-                  })
-                  .onMessage(function(message) {
-                    console.log("New push notification", message);
-                  });
-
+                           
             });
         })
 
@@ -231,7 +210,4 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
                     ;
             // if none of the above states are matched, use this as the fallback
             $urlRouterProvider.otherwise('/inicio');
-        })
-        /*.run(function(djangoAuth){
-         djangoAuth.initialize('//polar-hollows-6621.herokuapp.com/auth', false);
-         })*/;
+        });

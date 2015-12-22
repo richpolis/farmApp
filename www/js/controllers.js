@@ -1,5 +1,6 @@
 angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
-        .controller('AppController', function ($scope, $state, $timeout, User, Carrito, PedidosPeriodicos) {
+        .controller('AppController', function ($scope, $state, $timeout, 
+                                User, Carrito, PedidosPeriodicos, $ionicPush) {
             if (!User.hasToken()) {
                 $state.go('inicio');
             } else {
@@ -33,7 +34,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     });
                 }, 1000);
             });
-
+            
         })
         .controller('DefaultController', function ($scope, $state, User) {
             $scope.user = User.getUser();
@@ -44,13 +45,30 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
 
         })
         .controller('LoginController', function ($scope, $ionicPopup, $ionicModal, 
-                    $state, User, Loader, RecuperarPassword) {
+                    $state, User, Loader, RecuperarPassword, $ionicPush) {
             $scope.data = {
                 email: '',
                 password: ''
             };
             $scope.password = "";
             $scope.user = User.getUser();
+            function ionicPush(){
+                $ionicPush.init({
+                    "onNotification": function (notification) {
+                        var payload = notification.payload;
+                        alert(notification, payload);
+                    },
+                    "onRegister": function (data) {
+                        console.log("Login Token Phone: " + data.token);
+                        if(!User.hasTokenPhone()){
+                            User.addTokenPhone(data.token);
+                        }else{
+                            User.updateTokenPhone(data.token);
+                        }
+                    }
+                });
+                $ionicPush.register();
+            }
             function login() {
                 Loader.showLoading("Cargando información...");
                 User.login($scope.data.email, $scope.data.password)
@@ -68,6 +86,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             function get_me() {
                 User.me().then(function (user) {
                     Loader.hideLoading();
+                    ionicPush();
                     $scope.user = user;
                     $state.go('app.categorias');
                 }, function (err) {
@@ -125,8 +144,26 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
         })
 
-        .controller('RegistroController', function ($scope, $ionicPopup, $ionicModal, $state, User, Loader) {
+        .controller('RegistroController', function ($scope, $ionicPopup, 
+                $ionicModal, $state, User, Loader, $ionicPush) {
             $scope.data = {};
+            function ionicPush(){
+                $ionicPush.init({
+                    "onNotification": function (notification) {
+                        var payload = notification.payload;
+                        alert(notification, payload);
+                    },
+                    "onRegister": function (data) {
+                        console.log("Registro Token Phone: " + data.token);
+                        if(!User.hasTokenPhone()){
+                            User.addTokenPhone(data.token);
+                        }else{
+                            User.updateTokenPhone(data.token);
+                        }
+                    }
+                });
+                $ionicPush.register();
+            }
             $scope.doRegister = function () {
                 var todoCorrecto = true;
                 var formulario = document.forms[0];
@@ -164,6 +201,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     });
                     User.login(usuario.email, usuario.password).then(function (token) {
                         Loader.hideLoading();
+                        ionicPush();
                         $state.go('app.categorias');
                     }, function (err) {
                         Loader.hideLoading();
@@ -1365,20 +1403,21 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 var params = {"venta": $scope.venta.id},
                 headers = {"Accept":"application/json","Authorization": "Token " + User.getAuthToken()};
                 ImageService.upload($scope.images, params, headers, function (result) {
-                    console.log("SUCCESS: " + JSON.stringify(result.response));
+                    alert("SUCCESS: " + JSON.stringify(result));
                     cont++;
-                    if (cont <= cuantas) {
-                        Loader.showLoading('Subiendo: ' + cont + "/" + cuantas);
-                    } else {
-                        $scope.showPedidoRealizado();
+                    if(cuantas == cont){
+                        $scope.showPedidoRealizado();    
+                    }else{
+                        Loader.showLoading("Subiendo: " + cont + "/" + cuantas + " imagenes");
                     }
+                    
                 }, function (err) {
-                    console.log("ERROR: " + JSON.stringify(err));
+                    alert("ERROR: " + JSON.stringify(err));
                     cont++;
-                    if (cont <= cuantas) {
-                        Loader.showLoading('Subiendo: ' + cont + "/" + cuantas);
-                    } else {
-                        $scope.showPedidoRealizado();
+                    if(cuantas == cont){
+                        $scope.showPedidoRealizado();    
+                    }else{
+                        Loader.showLoading("Subiendo: " + cont + "/" + cuantas + " imagenes");
                     }
                 });
             }

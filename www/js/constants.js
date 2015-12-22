@@ -23,6 +23,7 @@ angular.module('farmApp')
     images_ventas: 'images/ventas/',
     images_inapam: 'images/inapam/',
     ratings: 'api/ratings/',
+    tokens_phone: 'api/tokens/phone/',
     contacto: 'contacto/',
     recover_password: 'solicitud/recuperar/password/'
 });
