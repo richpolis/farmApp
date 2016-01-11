@@ -3,7 +3,7 @@
         <ion-list class="card">
             <ion-item class="item-thumbnail-left">
                 <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}">
-                <h2>{{producto.name}}</h2>
+                <h2>{{producto.name}} - <span class="laboratorio">{{producto.laboratory.name}}</span></h2>
                 <p class="ion-item-categoria">
                     {{producto.category.name}}
                 </p>
@@ -51,10 +51,10 @@
             </ion-item>
             <ion-item class="item-text-wrap" ng-show="producto.recipe > 1">
                 <p class="text-center">
-                    <label class="require-receta font-small" ng-show="producto.recipe == 3">Este producto require de receta medica.</label>
+                    <label class="require-receta font-meddium" ng-show="producto.recipe == 3">Este producto require de receta medica.</label>
                     <br  ng-show="producto.recipe == 3"/>
-                    <label class="assertive font-small" ng-show="producto.recipe == 3">1.- El repartidor te pedira y se quedara con la receta.</label><br/>
-                    <label class="assertive font-meddium" ng-show="producto.recipe == 2">2.- El repartidor te pedira que le muestres la receta.</label>
+                    <label class="require-receta font-meddium" ng-show="producto.recipe == 3">El repartidor te pedira y se quedara con la receta.</label><br/>
+                    <label class="assertive font-meddium" ng-show="producto.recipe == 2">El repartidor te pedira que le muestres la receta.</label>
                 </p>
             </ion-item>
         </ion-list>

@@ -19,7 +19,7 @@
             <ion-item ng-repeat="producto in productos | filter:buscar | orderBy:ordenar "
                       class="item-thumbnail-left" href="#/app/producto/{{producto.id}}">
                 <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}">
-                <h2>{{producto.name}}</h2>
+                <h2>{{producto.name}} - <span class="laboratorio">{{producto.laboratory.name}}</span></h2>
                 <p class="ion-item-categoria">
                     {{producto.category.name}}
                 </p>

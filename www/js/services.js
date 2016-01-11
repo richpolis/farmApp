@@ -1000,6 +1000,7 @@ angular.module('farmApp.services', [])
                     var totales = {
                         subtotal: 0.0,
                         descuento: 0.0,
+                        iva: 0.0,
                         total: 0.0
                     };
 
