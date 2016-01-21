@@ -358,7 +358,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         return {
                             destinationType: Camera.DestinationType.FILE_URI,
                             sourceType: source,
-                            allowEdit: false,
+                            allowEdit: true,
                             encodingType: Camera.EncodingType.JPEG,
                             popoverOptions: CameraPopoverOptions,
                             saveToPhotoAlbum: false
@@ -1312,6 +1312,18 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     $scope.$apply();
                 });
             };
+            
+            $scope.removeImage = function (image) {
+                var name = $scope.inapam[0].substr($scope.inapam[0].lastIndexOf('/') + 1);
+                $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                        .then(function (success) {
+                            $scope.inapam = [];
+                            window.localStorage.setItem('inapam', JSON.stringify($scope.inapam));
+                            alert("Archivo eliminado");
+                        }, function (error) {
+                            alert("No es posible eliminar el archivo");
+                        });
+            };
 
             $scope.realizarPago = function () {
                 $state.go('app.pago');
@@ -1372,8 +1384,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         template: err.detail
                     });
                 });
-            }
-            ;
+            };
 
             function enviarPedido() {
                 $scope.venta = Carrito.getVenta();
@@ -1393,8 +1404,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 } else {
                     enviarDetallePedido();
                 }
-            }
-            ;
+            };
 
             function transferirImagenes() {
                 $scope.venta = Carrito.getVenta();
@@ -1420,8 +1430,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                         Loader.showLoading("Subiendo: " + cont + "/" + cuantas + " imagenes");
                     }
                 });
-            }
-            ;
+            };
 
             // Creamos el modal para finalizar el pago
             $ionicModal.fromTemplateUrl('templates/pedidoRealizadoModal.html', {

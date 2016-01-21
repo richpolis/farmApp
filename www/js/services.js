@@ -888,6 +888,7 @@ angular.module('farmApp.services', [])
         })
         .factory('Carrito', function ($q, $http, User, Direcciones, Descuentos, ImageService, FileService ,
                                       URL_BASE, AUTH_PATH, API_PATH) {
+            
             var productos = [];
             var direccion = {};
             var tarjeta = {};
@@ -895,16 +896,19 @@ angular.module('farmApp.services', [])
             var venta = {};
             var images = FileService.images;
             var token = User.getAuthToken();
+            
             productos = JSON.parse(window.localStorage['carrito'] || '[]');
             direccion = JSON.parse(window.localStorage['direccion'] || '{}');
             tarjeta = JSON.parse(window.localStorage['tarjeta'] || '{}');
             venta = JSON.parse(window.localStorage['venta'] || '{}');
+            
             function sumarTotal() {
                 total = 0;
                 for (var cont = 0; cont <= productos.length - 1; cont++) {
                     total += productos[cont].price * productos[cont].quantity;
                 }
             };
+            
             function crear_user_conekta(){
                 var configHttp = {
                     method: "POST",
@@ -925,6 +929,7 @@ angular.module('farmApp.services', [])
                         });
                 });
             };
+            
             return {
                 getProductos: function () {
                     return productos;
@@ -971,7 +976,7 @@ angular.module('farmApp.services', [])
                    window.localStorage.setItem('venta', JSON.stringify(venta));
                 },
                 setTarjeta: function(tarj){
-                    tarjeta = tarj;
+                    tarjetas.push(tarj);
                     window.localStorage.setItem('tarjeta', JSON.stringify(tarjeta));
                     crear_user_conekta();
                 },
@@ -1338,8 +1343,12 @@ angular.module('farmApp.services', [])
                   });
               });
             };
+            var validar_tarjeta = function(tarjeta){
+                
+            };
             return {
-                getTarjetaToken: get_tarjeta_token
+                getTarjetaToken: get_tarjeta_token,
+                valid: validar_tarjeta
             };
         })
         .factory('Contacto',function($q, $http, URL_BASE, API_PATH){
