@@ -9,7 +9,7 @@
         <ion-list>
 
             <ion-checkbox  ng-repeat="card in tarjetas" ng-model="seleccion"  
-                           ng-true-value="'card.id'">
+                           ng-true-value="card.id">
                 {{card.brand}} ****-****-****-{{card.last4}}
             </ion-checkbox>
             <ion-checkbox ng-model="seleccion" ng-true-value="'0'">
