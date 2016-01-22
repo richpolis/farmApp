@@ -6,7 +6,20 @@
             <div class="col balanced-bg text-center" style="color: white;">3</div>
             <div class="col balanced-bg text-center" style="color: white;">4</div>
         </div>
-        <form id="formRegister" ng-submit="doPago()">
+        <ion-list>
+
+            <ion-checkbox  ng-repeat="card in tarjetas" ng-model="seleccion"  
+                           ng-true-value="'card.id'">
+                {{card.brand}} ****-****-****-{{card.last4}}
+            </ion-checkbox>
+            <ion-checkbox ng-model="seleccion" ng-true-value="'0'">
+                Nueva
+            </ion-checkbox>
+        </ion-list>
+        <p class="padding text-center">
+        <button ng-show="seleccion!=0" class="button button-block button-balanced" ng-click="seleccionarTarjeta">Hacer Pedido</button>
+        </p>
+        <form ng-show="seleccion==0" id="formRegister" ng-submit="doPago()">
             <div class="list">
                 <label class="item item-input">
                     <input type="text" name="name" ng-model="tarjeta.card.name" placeholder="Nombre de cliente">

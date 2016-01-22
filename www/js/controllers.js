@@ -938,6 +938,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
         })
         .controller('PedidoController', function ($scope, $state, $ionicModal, $ionicPopup, $timeout,
                 $cordovaGeolocation, User, Direcciones, Carrito, Loader) {
+
+
             $scope.userData = User.getUser();
             $scope.direccionSeleccionada = "";
             $scope.direccionGuardada = Carrito.getDireccion();
@@ -947,6 +949,29 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             $scope.direcciones = [];
             $scope.colonias = [];
             $scope.mostrarMensajeMapa = true;
+
+            $scope.$on("venta", function (event, data) {
+                $timeout(function () {
+                    $scope.$apply(function () {
+                        $scope.direccionGuardada = Carrito.getDireccion();
+                        Direcciones.getDirecciones().then(function (direcciones) {
+                            $scope.direcciones = [];
+                            for(var cont = 0; cont < direcciones.length; cont++){
+                                if(direcciones[cont].active==true){
+                                    $scope.direcciones.push(direcciones[cont]);
+                                }
+                            }
+                            if ($scope.direcciones.length == 1) {
+                                var select = document.getElementById('recuperar-direccion');
+                                select.value = $scope.direcciones[0].street;
+                            }
+                        }, function (err) {
+                            console.log("Error al cargar direcciones");
+                        });
+                    });
+                }, 1000);
+            });
+
             Direcciones.getDirecciones().then(function (direcciones) {
                 $scope.direcciones = [];
                 for(var cont = 0; cont < direcciones.length; cont++){
@@ -1283,6 +1308,15 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 Carrito.setNotas($scope.pedido.notes);
                 doPedido();
             };
+
+            $scope.$on("venta", function (event, data) {
+                $timeout(function () {
+                    $scope.$apply(function () {
+                        $scope.pedido = Carrito.getVenta();
+                    });
+                }, 1000);
+            });
+
         })
 
         .controller('ImageController', function ($scope, $state, $ionicActionSheet, ImageService, FileService) {
@@ -1314,35 +1348,39 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
             };
             
             $scope.removeImage = function (image) {
-                var name = $scope.inapam[0].substr($scope.inapam[0].lastIndexOf('/') + 1);
-                $cordovaFile.removeFile(cordova.file.dataDirectory, name)
-                        .then(function (success) {
-                            $scope.inapam = [];
-                            window.localStorage.setItem('inapam', JSON.stringify($scope.inapam));
-                            alert("Archivo eliminado");
-                        }, function (error) {
-                            alert("No es posible eliminar el archivo");
-                        });
+                ImageService.removeImage(image);
             };
 
             $scope.realizarPago = function () {
                 $state.go('app.pago');
             };
 
+            $scope.$on("venta", function (event, data) {
+                $timeout(function () {
+                    $scope.$apply(function () {
+                        for(var cont=$scope.images.length; cont > 0; cont--){
+                            $scope.removeImage($scope.images[cont]);
+                        }
+                    });
+                }, 1000);
+            });
+
         })
 
         .controller('PagoController', function ($scope, $ionicPopup, $state, $ionicModal, $cordovaCamera,
                 User, Carrito, FileService, ImageService, UIConekta, Loader) {
             
-            $scope.tarjeta = Carrito.getTarjeta();
+            $scope.tarjeta = Carrito.getTarjetaVacia();
+            $scope.tarjetas = User.getTarjetas();
             $scope.user = User.getUser();
             $scope.venta = Carrito.getVenta();
             $scope.productos = Carrito.getProductos();
             $scope.images = FileService.images();
+            $scope.seleccion = '0';
             
             $scope.doPago = function () {
                 var tarjeta = $scope.tarjeta;
-                if (tarjeta.token) {
+                if (tarjeta.id) {
                     enviarPedido();
                 } else if (tarjeta.card.number) {
                     Loader.showLoading('Enviando datos pago...');
@@ -1363,6 +1401,26 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     });
                 }
             };
+            
+            $scope.seleccionarTarjeta = function(){
+                var tarj = {};
+                for(var cont=0; cont<$scope.tarjetas.length; cont++){
+                    if($scope.seleccion==$scope.tarjetas[cont].id){
+                        tarj = $scope.tarjetas[cont];
+                    }
+                }
+                if(tarj.id){
+                    Carrito.setTarjeta(tarj);
+                    enviarPedido();
+                }else{
+                    $ionicPopup.alert({
+                        title: 'Sin seleccion',
+                        template: 'Selecciona la tarjeta a la cual se realizara el cobro.'
+                    });
+                }
+                
+                
+            }
 
             function enviarDetallePedido(indice) {
                 var indice = indice || 0;
@@ -1416,7 +1474,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     alert("SUCCESS: " + JSON.stringify(result));
                     cont++;
                     if(cuantas == cont){
-                        $scope.showPedidoRealizado();    
+                        $scope.showPedidoRealizado();
                     }else{
                         Loader.showLoading("Subiendo: " + cont + "/" + cuantas + " imagenes");
                     }
@@ -1425,7 +1483,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     alert("ERROR: " + JSON.stringify(err));
                     cont++;
                     if(cuantas == cont){
-                        $scope.showPedidoRealizado();    
+                        $scope.showPedidoRealizado();
                     }else{
                         Loader.showLoading("Subiendo: " + cont + "/" + cuantas + " imagenes");
                     }
@@ -1445,7 +1503,8 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                     User.enviarCalificacion($scope.ranking);
                 }
                 $scope.pedidoRealizado.hide();
-                window.location.href="./main.html";
+                //window.location.href="./main.html";
+                $state.go('app.categorias');
             };
 
             $scope.ratingArr = [{
@@ -1487,6 +1546,7 @@ angular.module('farmApp.controllers', ['farmApp.services', 'ngCordova'])
                 Carrito.cerrarPedido().then(function (data) {
                     Carrito.empty();
                     $scope.$emit('carrito', 'actualizacion');
+                    $scope.$emit('venta', 'inicializar');
                     $scope.pedidoRealizado.show();
                 }, function (err) {
                     $ionicPopup.alert({

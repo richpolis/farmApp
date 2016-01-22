@@ -63,7 +63,7 @@
                     <div class="item">
                         <div class="row">
                             <div class="col col-offset-33 col-66 text-right">
-                                <label class="assertive-bg padding color-blanco" ng-show="producto.discount.short_name">{{producto.discount.short_name}}</label>
+                                <label class="assertive-bg padding color-blanco" ng-show="producto.discount.active_discount">{{producto.discount.short_name}}</label>
                                 <label class="balanced-bg padding color-blanco">{{producto.price * producto.quantity |currency:"$"}}</label>
                             </div>
                         </div>
@@ -71,7 +71,7 @@
                 </div>
             </div>
             <ion-item style="background-color: #2EC7C7; color: white;">
-                <div class="row" ng-if="totales.descuento > 0">
+                <div class="row" ng-if="totales.subtotal > 0">
                     <div class="col">
                         Subtotal:
                     </div>

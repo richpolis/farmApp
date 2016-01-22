@@ -373,6 +373,13 @@ angular.module('farmApp.services', [])
                     user.direcciones = direcciones;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
+                getTarjetas: function(){
+                    return user.cards || [];
+                },
+                setTarjetas: function(tarjetas){
+                    user.cards = tarjetas;
+                    window.localStorage.setItem('user', JSON.stringify(user));
+                },
                 getPedidosPeriodicos: function() {
                     return user.schedules_orders || [];
                 },
@@ -819,6 +826,14 @@ angular.module('farmApp.services', [])
         })
         .factory('Descuentos', function(){
             return {
+                calcularIva: function(producto, subt, desc){
+                    if(producto.with_tax){
+                        var total = subt - desc;
+                        return total * 0.16;
+                    }else{
+                        return 0.0;
+                    }
+                },
                 calcularDescuento: function(producto){
                     var price = 0.0;
                     var descuento = 0.0;
@@ -826,7 +841,7 @@ angular.module('farmApp.services', [])
                     var fracciones = 0;
                     var conDescuento = 0.0;
                     var sinDescuento = 0.0;
-                    if(producto.discount && producto.discount.type){
+                    if(producto.discount && producto.discount.active_discount){
                         if(producto.discount.type == "precio"){
                             price = producto.discount.price;
                             descuento = (producto.price * producto.quantity ) - ( producto.quantity * price);
@@ -909,7 +924,7 @@ angular.module('farmApp.services', [])
                 }
             };
             
-            function crear_user_conekta(){
+            function crear_user_conekta(tokenConekta){
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.register_user_conekta ,
@@ -917,12 +932,21 @@ angular.module('farmApp.services', [])
                         "Content-Type": "application/json",
                         "Authorization": "Token " + User.getAuthToken()
                     },
-                    data: { conektaTokenId: tarjeta.token.id }
+                    data: { conektaTokenId: tokenConekta.id }
                 };
+                console.log("Token de Conekta: " + JSON.stringify(tokenConekta));
                 return $q(function (resolve, reject) {
                     $http(configHttp)
-                        .success(function (ok) {
-                            resolve(ok);
+                        .success(function (data) {
+                            console.log("Data: " )
+                            console.log(data);
+                            tarjeta = data.card;
+                            if(!data.error){
+                                var tarjetas = User.getTarjetas();
+                                tarjetas.push(tarjeta);
+                                User.setTarjetas(tarjetas);
+                            }
+                            resolve(data);
                         })
                         .error(function (err) {
                             reject(err);
@@ -976,24 +1000,29 @@ angular.module('farmApp.services', [])
                    window.localStorage.setItem('venta', JSON.stringify(venta));
                 },
                 setTarjeta: function(tarj){
-                    tarjetas.push(tarj);
+                    tarjeta = tarj;
                     window.localStorage.setItem('tarjeta', JSON.stringify(tarjeta));
-                    crear_user_conekta();
+                },
+                createCardConekta: function(tokenConekta){
+                    return crear_user_conekta(tokenConekta);
                 },
                 getTarjeta: function(){
-                    if(tarjeta.name){
+                    if(tarjeta.id){
                         return tarjeta;
                     }else{
-                        return {
-                            "card": {
-                                "number": "4242424242424242",
-                                "name": "Ricardo Alcantara G.",
-                                "exp_year": "2015",
-                                "exp_month": "12",
-                                "cvc": "123"
-                            }
-                        };
+                        return null;
                     }
+                },
+                getTarjetaVacia: function () {
+                    return {
+                        "card": {
+                            "number": "",
+                            "name": "",
+                            "exp_year": "",
+                            "exp_month": "",
+                            "cvc": ""
+                        }
+                    };
                 },
                 getTotal: function(){
                     if(productos.length > 0 && total==0){
@@ -1008,13 +1037,16 @@ angular.module('farmApp.services', [])
                         iva: 0.0,
                         total: 0.0
                     };
-
+                    var subT = 0.0, desc = 0.0;
                     for (var cont = 0; cont <= productos.length - 1; cont++) {
-                        totales.subtotal += productos[cont].price * productos[cont].quantity;
-                        totales.descuento += Descuentos.calcularDescuento(productos[cont]);
+                        subT = productos[cont].price * productos[cont].quantity;
+                        desc = Descuentos.calcularDescuento(productos[cont]);
+                        totales.subtotal += subT;
+                        totales.descuento += desc;
+                        totales.iva += Descuentos.calcularIva(productos[cont],subT, desc);
                     }
 
-                    totales.total = totales.subtotal - totales.descuento;
+                    totales.total = totales.subtotal - totales.descuento + totales.iva;
 
                     return totales;
 
@@ -1032,8 +1064,9 @@ angular.module('farmApp.services', [])
                             "Authorization": "Token " + User.getAuthToken()
                         },
                         data: { direction: direccion.id, status: 0, scheduled_order: false,
-                                delivered: false, notes: venta.notes }
+                                delivered: false, notes: venta.notes, card_conekta: tarjeta.id }
                     };
+                    console.log(configHttp);
                     return $q(function (resolve, reject) {
                         $http(configHttp)
                             .success(function (vta) {
@@ -1335,9 +1368,12 @@ angular.module('farmApp.services', [])
               return $q(function(resolve, reject){
                   Conekta.token.create(tarjeta, function(token){
                       console.log(token);
-                      tarjeta.token = token;
-                      Carrito.setTarjeta(tarjeta);
-                      resolve(token);
+                      Carrito.createCardConekta(token).then(function(data){
+                        resolve(token);
+                      },function(err){
+                        reject(err);
+                      });
+
                   }, function(err) {
                       reject(err);
                   });

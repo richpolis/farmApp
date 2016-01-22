@@ -44,7 +44,7 @@
             <ion-item>
                 <div class="row">
                     <div class="col col-offset-50 col-50 text-right">
-                        <label class="assertive-bg padding color-blanco" ng-show="producto.discount.short_name">{{producto.discount.short_name}}</label>
+                        <label class="assertive-bg padding color-blanco" ng-show="producto.discount.active_discount">{{producto.discount.short_name}}</label>
                         <label class="balanced-bg padding color-blanco">{{producto.price * producto.quantity |currency:"$"}}</label>
                     </div>
                 </div>
