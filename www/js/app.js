@@ -32,12 +32,14 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
 
                     .state('login', {
                         url: '/login',
+                        cache: false,
                         templateUrl: 'templates/login.html',
                         controller: 'LoginController'
                     })
 
                     .state('registro', {
                         url: '/registro',
+                        cache: false,
                         templateUrl: 'templates/registro.html',
                         controller: 'RegistroController'
                     })
@@ -57,6 +59,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
 
                     .state('app.perfil', {
                         url: '/perfil',
+                        cache: false, 
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/perfil.html',
@@ -77,6 +80,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
 
                     .state('app.contacto', {
                         url: '/contacto',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/contacto.html',
@@ -137,6 +141,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
 
                     .state('app.carrito', {
                         url: '/carrito',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/carrito.html',
@@ -146,6 +151,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                     })
                     .state('app.pedido', {
                         url: '/pedido',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/pedido.html',
@@ -155,6 +161,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                     })
                     .state('app.notas', {
                         url: '/notas',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/notas_observaciones.html',
@@ -164,6 +171,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                     })
                     .state('app.pago', {
                         url: '/pago',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/pago.html',
@@ -173,6 +181,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                     })
                     .state('app.recetas', {
                         url: '/recetas',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/recetas.html',

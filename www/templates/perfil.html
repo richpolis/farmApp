@@ -45,9 +45,9 @@
                         <div class="input-label">
                             Direccion guardada
                         </div>
-                        <select ng-change="recuperarDireccion()" ng-model="direccionSeleccionada" id="recuperar-direccion">
-                            <option selected value="">Nueva...</option>
-                            <option ng-repeat="direccion in direcciones" value="{{direccion.street}}">{{direccion.street}}</option>
+                        <select ng-model="direccionSeleccionada.id" id="recuperar-direccion">
+                            <option selected value="0">Nueva...</option>
+                            <option ng-repeat="direccion in direcciones" value="{{direccion.id}}">{{direccion.street}}</option>
                         </select>
                     </label>
                     <div class="item item-button-right">

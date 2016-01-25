@@ -19,7 +19,7 @@ angular.module('farmApp.services', [])
                     }
                 };
         }])
-        .factory('FileService', function($cordovaFile) {
+        .factory('FileService', function($cordovaFile, $ionicPopup) {
             var images;
             var IMAGE_STORAGE_KEY = 'images';
 
@@ -41,7 +41,36 @@ angular.module('farmApp.services', [])
                     var trueOrigin = cordova.file.dataDirectory + imageName;
                     return trueOrigin;
                 },
+                removeImage: function(image){
+                    var imagenes = this.images();
+                    var indexImage = imagenes.indexOf(image);
+                    var name = imagenes[indexImage].substr(imagenes[indexImage].lastIndexOf('/') + 1);
+                        $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                                .then(function (success) {
+                                    $ionicPopup.alert({
+                                        title: 'Receta',
+                                        template: 'Archivo eliminado'
+                                    });
+                                }, function (error) {
+                                    $ionicPopup.alert({
+                                        title: 'Receta',
+                                        template: 'No es posible eliminar el archivo'
+                                    });
+                                });
+                    imagenes.splice(indexImage,1);
+                    window.localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(imagenes));
+                },
                 empty: function(){
+                    var imagenes = this.images();
+                    for(var cont=0; cont<imagenes.length; cont++){
+                        var name = imagenes[cont].substr(imagenes[cont].lastIndexOf('/') + 1);
+                        $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                                .then(function (success) {
+                                    console.log("Archivo eliminado");
+                                }, function (error) {
+                                    console.log("No es posible eliminar el archivo");
+                                });
+                    }
                     images=[];
                     window.localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(images));
                 }
@@ -609,6 +638,7 @@ angular.module('farmApp.services', [])
             };
             var get_direccion_base = function () {
                 return  {
+                    "id": 0,
                     "location": "Mexico DF",
                     "street": "",
                     "interior_number": "",
@@ -903,7 +933,7 @@ angular.module('farmApp.services', [])
         })
         .factory('Carrito', function ($q, $http, User, Direcciones, Descuentos, ImageService, FileService ,
                                       URL_BASE, AUTH_PATH, API_PATH) {
-            
+
             var productos = [];
             var direccion = {};
             var tarjeta = {};
@@ -911,19 +941,19 @@ angular.module('farmApp.services', [])
             var venta = {};
             var images = FileService.images;
             var token = User.getAuthToken();
-            
+
             productos = JSON.parse(window.localStorage['carrito'] || '[]');
             direccion = JSON.parse(window.localStorage['direccion'] || '{}');
             tarjeta = JSON.parse(window.localStorage['tarjeta'] || '{}');
             venta = JSON.parse(window.localStorage['venta'] || '{}');
-            
+
             function sumarTotal() {
                 total = 0;
                 for (var cont = 0; cont <= productos.length - 1; cont++) {
                     total += productos[cont].price * productos[cont].quantity;
                 }
             };
-            
+
             function crear_user_conekta(tokenConekta){
                 var configHttp = {
                     method: "POST",
@@ -953,7 +983,7 @@ angular.module('farmApp.services', [])
                         });
                 });
             };
-            
+
             return {
                 getProductos: function () {
                     return productos;
@@ -1151,6 +1181,16 @@ angular.module('farmApp.services', [])
                             });
                     });
                 },
+                hasProductsWithRecipe: function(index){
+                    var encontrado = false;
+                    for (var cont = 0; cont < productos.length; cont++) {
+                        if (productos[cont].recipe > index ) {
+                            encontrado = true;
+                            break;
+                        }
+                    }
+                    return encontrado;
+                },
                 empty: function(){
                     // limpiar los datos del carrito.
                     direccion = {};
@@ -1158,6 +1198,7 @@ angular.module('farmApp.services', [])
                     venta = {};
                     window.localStorage.setItem('direccion', JSON.stringify(direccion));
                     window.localStorage.setItem('carrito', JSON.stringify(productos));
+                    window.localStorage.setItem('tarjeta', JSON.stringify(tarjeta));
                     window.localStorage.setItem('venta', JSON.stringify(venta));
                     FileService.empty();
                 }
@@ -1369,7 +1410,7 @@ angular.module('farmApp.services', [])
                   Conekta.token.create(tarjeta, function(token){
                       console.log(token);
                       Carrito.createCardConekta(token).then(function(data){
-                        resolve(token);
+                        resolve(data);
                       },function(err){
                         reject(err);
                       });
@@ -1380,11 +1421,22 @@ angular.module('farmApp.services', [])
               });
             };
             var validar_tarjeta = function(tarjeta){
-                
+                return Conekta.card.validateNumber(tarjeta.card.number);
+            };
+            var validar_fecha_expiracion = function(tarjeta){
+                var exp_month = tarjeta.card.exp_month || tarjeta.exp_month;
+                var exp_year = tarjeta.card.exp_year || tarjeta.exp_year;
+                return Conekta.card.validateExpirationDate(exp_month, exp_year);
+            };
+            var validar_cvc = function(tarjeta){
+                return Conekta.card.validateCVC(tarjeta.card.cvc);
             };
             return {
                 getTarjetaToken: get_tarjeta_token,
-                valid: validar_tarjeta
+                validarTarjeta: validar_tarjeta,
+                validarFechaExpiracion: validar_fecha_expiracion,
+                validarCvc: validar_cvc
+                
             };
         })
         .factory('Contacto',function($q, $http, URL_BASE, API_PATH){
@@ -1396,8 +1448,8 @@ angular.module('farmApp.services', [])
                         "Content-Type": "application/json"
                     },
                     data: {
-                        "name": object.name, 
-                        "email": object.email, 
+                        "name": object.name,
+                        "email": object.email,
                         "phone": object.phone,
                         "subject": object.subject,
                         "message": object.message
@@ -1448,7 +1500,7 @@ angular.module('farmApp.services', [])
             var contNotificacion = 0;
             notificaciones =  JSON.parse(window.localStorage['notificaciones'] || '[]');
             contNotificacion =  JSON.parse(window.localStorage['contNotificacion'] || '0');
-            
+
             var find_notificacion = function(notificacionId){
                 var obj = null;
                 for(var i = 0; i<=notificaciones.length; i++){
@@ -1459,7 +1511,7 @@ angular.module('farmApp.services', [])
                 }
                 return obj;
             };
-            
+
             var add_notificacion = function(notificacion) {
                 var fecha = new Date();
                 var hora = notificacion.tiempo.hora;
@@ -1480,11 +1532,11 @@ angular.module('farmApp.services', [])
                 window.localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
                 window.localStorage.setItem('contNotificacion', JSON.stringify(contNotificacion));
             };
-            
+
             var get_notificaciones = function(){
                 return notificaciones;
             };
-            
+
             var get_notificacion_vacia = function(){
                 date = new Date();
                 return {
@@ -1493,23 +1545,23 @@ angular.module('farmApp.services', [])
                         hora: '00',
                         minutos: '00',
                         horario: 'am'
-                    }, 
+                    },
                     message: "",
                     title: "",
                     repetir: {
                         todosLosDias: false,
-                        domingo: false, 
-                        sabado: false, 
-                        lunes: false, 
+                        domingo: false,
+                        sabado: false,
+                        lunes: false,
                         martes: false,
                         miercoles: false,
-                        jueves: false, 
+                        jueves: false,
                         viernes: false
                     },
                     intervalo: ""
                 };
             };
-            
+
             function getIntervaloString(notificacion){
                 var cadena = "";
                 if(notificacion.repetir.todosLosDias){
@@ -1538,7 +1590,7 @@ angular.module('farmApp.services', [])
                 }
                 return cadena;
             }
-            
+
             return {
                 add: add_notificacion,
                 get: get_notificaciones,

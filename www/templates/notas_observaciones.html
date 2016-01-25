@@ -1,10 +1,15 @@
 <ion-view view-title="Notas/Observaciones">
     <ion-content class="has-header" padding="true">
-        <div class="row">
+        <div class="row" ng-show="hasProductsWithRecipe">
             <div class="col balanced-bg text-center" style="color: white;">1</div>
             <div class="col balanced-bg text-center" style="color: white;">2</div>
             <div class="col text-center">3</div>
             <div class="col text-center">4</div>
+        </div>
+        <div class="row" ng-show="!hasProductsWithRecipe">
+            <div class="col balanced-bg text-center" style="color: white;">1</div>
+            <div class="col balanced-bg text-center" style="color: white;">2</div>
+            <div class="col text-center">3</div>
         </div>
         <form id="formNotas" ng-submit="doNotas()">
             <div class="list" style="margin-bottom: 5px;">
@@ -12,7 +17,7 @@
                     <textarea ng-model="pedido.notes" style="width: 98%; height: 100px;border: 2px solid #2EC7C7; padding: 5px;"></textarea>
                 </label>
                 <p class="text-center">
-                    Si deseas agregar alguna nota o observación (Ej. Porton Azul) ingrésala.
+                    Si deseas agregar alguna nota o observación <br/>(Ej. Porton Azul) ingrésala.
                 </p>
                 <label class="item">
                     <button class="button button-block button-balanced" type="submit">Siguiente</button>
