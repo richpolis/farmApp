@@ -164,16 +164,18 @@ angular.module('farmApp.services', [])
         .factory('User', function ($http, $timeout, $q, URL_BASE, AUTH_PATH, API_PATH) {
             var accessToken;
             var user;
+            var tokenPhone;
             user = JSON.parse(window.localStorage['user'] || '{}');
             accessToken = JSON.parse(window.localStorage['access_token'] || '{}');
+            tokenPhone = JSON.parse(window.localStorage['token_phone'] || '{}');
             function request(args) {
                 // Let's retrieve the token from the cookie, if available
                 if(accessToken.auth_token){
                     $http.defaults.headers.common.Authorization = 'Token ' + accessToken.auth_token;
                 }
                 // Continue
-                params = args.params || {};
-                args = args || {};
+                var params = args.params || {};
+                var args = args || {};
                 var deferred = $q.defer(),
                     url = this.API_URL + args.url,
                     method = args.method || "GET",
@@ -264,6 +266,109 @@ angular.module('farmApp.services', [])
                             });
                 });
 
+            };
+            
+            function delete_reminder(reminder) {
+                var configHttp = {
+                    method: "DELETE",
+                    url: URL_BASE.urlBase + AUTH_PATH.recordatorios + reminder.id + "/",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + accessToken.auth_token
+                    }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = this.getRecordatorios();
+                                var indexReminder = recordatorios.indexOf(reminder);
+                                recordatorios.splice(indexReminder,1);
+                                this.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            function post_reminder(reminder) {
+                var configHttp = {
+                    method: "POST",
+                    url: URL_BASE.urlBase + AUTH_PATH.recordatorios ,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + accessToken.auth_token
+                    },
+                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.moday,
+                    "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
+                    "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday}
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = this.getRecordatorios();
+                                recordatorios.push(data);
+                                this.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            
+            function update_reminder(reminder) {
+                var configHttp = {
+                    method: "PUT",
+                    url: URL_BASE.urlBase + AUTH_PATH.recordatorios + reminder.id + "/" ,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + accessToken.auth_token
+                    },
+                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.moday,
+                    "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
+                    "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday}
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = this.getRecordatorios();
+                                for(var cont=0; cont<recordatorios.length;cont++){
+                                    if(recordatorios[cont].id==reminder.id){
+                                        recordatorios[cont] = reminder;
+                                    }
+                                }
+                                this.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            
+            function delete_card(card) {
+                var configHttp = {
+                    method: "DELETE",
+                    url: URL_BASE.urlBase + AUTH_PATH.tarjetas + card.id + "/",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + accessToken.auth_token
+                    }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var tarjetas = this.getTarjetas();
+                                var indexCard = tarjetas.indexOf(card);
+                                tarjetas.splice(indexCard,1);
+                                this.setTarjetas(tarjetas);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
             };
 
             function user_me() {
@@ -409,6 +514,7 @@ angular.module('farmApp.services', [])
                     user.cards = tarjetas;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
+                borrarTarjeta: delete_card,
                 getPedidosPeriodicos: function() {
                     return user.schedules_orders || [];
                 },
@@ -416,6 +522,16 @@ angular.module('farmApp.services', [])
                     user.schedules_orders = pedidos;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
+                guardarRecordatorio: post_reminder,
+                getRecordatorios: function(){
+                    return user.reminders || [];
+                },
+                setRecordatorios: function(reminders){
+                    user.reminders = reminders;
+                    window.localStorage.setItem('user', JSON.stringify(user));
+                },
+                updateRecordatorio: update_reminder,
+                deleteRecordatorio: delete_reminder,
                 enviarCalificacion: function(ranking){
                     var configHttp = {
                         method: "POST",
@@ -442,6 +558,15 @@ angular.module('farmApp.services', [])
                     var tokenPhone = this.getTokenPhone();
                     return tokenPhone.id != 0;
                 },
+                tokenPhoneIsEqual: function(){
+                    this.getUser();
+                    var token = this.getTokenPhone();
+                    if(tokenPhone.token && tokenPhone.token == token.token){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                },
                 getTokenPhone: function () {
                     if(user.token_phone.length && user.token_phone.length > 0){
                         return user.token_phone[0];
@@ -464,7 +589,9 @@ angular.module('farmApp.services', [])
                         $http(configHttp)
                                 .success(function (data) {
                                     user.token_phone.push(data);
+                                    tokenPhone = data;
                                     window.localStorage.setItem('user', JSON.stringify(user));
+                                    window.localStorage.setItem('token_phone', JSON.stringify(tokenPhone));
                                     resolve(data);
                                 })
                                 .error(function (err) {
@@ -488,7 +615,9 @@ angular.module('farmApp.services', [])
                         $http(configHttp)
                                 .success(function (data) {
                                     user.token_phone[0] = data;
+                                    tokenPhone = data;
                                     window.localStorage.setItem('user', JSON.stringify(user));
+                                    window.localStorage.setItem('token_phone', JSON.stringify(tokenPhone));
                                     resolve(data);
                                 })
                                 .error(function (err) {
@@ -1495,234 +1624,151 @@ angular.module('farmApp.services', [])
               recuperarPassword:recuperar_password
             };
         })
-        .factory('NotificacionLocal',function($cordovaLocalNotification){
-            var notificaciones = [];
-            var contNotificacion = 0;
-            notificaciones =  JSON.parse(window.localStorage['notificaciones'] || '[]');
-            contNotificacion =  JSON.parse(window.localStorage['contNotificacion'] || '0');
-
-            var find_notificacion = function(notificacionId){
+        .factory('Recordatorios',function(User){
+            var find_recordatorio = function(recordatorioId){
                 var obj = null;
-                for(var i = 0; i<=notificaciones.length; i++){
-                    if(notificaciones[i].id == notificacionId){
-                        obj = notificaciones[i];
+                var recordatorios = User.getRecordatorios();
+                for(var i = 0; i<=recordatorios.length; i++){
+                    if(recordatorios[i].id == recordatorioId){
+                        obj = recordatorios[i];
                         break;
                     }
                 }
                 return obj;
             };
 
-            var add_notificacion = function(notificacion) {
-                var fecha = new Date();
-                var hora = notificacion.tiempo.hora;
-                if(notificacion.tiempo.horario=="pm"){
-                    hora += 12;
+            var add_recordatorio = function(recordatorio) {
+                //recordatorio.time = get_time();
+                User.guardarRecordatorio(recordatorio);
+            };
+            
+            var update_recordatorio = function(recordatorio){
+                User.updateRecordatorio(recordatorio);
+            }
+
+            var get_recordatorios = function(){
+                var recordatorios = User.getRecordatorios();
+                for(var cont=0; cont<recordatorios.length; cont++){
+                    recordatorios[cont].allDays = all_days(recordatorios[cont]);
+                    recordatorios[cont].weekend = only_weekend(recordatorios[cont]);
+                    recordatorios[cont].monday_to_friday = only_monday_to_friday(recordatorios[cont]);
+                    recordatorios[cont].leyend = getIntervaloString(recordatorios[cont]);
+                    recordatorios[cont].tiempo = get_tiempo(recordatorios[cont]);
                 }
-                fecha.setHours(hora);
-                fecha.setMinutes(notificacion.tiempo.minutos);
-                notificacion.autoCancel = true;
-                contNotificacion++;
-                notificacion.id = contNotificacion;
-                notificacion.date = fecha;
-                notificacion.intervalo = getIntervaloString(notificacion);
-                $cordovaLocalNotification.add(notificacion).then(function () {
-                    console.log("The notification has been set");
-                });
-                notificaciones.push(notificacion);
-                window.localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
-                window.localStorage.setItem('contNotificacion', JSON.stringify(contNotificacion));
+                return recordatorios;
             };
+            
+            var delete_recordatorio = function(recordatorio){
+                User.deleteRecordatorio(recordatorio);
+            }
 
-            var get_notificaciones = function(){
-                return notificaciones;
-            };
-
-            var get_notificacion_vacia = function(){
-                date = new Date();
-                return {
-                    date: date,
+            var get_recordatorio_vacia = function(){
+                var date = new Date();
+                var recordatorio =  {
+                    time: '00:00:00',
                     tiempo: {
-                        hora: '00',
-                        minutos: '00',
-                        horario: 'am'
+                        "hora":"00",
+                        "minutos": "00",
+                        "horario": 'am'
                     },
                     message: "",
-                    title: "",
-                    repetir: {
-                        todosLosDias: false,
-                        domingo: false,
-                        sabado: false,
-                        lunes: false,
-                        martes: false,
-                        miercoles: false,
-                        jueves: false,
-                        viernes: false
-                    },
-                    intervalo: ""
+                    monday: false,
+                    tuesday: false,
+                    wednesday: false,
+                    thursday: false,
+                    friday: false,
+                    saturday: false,
+                    sunday: false,
+                    allDays: false,
+                    weekend: false
                 };
             };
 
-            function getIntervaloString(notificacion){
+            function getIntervaloString(recordatorio){
                 var cadena = "";
-                if(notificacion.repetir.todosLosDias){
-                    return "Todos los Dias";
+                
+                if(recordatorio.allDays){
+                    return "Todos los dias";
                 }
-                if(notificacion.repetir.domingo){
-                    cadena += "Domingo ";
+                if(recordatorio.weekend){
+                    return "Fines de semana";
                 }
-                if(notificacion.repetir.sabado){
-                    cadena += "Sabado ";
+                if(recordatorio.monday_to_friday){
+                    return "Lunes a Viernes";
                 }
-                if(notificacion.repetir.lunes){
+
+                if(recordatorio.monday){
                     cadena += "Lunes ";
                 }
-                if(notificacion.repetir.martes){
+                if(recordatorio.tuesday){
                     cadena += "Martes ";
                 }
-                if(notificacion.repetir.miercoles){
+                if(recordatorio.wednesday){
                     cadena += "Miercoles ";
                 }
-                if(notificacion.repetir.jueves){
+                if(recordatorio.thursday){
                     cadena += "Jueves ";
                 }
-                if(notificacion.repetir.viernes){
+                if(recordatorio.friday){
                     cadena += "Viernes ";
+                }
+                if(recordatorio.saturday){
+                    cadena += "Sabado ";
+                }
+                if(recordatorio.sunday){
+                    cadena += "Domingo ";
                 }
                 return cadena;
             }
+            
+            function get_tiempo(recordatorio){
+                var arreglo = recordatorio.time.split(":");
+                var tiempo = {
+                    "hora": "00",
+                    "minutos": "00",
+                    "horario": 'am'
+                };
+                var hora = (parseInt(arreglo[0])>12)?parseInt(arreglo[0])-12:parseInt(arreglo[0]);
+                var minutos = parseInt(arreglo[1]);
+                var horario = (parseInt(arreglo[0])>12)?'pm':'am';
+                tiempo.hora = ((hora<10)?"0"+hora:hora);
+                tiempo.minutos = ((minutos<10)?"0"+minutos:minutos);
+                tiempo.horario = horario;
+                return tiempo;
+                
+            }
+            
+            function get_time(recordatorio){
+                var hora = parseInt(recordatorio.tiempo.hora);
+                var minutos = parseInt(recordatorio.tiempo.minutos);
+                var horario = recordatorio.tiempo.horario;
+                if(horario == "pm"){
+                    hora += 12;
+                    if(hora==24)
+                        hora = 0;
+                }
+                return ((hora<10)?"0"+hora:hora) + ":" + ((minutos<10)?"0"+minutos:minutos) + ":00";
+            }
+            
+            function all_days(n){
+                return (n.monday && n.thuesday && n.wednesday && n.thursday && n.friday && n.saturday && n.sunday);
+            }
+            
+            function only_weekend(n){
+                return (!n.monday && !n.thuesday && !n.wednesday && !n.thursday && !n.friday && n.saturday && n.sunday);
+            }
+
+            function only_monday_to_friday(n){
+                return (n.monday && n.thuesday && n.wednesday && n.thursday && n.friday && !n.saturday && !n.sunday);
+            }
 
             return {
-                add: add_notificacion,
-                get: get_notificaciones,
-                find: find_notificacion,
-                getEmpty: get_notificacion_vacia
+                add: add_recordatorio,
+                update: update_recordatorio,
+                get: get_recordatorios,
+                find: find_recordatorio,
+                delete: delete_recordatorio,
+                getEmpty: get_recordatorio_vacia
             };
         })
-        .factory("PushNotifications", function($cordovaPush, $rootScope){
-
-            var msgCallback;
-            var regCallback;
-            var errorCallback;
-            var gcmSenderId;
-
-            var service = {
-              setGcmSenderId: setGcmSenderId,
-              ensureRegistration: ensureRegistration,
-              getToken: getToken,
-              onMessage: onMessage
-            }
-
-            return service;
-
-            function setToken(token) {
-              window.localStorage.setItem('pushToken', token);
-            }
-
-            function setGcmSenderId(senderId) {
-              gcmSenderId = senderId;
-            }
-
-            function getToken() {
-              return window.localStorage.getItem('pushToken', '');
-            }
-
-            function onMessage(cb) {
-              msgCallback = cb;
-            }
-
-            // returns an object to the callback with source and token properties
-            function ensureRegistration(cb, errorCb) {
-              regCallback = cb;
-              errorCallback = errorCb;
-
-              document.addEventListener("deviceready", function(){
-                if (ionic.Platform.isAndroid()) {
-                  registerAndroid();
-                  $rootScope.$on('$cordovaPush:notificationReceived', androidPushReceived);
-                }
-                if (ionic.Platform.isIOS()) {
-                  registerIOS();
-                  $rootScope.$on('$cordovaPush:notificationReceived', iosPushReceived);
-                }
-              });
-
-              return this;
-            }
-
-            function registerIOS() {
-              var config = {
-                "badge": true,
-                "sound": true,
-                "alert": true,
-              };
-
-              $cordovaPush.register(config).then(function(result) {
-                setToken(result.deviceToken);
-                if (regCallback !== undefined) {
-                  regCallback({
-                    source: 'ios',
-                    token: result.deviceToken
-                  });
-                }
-              }, function(err) {
-                if (errorCallback !== undefined) {
-                  errorCallback(err);
-                }
-                console.log("Registration error on IOS: ", err)
-              });
-
-            }
-
-            // Inits the Android registration
-            // NOTICE: This will not set the token inmediatly, it will come
-            // on the androidPushReceived
-            function registerAndroid() {
-              var config = {
-                "senderID": gcmSenderId
-              };
-
-              // PushPlugin's telerik only register if necesary or when upgrading app
-              $cordovaPush.register(config).then(function(result) {
-                console.log("Registration requested!");
-              }, function(err) {
-                console.log("Error registering on Android", err);
-              });
-
-
-            }
-
-            // Process incoming push messages from android
-            function androidPushReceived(event, notification) {
-              switch(notification.event) {
-                case 'registered':
-                  if (notification.regid.length > 0 ) {
-                    setToken(notification.regid);
-                    if (regCallback !== undefined) {
-                      regCallback({
-                        source: 'android',
-                        token: notification.regid
-                      })
-                    }
-                  }
-                  break;
-
-                case 'message':
-                  if (msgCallback !== undefined) { msgCallback(notification) }
-                  break;
-
-                case 'error':
-                  console.log('GCM error = ' + notification.msg);
-                  break;
-
-                default:
-                  console.log('An unknown GCM event has occurred');
-                  break;
-              };
-            }
-
-            function iosPushReceived(event, notification) {
-              if (msgCallback !== undefined) { msgCallback(notification) }
-            }
-
-          })
         ;

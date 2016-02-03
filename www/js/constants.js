@@ -1,6 +1,6 @@
 angular.module('farmApp')
 .constant('URL_BASE', {
-    urlBase: 'http://localhost:8000/',
+    urlBase: 'http://farmaapp.mx/',
     urlConekta: 'https://api.conekta.io/charges'
 })
 .constant('AUTH_PATH', {
@@ -24,6 +24,8 @@ angular.module('farmApp')
     images_inapam: 'images/inapam/',
     ratings: 'api/ratings/',
     tokens_phone: 'api/tokens/phone/',
+    tarjetas: 'api/cards/',
+    recordatorios: 'api/reminders/',
     contacto: 'contacto/',
     recover_password: 'solicitud/recuperar/password/'
 });

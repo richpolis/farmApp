@@ -22,6 +22,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                 }
                 Conekta.setPublishableKey('key_FrzHZPkJxzRSbUNFcnpGyYw');
                 
+                
                            
             });
         })
@@ -46,6 +47,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
 
                     .state('inicio', {
                         url: '/inicio',
+                        cache: false,
                         templateUrl: 'templates/inicio.html',
                         controller: 'DefaultController'
                     })
@@ -53,6 +55,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                     .state('app', {
                         url: '/app',
                         abstract: true,
+                        cache: false,
                         templateUrl: 'templates/menu.html',
                         controller: 'AppController'
                     })
@@ -189,30 +192,33 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             }
                         }
                     })
-                    .state('app.notificaciones', {
-                        url: '/notificaciones',
+                    .state('app.recordatorios', {
+                        url: '/recordatorios',
+                        cache: false,
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/notificaciones.html',
-                                controller: 'NotificacionesController'
+                                templateUrl: 'templates/recordatorios.html',
+                                controller: 'RecordatoriosController'
                             }
                         }
                     })
-                    .state('app.addNotificacion', {
-                        url: '/add/notificacion',
+                    .state('app.addRecordatorio', {
+                        url: '/add/recordatorio',
+                        cache: false,
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/formNotificacion.html',
-                                controller: 'FormNotificacionController'
+                                templateUrl: 'templates/formRecordatorio.html',
+                                controller: 'FormRecordatorioController'
                             }
                         }
                     })
-                    .state('app.viewNotificacion', {
-                        url: '/notificaciones/:notificacionId',
+                    .state('app.viewRecordatorio', {
+                        url: '/recordatorios/:recordatorioId',
+                        cache: false,
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/notificacion.html',
-                                controller: 'NotificacionController'
+                                templateUrl: 'templates/recordatorio.html',
+                                controller: 'RecordatorioController'
                             }
                         }
                     })
