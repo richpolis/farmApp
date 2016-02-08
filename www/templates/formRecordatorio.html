@@ -1,6 +1,6 @@
-<ion-view cache-view="false" view-title="Agregar recordatorio">
+<ion-view cache-view="false" view-title="{{title}}">
     <ion-header-bar class="bar-stable">
-        <h1 class="title">Agregar Recordatorio</h1>
+        <h1 class="title">{{title}}</h1>
         <div class="buttons">
             <button class="button button-clear" ng-click="closeModalRecordatorio()">
                 <i class="icon ion-close-round"></i>
@@ -14,22 +14,22 @@
             </div>
             <label class="item item-input">
                 <div class="row">
- -                    <div class="col">
- -                        <select style="padding: 8px; margin-bottom: 10px; font-size: 1em;" ng-model="recordatorio.tiempo.hora" ng-options="hora for hora in ['00', '01', '02', '03','04', '05', '06', '07','08', '09', '10', '11', '12']">
- -                        </select>
- -                    </div>
- -                    <div class="col">
- -                        :
- -                    </div>
- -                    <div class="col">
- -                        <select style="padding: 8px; margin-bottom: 10px; font-size: 1em;" ng-model="recordatorio.tiempo.minutos" ng-options="minutos for minutos in ['00', '05', '10', '15','20', '25', '30', '35','40', '45', '55']">
- -                        </select>
- -                    </div>
- -                    <div class="col">
- -                        <select style="padding: 8px; margin-bottom: 10px; font-size: 1em;" ng-model="recordatorio.tiempo.horario" ng-options="horario for horario in ['am', 'pm']">
- -                        </select>
- -                    </div>
- -                </div>   
+                    <div class="col">
+                        <select style="padding: 8px; margin-bottom: 10px; font-size: 1em;" ng-change="changeTime()" ng-model="recordatorio.tiempo.hora" ng-options="hora for hora in ['00', '01', '02', '03','04', '05', '06', '07','08', '09', '10', '11', '12']">
+                        </select>
+                    </div>
+                    <div class="col">
+                        :
+                    </div>
+                    <div class="col">
+                        <select style="padding: 8px; margin-bottom: 10px; font-size: 1em;" ng-change="changeTime()" ng-model="recordatorio.tiempo.minutos" ng-options="minutos for minutos in ['00', '05', '10', '15','20', '25', '30', '35','40', '45', '55']">
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select style="padding: 8px; margin-bottom: 10px; font-size: 1em;" ng-change="changeTime()" ng-model="recordatorio.tiempo.horario" ng-options="horario for horario in ['am', 'pm']">
+                        </select>
+                    </div>
+                </div>   
             </label>
             <label class="item item-input">
                 <input type="text" ng-model="recordatorio.message" value="" placeholder="Ingresa el recordatorio">
@@ -38,7 +38,7 @@
                 <div class="input-label">
                     Repetir
                 </div>
-                <select ng-model="seleccion.repetir" ng-options="dato for dato in ['Todos los dias','Sabado y Domingo', 'Personalizar']">
+                <select ng-model="seleccion.repetir" ng-options="dato for dato in ['Todos los dias', 'Sabado y Domingo', 'Lunes a Viernes', 'Personalizar']">
                 </select>
             </label>
             <div class="item item-checkbox" ng-show="seleccion.repetir==='Personalizar'">
@@ -67,7 +67,7 @@
             </div>
             <div class="item item-checkbox" ng-show="seleccion.repetir==='Personalizar'">
                 <label class="checkbox">
-                    <input type="checkbox" ng-model="recordoatorio.wednesday">
+                    <input type="checkbox" ng-model="recordatorio.wednesday">
                 </label>
                 Miercoles
             </div>
@@ -84,7 +84,7 @@
                 Viernes
             </div>
             <label class="item">
-                <button class="button button-block button-balanced" ng-click="add()">Agregar recordatorio</button>
+                <button class="button button-block button-balanced" ng-click="add()">Guardar</button>
             </label>
         </div>
     </ion-content>
