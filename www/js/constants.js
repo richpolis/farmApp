@@ -20,8 +20,12 @@ angular.module('farmApp')
     ventas: 'api/ventas/',
     detalle_ventas: 'api/detalle/ventas/',
     pedidos_periodicos: 'api/pedidos/periodicos/',
-    images_ventas: 'api/images/ventas/',
+    images_ventas: 'images/ventas/',
+    images_inapam: 'images/inapam/',
     ratings: 'api/ratings/',
+    tokens_phone: 'api/tokens/phone/',
+    tarjetas: 'api/cards/',
+    recordatorios: 'api/reminders/',
     contacto: 'contacto/',
     recover_password: 'solicitud/recuperar/password/'
 });

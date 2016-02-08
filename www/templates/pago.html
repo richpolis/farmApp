@@ -1,6 +1,34 @@
 <ion-view view-title="Pago">
     <ion-content class="has-header">
-        <form id="formRegister" ng-submit="doPago()">
+        <div class="row" ng-show="hasProductsWithRecipe">
+            <div class="col balanced-bg text-center" style="color: white;">1</div>
+            <div class="col balanced-bg text-center" style="color: white;">2</div>
+            <div class="col balanced-bg text-center" style="color: white;">3</div>
+            <div class="col balanced-bg text-center" style="color: white;">4</div>
+        </div>
+        <div class="row" ng-show="!hasProductsWithRecipe">
+            <div class="col balanced-bg text-center" style="color: white;">1</div>
+            <div class="col balanced-bg text-center" style="color: white;">2</div>
+            <div class="col balanced-bg text-center" style="color: white;">3</div>
+        </div>
+        <ion-list>
+          <ion-radio ng-model="seleccion.numero" ng-value="card.id"
+          ng-repeat="card in tarjetas">
+              
+            <img src="img/ico_mastercard.jpg" ng-if="card.brand=='mastercard'" />
+            <img src="img/ico_visa.jpg" ng-if="card.brand=='visa'" />
+            <img src="img/tarjeta-american-express-icono-8441-48.png" ng-if="card.brand=='AMEX'"/>
+            **** **** **** {{card.last4}}
+          </ion-radio>
+          <ion-radio ng-model="seleccion.numero" ng-value="0">
+            Nueva
+          </ion-radio>
+
+        </ion-list>
+        <p class="padding text-center">
+        <button ng-show="seleccion.numero!=0" class="button button-block button-balanced" ng-click="doPago()">Hacer Pedido</button>
+        </p>
+        <form ng-show="seleccion.numero==0" id="formRegister" ng-submit="doPago()">
             <div class="list">
                 <label class="item item-input">
                     <input type="text" name="name" ng-model="tarjeta.card.name" placeholder="Nombre de cliente">

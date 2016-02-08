@@ -1,11 +1,17 @@
 <ion-view cache-view="false" view-title="Recetas">
     <ion-content class="has-header padding" ng-controller="ImageController">
+        <div class="row">
+            <div class="col balanced-bg text-center" style="color: white;">1</div>
+            <div class="col balanced-bg text-center" style="color: white;">2</div>
+            <div class="col balanced-bg text-center" style="color: white;">3</div>
+            <div class="col text-center">4</div>
+        </div>
         <div class="list card" ng-repeat="image in images">
             <div class="item item-image">
                 <img ng-src="{{urlForImage(image)}}" />
             </div>
 
-            <a class="item item-icon-left assertive" href="#" ng-click="eliminar(image)">
+            <a class="item item-icon-left assertive" href="#" ng-click="removeImage(image)">
                 <i class="icon ion-trash-a"></i>
                 Eliminar
             </a>
@@ -17,5 +23,8 @@
         <button class="button button-full button-positive" ng-click="realizarPago()">
             Siguiente
         </button>
+        <br/>
+        <p class="text-center">Por favor toma o selecciona una foto de tu receta para que la verifiquemos. En caso de no ser aprobada recibirás una notificación.</p>
+        <br/>
     </ion-content>
 </ion-view>

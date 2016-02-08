@@ -19,7 +19,7 @@ angular.module('farmApp.services', [])
                     }
                 };
         }])
-        .factory('FileService', function($cordovaFile) {
+        .factory('FileService', function($cordovaFile, $ionicPopup) {
             var images;
             var IMAGE_STORAGE_KEY = 'images';
 
@@ -41,13 +41,42 @@ angular.module('farmApp.services', [])
                     var trueOrigin = cordova.file.dataDirectory + imageName;
                     return trueOrigin;
                 },
+                removeImage: function(image){
+                    var imagenes = this.images();
+                    var indexImage = imagenes.indexOf(image);
+                    var name = imagenes[indexImage].substr(imagenes[indexImage].lastIndexOf('/') + 1);
+                        $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                                .then(function (success) {
+                                    $ionicPopup.alert({
+                                        title: 'Receta',
+                                        template: 'Archivo eliminado'
+                                    });
+                                }, function (error) {
+                                    $ionicPopup.alert({
+                                        title: 'Receta',
+                                        template: 'No es posible eliminar el archivo'
+                                    });
+                                });
+                    imagenes.splice(indexImage,1);
+                    window.localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(imagenes));
+                },
                 empty: function(){
+                    var imagenes = this.images();
+                    for(var cont=0; cont<imagenes.length; cont++){
+                        var name = imagenes[cont].substr(imagenes[cont].lastIndexOf('/') + 1);
+                        $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                                .then(function (success) {
+                                    console.log("Archivo eliminado");
+                                }, function (error) {
+                                    console.log("No es posible eliminar el archivo");
+                                });
+                    }
                     images=[];
                     window.localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(images));
                 }
             }
         })
-        .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile, URL_BASE, API_PATH) {
+        .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile, URL_BASE, API_PATH, Loader) {
 
                 function makeid() {
                     var text = '';
@@ -100,14 +129,12 @@ angular.module('farmApp.services', [])
 
             function getImageUploadOptions(imageURI, params, headers) {
                 var options = new FileUploadOptions();
+                options.fileKey = "receta";
                 options.fileName = imageURI.substr(imageURI.lastIndexOf('/')+1);
                 options.mimeType = "image/" + imageURI.substr(imageURI.lastIndexOf('.')+1);
                 options.params = params;
                 options.httpMethod = "POST";
                 options.headers = headers;
-                /*uploadOptions.headers = {
-                    Connection:"close"
-                };*/
                 return options;
             }
 
@@ -121,29 +148,34 @@ angular.module('farmApp.services', [])
                 handleMediaDialog: saveMedia,
                 upload: function (images, params, headers, onSuccess, onError) {
                     var ft =  new FileTransfer();
+                    Loader.showLoading("Cargando imagenes de receta");
                     for (var i = 0; i < images.length; i++) {
+                        Loader.showLoading("Cargando " + i + "/" + images.length);
                         var image = images[i];
                         var urlImage = FileService.getUrlForImage(image);
                         ft.upload(urlImage,
-                            encodeURI(BASE_URL.urlBase + API_PATH.images_ventas),
+                            encodeURI(URL_BASE.urlBase + API_PATH.images_ventas),
                             savedFile(image, onSuccess), onError, getImageUploadOptions(urlImage, params, headers));
                     }
+                    Loader.hideLoading();
                 }
             }
         })
         .factory('User', function ($http, $timeout, $q, URL_BASE, AUTH_PATH, API_PATH) {
             var accessToken;
             var user;
+            var tokenPhone;
             user = JSON.parse(window.localStorage['user'] || '{}');
             accessToken = JSON.parse(window.localStorage['access_token'] || '{}');
+            tokenPhone = JSON.parse(window.localStorage['token_phone'] || '{}');
             function request(args) {
                 // Let's retrieve the token from the cookie, if available
                 if(accessToken.auth_token){
                     $http.defaults.headers.common.Authorization = 'Token ' + accessToken.auth_token;
                 }
                 // Continue
-                params = args.params || {};
-                args = args || {};
+                var params = args.params || {};
+                var args = args || {};
                 var deferred = $q.defer(),
                     url = this.API_URL + args.url,
                     method = args.method || "GET",
@@ -185,7 +217,7 @@ angular.module('farmApp.services', [])
                     }));
                 return deferred.promise;
             };
-            function user_login(email, password) {
+            var user_login = function(email, password) {
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.login,
@@ -210,7 +242,7 @@ angular.module('farmApp.services', [])
                             });
                 });
             };
-            function user_logout() {
+            var user_logout = function () {
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.logout,
@@ -235,8 +267,32 @@ angular.module('farmApp.services', [])
                 });
 
             };
+            
+            function delete_card(card) {
+                var configHttp = {
+                    method: "DELETE",
+                    url: URL_BASE.urlBase + API_PATH.tarjetas + card.id + "/",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + accessToken.auth_token
+                    }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var tarjetas = user.cards || [];
+                                var indexCard = tarjetas.indexOf(card);
+                                tarjetas.splice(indexCard,1);
+                                this.setTarjetas(tarjetas);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
 
-            function user_me() {
+            var user_me = function () {
                 var configHttp = {
                     method: "GET",
                     url: URL_BASE.urlBase + API_PATH.usuarios,
@@ -257,7 +313,7 @@ angular.module('farmApp.services', [])
                             });
                 });
             };
-            function user_register(objUser) {
+            var user_register = function(objUser) {
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.register,
@@ -286,7 +342,7 @@ angular.module('farmApp.services', [])
                             );
                 });
             };
-            function user_update(objUser) {
+            var user_update = function(objUser) {
                 var configHttp = {
                     method: "PATCH",
                     url: URL_BASE.urlBase + AUTH_PATH.me,
@@ -313,14 +369,8 @@ angular.module('farmApp.services', [])
                             });
                 });
             };
-
-            return {
-                login: user_login,
-                logout: user_logout,
-                me: user_me,
-                register: user_register,
-                update: user_update,
-                changePassword: function(objUser){
+            
+            var change_password = function(objUser){
                     var configHttp = {
                         method: "POST",
                         url: URL_BASE.urlBase + AUTH_PATH.change_password,
@@ -342,7 +392,15 @@ angular.module('farmApp.services', [])
                                 reject(err);
                             });
                     });
-                },
+            };
+            
+            return {
+                login: user_login,
+                logout: user_logout,
+                me: user_me,
+                register: user_register,
+                update: user_update,
+                changePassword: change_password,
                 hasUser: function () {
                     return user.email;
                 },
@@ -372,11 +430,26 @@ angular.module('farmApp.services', [])
                     user.direcciones = direcciones;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
+                getTarjetas: function(){
+                    return user.cards || [];
+                },
+                setTarjetas: function(cards){
+                    user.cards = cards;
+                    window.localStorage.setItem('user', JSON.stringify(user));
+                },
+                borrarTarjeta: delete_card,
                 getPedidosPeriodicos: function() {
                     return user.schedules_orders || [];
                 },
                 setPedidosPeriodicos: function(pedidos){
                     user.schedules_orders = pedidos;
+                    window.localStorage.setItem('user', JSON.stringify(user));
+                },
+                getRecordatorios: function(){
+                    return user.reminders || [];
+                },
+                setRecordatorios: function(reminders){
+                    user.reminders = reminders;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
                 enviarCalificacion: function(ranking){
@@ -400,13 +473,83 @@ angular.module('farmApp.services', [])
                                     reject(err);
                                 });
                     });
+                },
+                hasTokenPhone: function(){
+                    var tokenPhone = this.getTokenPhone();
+                    return tokenPhone.id != 0;
+                },
+                tokenPhoneIsEqual: function(){
+                    this.getUser();
+                    var token = this.getTokenPhone();
+                    if(tokenPhone.token && tokenPhone.token == token.token){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                },
+                getTokenPhone: function () {
+                    if(user.token_phone.length && user.token_phone.length > 0){
+                        return user.token_phone[0];
+                    }else{
+                        return {id: 0, token:''};
+                    }
+                },
+                addTokenPhone: function (token) {
+                    var configHttp = {
+                        method: "POST",
+                        url: URL_BASE.urlBase + API_PATH.tokens_phone,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + accessToken.auth_token
+                        },
+                        data: {"token": token}
+                    };
+                    console.log(configHttp);
+                    return $q(function (resolve, reject) {
+                        $http(configHttp)
+                                .success(function (data) {
+                                    user.token_phone.push(data);
+                                    tokenPhone = data;
+                                    window.localStorage.setItem('user', JSON.stringify(user));
+                                    window.localStorage.setItem('token_phone', JSON.stringify(tokenPhone));
+                                    resolve(data);
+                                })
+                                .error(function (err) {
+                                    reject(err);
+                                });
+                    });
+                },
+                updateTokenPhone: function(token){
+                    var tokenPhone = this.getTokenPhone();
+                    var configHttp = {
+                        method: "PUT",
+                        url: URL_BASE.urlBase + API_PATH.tokens_phone + tokenPhone.id + "/",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + accessToken.auth_token
+                        },
+                        data: {"token": token}
+                    };
+                    console.log(configHttp);
+                    return $q(function (resolve, reject) {
+                        $http(configHttp)
+                                .success(function (data) {
+                                    user.token_phone[0] = data;
+                                    tokenPhone = data;
+                                    window.localStorage.setItem('user', JSON.stringify(user));
+                                    window.localStorage.setItem('token_phone', JSON.stringify(tokenPhone));
+                                    resolve(data);
+                                })
+                                .error(function (err) {
+                                    reject(err);
+                                });
+                    });
                 }
             }
         })
         .factory('Direcciones', function ($http, $timeout, $q, User, URL_BASE, API_PATH) {
             var direcciones = [];
             var peticionDirecciones = false;
-            var token = User.getAuthToken();
             //direcciones = JSON.parse(window.localStorage['direcciones'] || '[]');
             direcciones = User.getDirecciones();
             var get_direcciones = function () {
@@ -416,7 +559,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.direcciones,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -461,7 +604,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.direcciones,
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
                         "location": direccion.location,
@@ -494,7 +637,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.direcciones  + direccion.id + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
                         "location": direccion.location,
@@ -527,7 +670,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.direcciones  + direccion.id + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -544,6 +687,7 @@ angular.module('farmApp.services', [])
             };
             var get_direccion_base = function () {
                 return  {
+                    "id": 0,
                     "location": "Mexico DF",
                     "street": "",
                     "interior_number": "",
@@ -566,15 +710,13 @@ angular.module('farmApp.services', [])
             };
         })
         .factory('Pedidos', function ($http, $timeout, $q, User, URL_BASE, API_PATH) {
-            var token = User.getAuthToken();
-            return {
-                getPedidos: function () {
+            var get_pedidos = function () {
                     var configHttp = {
                         method: "GET",
                         url: URL_BASE.urlBase + API_PATH.ventas,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -586,11 +728,12 @@ angular.module('farmApp.services', [])
                                 reject(err);
                             });
                     });
-                }
+                };
+            return {
+                getPedidos: get_pedidos
             };
         })
         .factory('Preguntas', function ($http, $timeout, $q, User ,URL_BASE, API_PATH) {
-            var token = User.getAuthToken();
             var preguntas = [];
             var peticionPreguntas = false;
             var get_preguntas = function () {
@@ -600,7 +743,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.preguntas,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -641,7 +784,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.categorias,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     console.log(configHttp);
@@ -674,7 +817,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.categorias  + id + "/",
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         }
                     };
                     return $q(function (resolve, reject) {
@@ -710,7 +853,6 @@ angular.module('farmApp.services', [])
             };
         })
         .factory('Productos', function ($http, $timeout, $q, URL_BASE, API_PATH, User ) {
-            var token = User.getAuthToken();
             var productos = [];
             var get_productos = function (categoriaId) {
                 var configHttp = {
@@ -718,11 +860,10 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.productos,
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     params: { category: categoriaId }
                 };
-                console.log(configHttp);
                 return $q(function (resolve, reject) {
                     $http(configHttp)
                         .success(function (data) {
@@ -740,7 +881,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.productos +  productoId + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -761,6 +902,14 @@ angular.module('farmApp.services', [])
         })
         .factory('Descuentos', function(){
             return {
+                calcularIva: function(producto, subt, desc){
+                    if(producto.with_tax){
+                        var total = subt - desc;
+                        return total * 0.16;
+                    }else{
+                        return 0.0;
+                    }
+                },
                 calcularDescuento: function(producto){
                     var price = 0.0;
                     var descuento = 0.0;
@@ -768,7 +917,7 @@ angular.module('farmApp.services', [])
                     var fracciones = 0;
                     var conDescuento = 0.0;
                     var sinDescuento = 0.0;
-                    if(producto.discount && producto.discount.type){
+                    if(producto.discount && producto.discount.active_discount){
                         if(producto.discount.type == "precio"){
                             price = producto.discount.price;
                             descuento = (producto.price * producto.quantity ) - ( producto.quantity * price);
@@ -795,7 +944,6 @@ angular.module('farmApp.services', [])
             };
         })
         .factory('Buscador', function($q, $http, User, Productos, URL_BASE, API_PATH){
-            var token = User.getAuthToken();
             var query = "";
             query = JSON.parse(window.localStorage['query'] || '{}');
             return {
@@ -812,7 +960,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.productos ,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         params: { q: query.producto }
                     };
@@ -830,6 +978,7 @@ angular.module('farmApp.services', [])
         })
         .factory('Carrito', function ($q, $http, User, Direcciones, Descuentos, ImageService, FileService ,
                                       URL_BASE, AUTH_PATH, API_PATH) {
+
             var productos = [];
             var direccion = {};
             var tarjeta = {};
@@ -837,36 +986,52 @@ angular.module('farmApp.services', [])
             var venta = {};
             var images = FileService.images;
             var token = User.getAuthToken();
+
             productos = JSON.parse(window.localStorage['carrito'] || '[]');
             direccion = JSON.parse(window.localStorage['direccion'] || '{}');
             tarjeta = JSON.parse(window.localStorage['tarjeta'] || '{}');
             venta = JSON.parse(window.localStorage['venta'] || '{}');
+
             function sumarTotal() {
                 total = 0;
                 for (var cont = 0; cont <= productos.length - 1; cont++) {
                     total += productos[cont].price * productos[cont].quantity;
                 }
             };
-            function crear_user_conekta(){
+
+            function crear_user_conekta(token){
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.register_user_conekta ,
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
-                    data: { conektaTokenId: tarjeta.token.id }
+                    data: { 
+                        token_id: token.token_id, 
+                        device_session_id: token.device_session_id 
+                    }
                 };
+                console.log("Token de tarjeta: " + JSON.stringify(token));
                 return $q(function (resolve, reject) {
                     $http(configHttp)
-                        .success(function (ok) {
-                            resolve(ok);
+                        .success(function (data) {
+                            console.log("Data: " )
+                            console.log(data);
+                            tarjeta = data.card;
+                            if(!data.error){
+                                var tarjetas = User.getTarjetas();
+                                tarjetas.push(tarjeta);
+                                User.setTarjetas(tarjetas);
+                            }
+                            resolve(data);
                         })
                         .error(function (err) {
                             reject(err);
                         });
                 });
             };
+
             return {
                 getProductos: function () {
                     return productos;
@@ -915,22 +1080,27 @@ angular.module('farmApp.services', [])
                 setTarjeta: function(tarj){
                     tarjeta = tarj;
                     window.localStorage.setItem('tarjeta', JSON.stringify(tarjeta));
-                    crear_user_conekta();
+                },
+                createCardConekta: function(tokenConekta){
+                    return crear_user_conekta(tokenConekta);
                 },
                 getTarjeta: function(){
-                    if(tarjeta.name){
+                    if(tarjeta.id){
                         return tarjeta;
                     }else{
-                        return {
-                            "card": {
-                                "number": "4242424242424242",
-                                "name": "Ricardo Alcantara G.",
-                                "exp_year": "2015",
-                                "exp_month": "12",
-                                "cvc": "123"
-                            }
-                        };
+                        return null;
                     }
+                },
+                getTarjetaVacia: function () {
+                    return {
+                        "card": {
+                            "number": "",
+                            "name": "",
+                            "exp_year": "",
+                            "exp_month": "",
+                            "cvc": ""
+                        }
+                    };
                 },
                 getTotal: function(){
                     if(productos.length > 0 && total==0){
@@ -942,15 +1112,19 @@ angular.module('farmApp.services', [])
                     var totales = {
                         subtotal: 0.0,
                         descuento: 0.0,
+                        iva: 0.0,
                         total: 0.0
                     };
-
+                    var subT = 0.0, desc = 0.0;
                     for (var cont = 0; cont <= productos.length - 1; cont++) {
-                        totales.subtotal += productos[cont].price * productos[cont].quantity;
-                        totales.descuento += Descuentos.calcularDescuento(productos[cont]);
+                        subT = productos[cont].price * productos[cont].quantity;
+                        desc = Descuentos.calcularDescuento(productos[cont]);
+                        totales.subtotal += subT;
+                        totales.descuento += desc;
+                        totales.iva += Descuentos.calcularIva(productos[cont],subT, desc);
                     }
 
-                    totales.total = totales.subtotal - totales.descuento;
+                    totales.total = totales.subtotal - totales.descuento + totales.iva;
 
                     return totales;
 
@@ -965,11 +1139,12 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.ventas ,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         data: { direction: direccion.id, status: 0, scheduled_order: false,
-                                delivered: false, notes: venta.notes }
+                                delivered: false, notes: venta.notes, card_conekta: tarjeta.id }
                     };
+                    console.log(configHttp);
                     return $q(function (resolve, reject) {
                         $http(configHttp)
                             .success(function (vta) {
@@ -988,7 +1163,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.ventas + venta.id + "/",
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         data: {  status: 1 }
                     };
@@ -1011,7 +1186,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.detalle_ventas ,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         data: { sale: venta.id, product: productos[indice].id, quantity: productos[indice].quantity }
                     };
@@ -1040,7 +1215,7 @@ angular.module('farmApp.services', [])
                         url: URL_BASE.urlBase + API_PATH.images_ventas ,
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": "Token " + token
+                            "Authorization": "Token " + User.getAuthToken()
                         },
                         data: { sale: venta.id, image_recipe: urlImage }
                     };
@@ -1054,6 +1229,16 @@ angular.module('farmApp.services', [])
                             });
                     });
                 },
+                hasProductsWithRecipe: function(index){
+                    var encontrado = false;
+                    for (var cont = 0; cont < productos.length; cont++) {
+                        if (productos[cont].recipe > index ) {
+                            encontrado = true;
+                            break;
+                        }
+                    }
+                    return encontrado;
+                },
                 empty: function(){
                     // limpiar los datos del carrito.
                     direccion = {};
@@ -1061,6 +1246,7 @@ angular.module('farmApp.services', [])
                     venta = {};
                     window.localStorage.setItem('direccion', JSON.stringify(direccion));
                     window.localStorage.setItem('carrito', JSON.stringify(productos));
+                    window.localStorage.setItem('tarjeta', JSON.stringify(tarjeta));
                     window.localStorage.setItem('venta', JSON.stringify(venta));
                     FileService.empty();
                 }
@@ -1072,31 +1258,25 @@ angular.module('farmApp.services', [])
             var peticionPedidos = true;
             //pedidos = JSON.parse(window.localStorage['periodicos'] || '[]');
             pedidos = User.getPedidosPeriodicos();
-            function get_pedidos_periodicos(){
-                if (!peticionPedidos) {
-                    var configHttp = {
-                        method: "GET",
-                        url: URL_BASE.urlBase + API_PATH.usuarios,
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Token " + token
-                        }
-                    };
-                    return $q(function (resolve, reject) {
-                        $http(configHttp)
+            function get_pedidos_periodicos() {
+                var configHttp = {
+                    method: "GET",
+                    url: URL_BASE.urlBase + API_PATH.usuarios,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + User.getAuthToken()
+                    }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
                             .success(function (data) {
-                                pedidos = data.schedules_orders;
+                                pedidos = data.schedules_orders || [];
                                 resolve(pedidos);
                             })
                             .error(function (err) {
                                 reject(err);
                             });
-                    });
-                } else {
-                    return $q(function (resolve, reject) {
-                        resolve(pedidos);
-                    });
-                }
+                });
             };
             function add_pedido_periodico(producto){
                 var configHttp = {
@@ -1104,7 +1284,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.pedidos_periodicos ,
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
                         product: producto.id,
@@ -1130,7 +1310,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.pedidos_periodicos + pedido.id + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
                         product: pedido.product.id,
@@ -1157,7 +1337,7 @@ angular.module('farmApp.services', [])
                     url: URL_BASE.urlBase + API_PATH.pedidos_periodicos + pedido.id + "/",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Token " + token
+                        "Authorization": "Token " + User.getAuthToken()
                     }
                 };
                 return $q(function (resolve, reject) {
@@ -1271,16 +1451,91 @@ angular.module('farmApp.services', [])
               return $q(function(resolve, reject){
                   Conekta.token.create(tarjeta, function(token){
                       console.log(token);
-                      tarjeta.token = token;
-                      Carrito.setTarjeta(tarjeta);
-                      resolve(token);
+                      Carrito.createCardConekta(token).then(function(data){
+                        resolve(data);
+                      },function(err){
+                        reject(err);
+                      });
+
                   }, function(err) {
                       reject(err);
                   });
               });
             };
+            var validar_tarjeta = function(tarjeta){
+                return Conekta.card.validateNumber(tarjeta.card.number);
+            };
+            var validar_fecha_expiracion = function(tarjeta){
+                var exp_month = tarjeta.card.exp_month || tarjeta.exp_month;
+                var exp_year = tarjeta.card.exp_year || tarjeta.exp_year;
+                return Conekta.card.validateExpirationDate(exp_month, exp_year);
+            };
+            var validar_cvc = function(tarjeta){
+                return Conekta.card.validateCVC(tarjeta.card.cvc);
+            };
             return {
-                getTarjetaToken: get_tarjeta_token
+                getTarjetaToken: get_tarjeta_token,
+                validarTarjeta: validar_tarjeta,
+                validarFechaExpiracion: validar_fecha_expiracion,
+                validarCvc: validar_cvc
+                
+            };
+        })
+        .factory('UIOpenPay',function($q, Carrito ){
+            var get_tarjeta_token = function(tarjeta){
+              return $q(function(resolve, reject){
+                  var data = {
+                      "card_number": tarjeta.card.number,
+                      "holder_name": tarjeta.card.name,
+                      "expiration_year": tarjeta.card.exp_year.substring(2),
+                      "expiration_month": tarjeta.card.exp_month,
+                      "cvv2": tarjeta.card.cvc
+                  };
+                  console.log(data);
+                  OpenPay.token.create(data, function(token){
+                      console.log("Respuesta Token de openpay: ");
+                      console.log(token);
+                      var deviceSessionId = get_device_session_id();
+                      var objData = {
+                          "token_id": token.data.id, 
+                          "device_session_id": deviceSessionId
+                      };
+                      Carrito.createCardConekta(objData).then(function(data){
+                        resolve(data);
+                      },function(err){
+                        reject(err);
+                      });
+                  }, function(err) {
+                      reject(err);
+                  });
+              });
+            };
+            var validar_tarjeta = function(tarjeta){
+                return OpenPay.card.validateCardNumber(tarjeta.card.number);
+            };
+            var validar_fecha_expiracion = function(tarjeta){
+                var exp_month = tarjeta.card.exp_month || tarjeta.exp_month;
+                var exp_year = tarjeta.card.exp_year || tarjeta.exp_year;
+                return OpenPay.card.validateExpiry(exp_month, exp_year);
+            };
+            var validar_cvc = function(tarjeta){
+                return OpenPay.card.validateCVC(tarjeta.card.cvc, tarjeta.card.number);
+            };
+            var validar_brand = function(tarjeta){
+                var brand = OpenPay.card.cardType(tarjeta.card.number);
+                console.log("brand: " + brand);
+                return brand != "American Express";
+            };
+            var get_device_session_id = function(){
+                return OpenPay.deviceData.setup();
+            };
+            return {
+                getTarjetaToken: get_tarjeta_token,
+                validarTarjeta: validar_tarjeta,
+                validarFechaExpiracion: validar_fecha_expiracion,
+                validarCvc: validar_cvc,
+                validarBrand: validar_brand, 
+                getDeviceSessionId: get_device_session_id
             };
         })
         .factory('Contacto',function($q, $http, URL_BASE, API_PATH){
@@ -1292,8 +1547,8 @@ angular.module('farmApp.services', [])
                         "Content-Type": "application/json"
                     },
                     data: {
-                        "name": object.name, 
-                        "email": object.email, 
+                        "name": object.name,
+                        "email": object.email,
                         "phone": object.phone,
                         "subject": object.subject,
                         "message": object.message
@@ -1339,234 +1594,255 @@ angular.module('farmApp.services', [])
               recuperarPassword:recuperar_password
             };
         })
-        .factory('NotificacionLocal',function($cordovaLocalNotification){
-            var notificaciones = [];
-            var contNotificacion = 0;
-            notificaciones =  JSON.parse(window.localStorage['notificaciones'] || '[]');
-            contNotificacion =  JSON.parse(window.localStorage['contNotificacion'] || '0');
-            
-            var find_notificacion = function(notificacionId){
+        .factory('Recordatorios',function(User, URL_BASE, API_PATH, $q, $http){
+            var find_recordatorio = function(recordatorioId){
                 var obj = null;
-                for(var i = 0; i<=notificaciones.length; i++){
-                    if(notificaciones[i].id == notificacionId){
-                        obj = notificaciones[i];
+                var recordatorios = get_recordatorios();
+                for(var i = 0; i<=recordatorios.length; i++){
+                    if(recordatorios[i].id == recordatorioId){
+                        obj = recordatorios[i];
                         break;
                     }
                 }
                 return obj;
             };
-            
-            var add_notificacion = function(notificacion) {
-                var fecha = new Date();
-                var hora = notificacion.tiempo.hora;
-                if(notificacion.tiempo.horario=="pm"){
-                    hora += 12;
+
+            var get_recordatorios = function(){
+                var recordatorios = User.getRecordatorios();
+                for(var cont=0; cont<recordatorios.length; cont++){
+                    recordatorios[cont].allDays = all_days(recordatorios[cont]);
+                    recordatorios[cont].weekend = only_weekend(recordatorios[cont]);
+                    recordatorios[cont].monday_to_friday = only_monday_to_friday(recordatorios[cont]);
+                    recordatorios[cont].leyend = getIntervaloString(recordatorios[cont]);
+                    recordatorios[cont].tiempo = get_tiempo(recordatorios[cont]);
+                    console.log(recordatorios[cont]);
                 }
-                fecha.setHours(hora);
-                fecha.setMinutes(notificacion.tiempo.minutos);
-                notificacion.autoCancel = true;
-                contNotificacion++;
-                notificacion.id = contNotificacion;
-                notificacion.date = fecha;
-                notificacion.intervalo = getIntervaloString(notificacion);
-                $cordovaLocalNotification.add(notificacion).then(function () {
-                    console.log("The notification has been set");
-                });
-                notificaciones.push(notificacion);
-                window.localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
-                window.localStorage.setItem('contNotificacion', JSON.stringify(contNotificacion));
+                return recordatorios;
             };
             
-            var get_notificaciones = function(){
-                return notificaciones;
-            };
-            
-            var get_notificacion_vacia = function(){
-                date = new Date();
-                return {
-                    date: date,
+            var get_recordatorio_vacia = function(){
+                var date = new Date();
+                var hora = date.getHours();
+                var minutos = get_minutes_corrects(date.getMinutes());
+                if(minutos == 60){
+                    hora += 1;
+                    minutos = 0;
+                    if(hora == 24){
+                        hora = 0;
+                    }
+                }
+                var recordatorio =  {
+                    id: 0,
+                    time: (hora<10?'0'+hora:hora) + ':' + (minutos<10?'0'+minutos:minutos) + ':00',
                     tiempo: {
-                        hora: '00',
-                        minutos: '00',
-                        horario: 'am'
-                    }, 
-                    message: "",
-                    title: "",
-                    repetir: {
-                        todosLosDias: false,
-                        domingo: false, 
-                        sabado: false, 
-                        lunes: false, 
-                        martes: false,
-                        miercoles: false,
-                        jueves: false, 
-                        viernes: false
+                        "hora":"00",
+                        "minutos": "00",
+                        "horario": 'am'
                     },
-                    intervalo: ""
+                    message: "",
+                    monday: false,
+                    tuesday: false,
+                    wednesday: false,
+                    thursday: false,
+                    friday: false,
+                    saturday: false,
+                    sunday: false,
+                    allDays: false,
+                    weekend: false,
+                    monday_to_friday: false
                 };
+                recordatorio.tiempo = get_tiempo(recordatorio);
+                return recordatorio;
             };
-            
-            function getIntervaloString(notificacion){
+
+            var getIntervaloString = function(recordatorio){
                 var cadena = "";
-                if(notificacion.repetir.todosLosDias){
-                    return "Todos los Dias";
+                
+                if(recordatorio.allDays){
+                    return "Todos los dias";
                 }
-                if(notificacion.repetir.domingo){
-                    cadena += "Domingo ";
+                if(recordatorio.weekend){
+                    return "Sabado y Domingo";
                 }
-                if(notificacion.repetir.sabado){
-                    cadena += "Sabado ";
+                if(recordatorio.monday_to_friday){
+                    return "Lunes a Viernes";
                 }
-                if(notificacion.repetir.lunes){
+
+                if(recordatorio.monday){
                     cadena += "Lunes ";
                 }
-                if(notificacion.repetir.martes){
+                if(recordatorio.tuesday){
                     cadena += "Martes ";
                 }
-                if(notificacion.repetir.miercoles){
+                if(recordatorio.wednesday){
                     cadena += "Miercoles ";
                 }
-                if(notificacion.repetir.jueves){
+                if(recordatorio.thursday){
                     cadena += "Jueves ";
                 }
-                if(notificacion.repetir.viernes){
+                if(recordatorio.friday){
                     cadena += "Viernes ";
                 }
+                if(recordatorio.saturday){
+                    cadena += "Sabado ";
+                }
+                if(recordatorio.sunday){
+                    cadena += "Domingo ";
+                }
                 return cadena;
-            }
+            };
             
+            var get_tiempo = function(recordatorio){
+                var arreglo = recordatorio.time.split(":");
+                var tiempo = {
+                    "hora": "00",
+                    "minutos": "00",
+                    "horario": 'am'
+                };
+                var hora = (parseInt(arreglo[0])>12)?parseInt(arreglo[0])-12:parseInt(arreglo[0]);
+                var minutos = parseInt(arreglo[1]);
+                var horario = (parseInt(arreglo[0])>12)?'pm':'am';
+                tiempo.hora = ((hora<10)?"0"+hora:""+hora);
+                tiempo.minutos = ((minutos<10)?"0"+minutos:""+minutos);
+                tiempo.horario = horario;
+                return tiempo;
+                
+            };
+            
+            var get_minutes_corrects = function(minutos){
+              var residuo = minutos % 5;
+              if(residuo == 0){
+                  return minutos;
+              }else{
+                  minutos += (5 - residuo);
+              }
+              return minutos;
+            };
+            
+            var get_time = function(recordatorio){
+                var hora = parseInt(recordatorio.tiempo.hora);
+                var minutos = parseInt(recordatorio.tiempo.minutos);
+                var horario = recordatorio.tiempo.horario;
+                if(horario == "pm" && hora <= 11){
+                    hora += 12;
+                }else if(horario == "am" && hora == 12){
+                    hora = 0;
+                }
+                return ((hora<10)?"0"+hora:hora) + ":" + ((minutos<10)?"0"+minutos:minutos) + ":00";
+            };
+            
+            var all_days = function(n){
+                return (n.monday && n.tuesday && n.wednesday && n.thursday && n.friday  && n.saturday && n.sunday);
+            };
+            
+            var only_weekend = function(n){
+                return (!n.monday && !n.tuesday && !n.wednesday && !n.thursday && !n.friday  && n.saturday && n.sunday);
+            };
+
+            var only_monday_to_friday = function(n){
+                return (n.monday && n.tuesday && n.wednesday && n.thursday && n.friday  && !n.saturday && !n.sunday);
+            };
+            
+            var get_leyend_edit = function(n){
+                if(n.allDays || n.weekend || n.monday_to_friday){
+                    return n.leyend;
+                }else{
+                    return 'Personalizar';
+                }
+            };
+            
+            var post_reminder = function(reminder) {
+                var configHttp = {
+                    method: "POST",
+                    url: URL_BASE.urlBase + API_PATH.recordatorios ,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + User.getAuthToken()
+                    },
+                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.moday,
+                    "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
+                    "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday,
+                    "active": true }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = User.getRecordatorios();
+                                recordatorios.push(data);
+                                User.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            
+            var put_reminder = function(reminder) {
+                var configHttp = {
+                    method: "PUT",
+                    url: URL_BASE.urlBase + API_PATH.recordatorios + reminder.id + "/" ,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + User.getAuthToken()
+                    },
+                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.monday,
+                    "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
+                    "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday,
+                    "active": reminder.active}
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = User.getRecordatorios();
+                                for(var cont=0; cont<recordatorios.length;cont++){
+                                    if(recordatorios[cont].id==reminder.id){
+                                        recordatorios[cont] = reminder;
+                                    }
+                                }
+                                User.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            
+            var delete_reminder = function(reminder) {
+                var configHttp = {
+                    method: "DELETE",
+                    url: URL_BASE.urlBase + API_PATH.recordatorios + reminder.id + "/",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + User.getAuthToken()
+                    }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = User.getRecordatorios();
+                                var indexReminder = recordatorios.indexOf(reminder);
+                                recordatorios.splice(indexReminder,1);
+                                User.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            
+
             return {
-                add: add_notificacion,
-                get: get_notificaciones,
-                find: find_notificacion,
-                getEmpty: get_notificacion_vacia
+                add: post_reminder,
+                update: put_reminder,
+                get: get_recordatorios,
+                find: find_recordatorio,
+                delete: delete_reminder,
+                getEmpty: get_recordatorio_vacia,
+                getLeyendEdit: get_leyend_edit,
+                getParseTime: get_time
             };
         })
-        .factory("PushNotifications", function($cordovaPush, $rootScope){
-
-            var msgCallback;
-            var regCallback;
-            var errorCallback;
-            var gcmSenderId;
-
-            var service = {
-              setGcmSenderId: setGcmSenderId,
-              ensureRegistration: ensureRegistration,
-              getToken: getToken,
-              onMessage: onMessage
-            }
-
-            return service;
-
-            function setToken(token) {
-              window.localStorage.setItem('pushToken', token);
-            }
-
-            function setGcmSenderId(senderId) {
-              gcmSenderId = senderId;
-            }
-
-            function getToken() {
-              return window.localStorage.getItem('pushToken', '');
-            }
-
-            function onMessage(cb) {
-              msgCallback = cb;
-            }
-
-            // returns an object to the callback with source and token properties
-            function ensureRegistration(cb, errorCb) {
-              regCallback = cb;
-              errorCallback = errorCb;
-
-              document.addEventListener("deviceready", function(){
-                if (ionic.Platform.isAndroid()) {
-                  registerAndroid();
-                  $rootScope.$on('$cordovaPush:notificationReceived', androidPushReceived);
-                }
-                if (ionic.Platform.isIOS()) {
-                  registerIOS();
-                  $rootScope.$on('$cordovaPush:notificationReceived', iosPushReceived);
-                }
-              });
-
-              return this;
-            }
-
-            function registerIOS() {
-              var config = {
-                "badge": true,
-                "sound": true,
-                "alert": true,
-              };
-
-              $cordovaPush.register(config).then(function(result) {
-                setToken(result.deviceToken);
-                if (regCallback !== undefined) {
-                  regCallback({
-                    source: 'ios',
-                    token: result.deviceToken
-                  });
-                }
-              }, function(err) {
-                if (errorCallback !== undefined) {
-                  errorCallback(err);
-                }
-                console.log("Registration error on IOS: ", err)
-              });
-
-            }
-
-            // Inits the Android registration
-            // NOTICE: This will not set the token inmediatly, it will come
-            // on the androidPushReceived
-            function registerAndroid() {
-              var config = {
-                "senderID": gcmSenderId
-              };
-
-              // PushPlugin's telerik only register if necesary or when upgrading app
-              $cordovaPush.register(config).then(function(result) {
-                console.log("Registration requested!");
-              }, function(err) {
-                console.log("Error registering on Android", err);
-              });
-
-
-            }
-
-            // Process incoming push messages from android
-            function androidPushReceived(event, notification) {
-              switch(notification.event) {
-                case 'registered':
-                  if (notification.regid.length > 0 ) {
-                    setToken(notification.regid);
-                    if (regCallback !== undefined) {
-                      regCallback({
-                        source: 'android',
-                        token: notification.regid
-                      })
-                    }
-                  }
-                  break;
-
-                case 'message':
-                  if (msgCallback !== undefined) { msgCallback(notification) }
-                  break;
-
-                case 'error':
-                  console.log('GCM error = ' + notification.msg);
-                  break;
-
-                default:
-                  console.log('An unknown GCM event has occurred');
-                  break;
-              };
-            }
-
-            function iosPushReceived(event, notification) {
-              if (msgCallback !== undefined) { msgCallback(notification) }
-            }
-
-          })
         ;

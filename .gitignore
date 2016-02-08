@@ -20,3 +20,4 @@ www/lib/
 *.xdk
 *.xdke
 .codio
+pushnotification.json

@@ -18,6 +18,7 @@
                         </label>
                         <div class="item" ng-show="inapam.length==0">
                             <ion-toggle ng-model="userData.inapam" style="border: none; font-size: .9em;" toggle-class="toggle-calm">INAPAM</ion-toggle>
+                            <p class="text-center" style="color: gray;">Si cuentas con INAPAM registralo <br/>para hacerlo valido en tus compras.</p>
                         </div>
                         <div class="card" ng-repeat="imageUrl in inapam" ng-show="inapam.length>0">
                             <div class="item item-text-wrap">
@@ -44,9 +45,9 @@
                         <div class="input-label">
                             Direccion guardada
                         </div>
-                        <select ng-change="recuperarDireccion()" ng-model="direccionSeleccionada" id="recuperar-direccion">
-                            <option selected value="">Nueva...</option>
-                            <option ng-repeat="direccion in direcciones" value="{{direccion.street}}">{{direccion.street}}</option>
+                        <select ng-model="direccionSeleccionada.id" id="recuperar-direccion">
+                            <option selected value="0">Nueva...</option>
+                            <option ng-repeat="direccion in direcciones" value="{{direccion.id}}">{{direccion.street}}</option>
                         </select>
                     </label>
                     <div class="item item-button-right">

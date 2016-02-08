@@ -144,6 +144,12 @@ map {
   width: 100%;
   height: 100%;
 }
+
+span.laboratorio{
+    color:gray;
+    font-size: .8em;
+}
+
 .scroll {
   height: 100%;
 }
@@ -177,6 +183,7 @@ input.ion-google-place[readonly]{
     background-color: transparent;
     cursor: text;
 }
+
 
 @media only screen and (max-device-width: 480px){
     .item-select-cantidad {

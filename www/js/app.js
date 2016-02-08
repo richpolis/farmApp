@@ -4,46 +4,33 @@
 // 'farmApp' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'farmApp.controllers' is found in controllers.js
-angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','farmApp.services'])
+angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push', 
+                           'farmApp.controllers','farmApp.directives',
+                           'farmApp.services'])
 
-        .run(function ($ionicPlatform, $rootScope, $timeout, PushNotifications) {
+        .run(function ($ionicPlatform, $rootScope, $timeout) {
             $ionicPlatform.ready(function () {
                 // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
                 // for form inputs)
                 if (window.cordova && window.cordova.plugins.Keyboard) {
                     cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
                     cordova.plugins.Keyboard.disableScroll(true);
-
                 }
                 if (window.StatusBar) {
                     // org.apache.cordova.statusbar required
                     StatusBar.styleDefault();
                 }
-
-                Conekta.setPublishableKey('key_FrzHZPkJxzRSbUNFcnpGyYw');
                 
-                window.plugin.notification.local.onadd = function (id, state, json) {
-                    var notification = {
-                        id: id,
-                        state: state,
-                        json: json
-                    };
-                    $timeout(function() {
-                        $rootScope.$broadcast("$cordovaLocalNotification:added", notification);
-                    });
-                };
+                //Conekta.setPublishableKey('key_FrzHZPkJxzRSbUNFcnpGyYw');
                 
-                PushNotifications.setGcmSenderId('1012709617565');
-                PushNotifications
-                  .ensureRegistration(function(regInfo) {
-                    console.log("Registrado!", regInfo.source, regInfo.token);
-                  }, function() {
-                    console.log("Error al registrar");
-                  })
-                  .onMessage(function(message) {
-                    console.log("New push notification", message);
-                  });
-
+                OpenPay.setId('mpoejxraordmyeoi3naf');
+                OpenPay.setApiKey('pk_9ac5b1cf9fc24904b6fac2de97c1439f');
+                OpenPay.setSandboxMode(true);
+                
+                /*var deviceSessionId = OpenPay.deviceData.setup();
+                
+                localStorage.setItem('device_session_id',deviceSessionId);*/
+                           
             });
         })
 
@@ -53,18 +40,21 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
 
                     .state('login', {
                         url: '/login',
+                        cache: false,
                         templateUrl: 'templates/login.html',
                         controller: 'LoginController'
                     })
 
                     .state('registro', {
                         url: '/registro',
+                        cache: false,
                         templateUrl: 'templates/registro.html',
                         controller: 'RegistroController'
                     })
 
                     .state('inicio', {
                         url: '/inicio',
+                        cache: false,
                         templateUrl: 'templates/inicio.html',
                         controller: 'DefaultController'
                     })
@@ -72,12 +62,14 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
                     .state('app', {
                         url: '/app',
                         abstract: true,
+                        cache: false,
                         templateUrl: 'templates/menu.html',
                         controller: 'AppController'
                     })
 
                     .state('app.perfil', {
                         url: '/perfil',
+                        cache: false, 
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/perfil.html',
@@ -98,6 +90,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
 
                     .state('app.contacto', {
                         url: '/contacto',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/contacto.html',
@@ -158,6 +151,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
 
                     .state('app.carrito', {
                         url: '/carrito',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/carrito.html',
@@ -167,6 +161,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
                     })
                     .state('app.pedido', {
                         url: '/pedido',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/pedido.html',
@@ -176,6 +171,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
                     })
                     .state('app.notas', {
                         url: '/notas',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/notas_observaciones.html',
@@ -185,6 +181,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
                     })
                     .state('app.pago', {
                         url: '/pago',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/pago.html',
@@ -194,6 +191,7 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
                     })
                     .state('app.recetas', {
                         url: '/recetas',
+                        cache: false,
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/recetas.html',
@@ -201,37 +199,47 @@ angular.module('farmApp', ['ionic', 'farmApp.controllers','farmApp.directives','
                             }
                         }
                     })
-                    .state('app.notificaciones', {
-                        url: '/notificaciones',
+                    .state('app.recordatorios', {
+                        url: '/recordatorios',
+                        cache: false,
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/notificaciones.html',
-                                controller: 'NotificacionesController'
+                                templateUrl: 'templates/recordatorios.html',
+                                controller: 'RecordatoriosController'
                             }
                         }
                     })
-                    .state('app.addNotificacion', {
-                        url: '/add/notificacion',
+                    .state('app.addRecordatorio', {
+                        url: '/add/recordatorio',
+                        cache: false,
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/formNotificacion.html',
-                                controller: 'FormNotificacionController'
+                                templateUrl: 'templates/formRecordatorio.html',
+                                controller: 'FormRecordatorioController'
                             }
                         }
                     })
-                    .state('app.viewNotificacion', {
-                        url: '/notificaciones/:notificacionId',
+                    .state('app.editRecordatorio', {
+                        url: '/edit/recordatorio/:recordatorioId',
+                        cache: false,
                         views: {
                             'menuContent': {
-                                templateUrl: 'templates/notificacion.html',
-                                controller: 'NotificacionController'
+                                templateUrl: 'templates/formRecordatorio.html',
+                                controller: 'FormRecordatorioController'
+                            }
+                        }
+                    })
+                    .state('app.viewRecordatorio', {
+                        url: '/recordatorios/:recordatorioId',
+                        cache: false,
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/recordatorio.html',
+                                controller: 'RecordatorioController'
                             }
                         }
                     })
                     ;
             // if none of the above states are matched, use this as the fallback
             $urlRouterProvider.otherwise('/inicio');
-        })
-        /*.run(function(djangoAuth){
-         djangoAuth.initialize('//polar-hollows-6621.herokuapp.com/auth', false);
-         })*/;
+        });

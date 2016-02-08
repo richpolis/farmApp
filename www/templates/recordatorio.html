@@ -1,0 +1,22 @@
+<ion-view cache-view="false" view-title="Recordatorio">
+    <ion-content class="has-header padding">
+        <div class="list card">
+            <div class="item item-icon-left">
+                <i class="icon ion-clock"></i>
+                    {{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}}
+            </div>
+            <div class="item item-body">
+                <p>
+                    {{recordatorio.message}}
+                </p>
+                <p>
+                  {{recordatorio.leyend}}
+                </p>
+                <p>
+                  <a href="#/app/edit/recordatorio/{{recordatorio.id}}" class="subdued">Editar</a>
+                  <a href="#"  ng-click="borrarRecordatorio(recordatorio)" class="subdued">Eliminar</a>
+                </p>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

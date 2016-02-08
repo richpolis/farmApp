@@ -1,0 +1,19 @@
+<ion-view cache-view="false" view-title="Recordatorios">
+    <ion-content class="has-header padding">
+        <ion-list>
+            <ion-item href="#/app/recordatorios/{{recordatorio.id}}" ng-repeat="recordatorio in recordatorios">
+                <h2>{{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}}</h2>
+                <p>{{recordatorio.leyend}}</p>
+                <!--label class="toggle toggle-assertive">
+                    <input type="checkbox" ng-model="recordatorio.active" ng-change="updateRecordatorio(recordatorio)">
+                    <div class="track">
+                        <div class="handle"></div>
+                    </div>
+                </label-->
+            </ion-item>
+        </ion-list>
+        <a class="button button-full button-balanced" href="#/app/add/recordatorio">
+            Agregar recordatorio
+        </a>
+    </ion-content>
+</ion-view>
