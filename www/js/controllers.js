@@ -103,7 +103,13 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 }
             });
             
-            
+            $scope.$on("recordatorios",function(event, data){
+                $timeout(function () {
+                    $scope.$apply(function () {
+                        $rootScope.$broadcast('recordatorios_actualizar',data);
+                    });
+                }, 500);
+            });
             
 
         })
@@ -819,16 +825,19 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             }, function (err) {
                 Loader.hideLoading();
                 //alert("Error: " + JSON.stringify(err));
-                if (err.detail == "Token inválido.") {
+                if (err.detail && err.detail == "Token inválido.") {
                     Loader.showLoading("Buscando registro...");
                     $scope.$emit("empty","iniciarlizar");
                     window.location.href = "./main.html";
                     Loader.hideLoading();
-                }else{
+                }else if(err.detail){
                   $ionicPopup.alert({
                       title: 'Error en categorias!',
-                      template: err.detail
+                      template: JSON.stringify(err)
                   });
+                }else{
+                  $scope.$emit("empty","iniciarlizar");  
+                  window.location.href = "./main.html";  
                 }
             });
 
@@ -1444,7 +1453,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
 
         .controller('PagoController', function ($scope, $ionicPopup, $state,
                     $ionicModal, $cordovaCamera, User, Carrito, FileService,
-                    ImageService, UIConekta, Loader,$timeout) {
+                    ImageService, UIOpenPay, Loader,$timeout) {
 
             $scope.hasProductsWithRecipe = Carrito.hasProductsWithRecipe(2);
             $scope.tarjeta = Carrito.getTarjetaVacia();
@@ -1460,26 +1469,32 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     seleccionarTarjeta();
                 } else if ($scope.tarjeta.card.number) {
                     Loader.showLoading('Enviando datos pago...');
-                    if(!UIConekta.validarTarjeta($scope.tarjeta)){
+                    if(!UIOpenPay.validarTarjeta($scope.tarjeta)){
                         Loader.hideLoading();
                         $ionicPopup.alert({
                             title: 'Numero de tarjeta',
                             template: 'El numero de tarjeta no es valido'
                         });
-                    }else if(!UIConekta.validarFechaExpiracion($scope.tarjeta)){
+                    }else if(!UIOpenPay.validarBrand($scope.tarjeta)){
+                        Loader.hideLoading();
+                        $ionicPopup.alert({
+                            title: 'Numero de tarjeta',
+                            template: 'OpenPay no acepta pagos con American Express'
+                        });
+                    }else if(!UIOpenPay.validarFechaExpiracion($scope.tarjeta)){
                         Loader.hideLoading();
                         $ionicPopup.alert({
                             title: 'Fecha de expiración',
                             template: 'La fecha de expiración no es valida'
                         });
-                    }else if(!UIConekta.validarCvc($scope.tarjeta)){
+                    }else if(!UIOpenPay.validarCvc($scope.tarjeta)){
                         Loader.hideLoading();
                         $ionicPopup.alert({
                             title: 'CVC',
                             template: 'Verifique el numero CVC de su tarjeta'
                         });
                     }else{
-                        UIConekta.getTarjetaToken($scope.tarjeta).then(function (data) {
+                        UIOpenPay.getTarjetaToken($scope.tarjeta).then(function (data) {
                             Loader.hideLoading();
                             if(data.error){
                                 $ionicPopup.alert({
@@ -1488,13 +1503,22 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                                 });
                             }else{
                                 enviarPedido();
+                                console.log("Enviando pedido...");
                             }
                         }, function (err) {
+                            console.log("Error en token de tarjeta: " + JSON.stringify(err));
                             Loader.hideLoading();
-                            $ionicPopup.alert({
-                                title: 'Error token de tarjeta!',
-                                template: err.message
-                            });
+                            if(err.data.status){
+                                $ionicPopup.alert({
+                                    title: err.message,
+                                    template: err.data.description
+                                });
+                            }else{
+                                $ionicPopup.alert({
+                                    title: 'Error en registro de tarjeta!',
+                                    template: "Error: " + JSON.stringify(err)
+                                });
+                            }
                         });
                     }
                 } else {
@@ -1748,24 +1772,61 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             $scope.updateRecordatorio = function(){
                 Recordatorios.add()
             };
+            
+            $scope.$on("recordatorios_actualizar",function(event, data){
+                $timeout(function () {
+                    $scope.$apply(function () {
+                        $scope.recordatorios = Recordatorios.get();
+                    });
+                }, 1000);
+            });
         })
         .controller('RecordatorioController', function ($scope, $stateParams, 
-            $ionicModal, $state, Recordatorios) {
+                   $ionicPopup,  Recordatorios, $state) {
 
-            $scope.notificacion = Recordatorios.find($stateParams.notificacionId);
+            $scope.recordatorio = Recordatorios.find($stateParams.recordatorioId);
             
-            
+            $scope.borrarRecordatorio = function(recordatorio){
+                var confirmPopup = $ionicPopup.confirm({
+                    title: 'Confirmar eliminar recordatorio',
+                    template: 'Desea eliminar el recordatorio?',
+                    cancelText: "No",
+                    okText: "Si"
+                });
+                confirmPopup.then(function (res) {
+                    if (res) {
+                        console.log(recordatorio);
+                        Recordatorios.delete(recordatorio);
+                        $scope.$emit('recordatorios', 'add');
+                        $state.go('app.recordatorios');
+                    }
+                });
+            };
 
         })
-        .controller('FormRecordatorioController', function ($scope, $state, Recordatorios) {
+        .controller('FormRecordatorioController', function ($scope, $state, 
+            $stateParams, $ionicNavBarDelegate, Recordatorios) {
+            
+            if($stateParams.recordatorioId){
+                $scope.recordatorio = Recordatorios.find($stateParams.recordatorioId);
+                $ionicNavBarDelegate.title("Editar recordatorio");
+                $scope.title = "Editar recordatorio";
+                var leyenda = Recordatorios.getLeyendEdit($scope.recordatorio);
+                $scope.seleccion = {'repetir': leyenda};
+                console.log("Entro a la configuracion de edit");
+            }else{
+                $scope.recordatorio = Recordatorios.getEmpty();
+                $ionicNavBarDelegate.title("Agregar recordatorio");
+                $scope.title = "Agregar recordatorio";
+                $scope.seleccion = {'repetir': 'Todos los dias'};
+                console.log("Entro a la configuracion de add")
+                console.log($scope.recordatorio);
+            }
 
-
-            $scope.recordatorio = Recordatorios.getEmpty();
-
-            $scope.seleccion = {'repetir': 'Todos los dias'};
+            
             
             $scope.$watch('seleccion.repetir',function(){
-                if($scope.seleccion.repetir=="Todos los dias"){
+                if($scope.recordatorio && $scope.seleccion.repetir=="Todos los dias"){
                     $scope.recordatorio.allDays = true;
                     $scope.recordatorio.weekend = false;
                     $scope.recordatorio.monday = true;
@@ -1775,7 +1836,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     $scope.recordatorio.friday = true;
                     $scope.recordatorio.saturday = true;
                     $scope.recordatorio.sunday = true;
-                }else if($scope.seleccion.repetir == "Sabado y Domingo"){
+                }else if($scope.recordatorio && $scope.seleccion.repetir == "Sabado y Domingo"){
                     $scope.recordatorio.allDays = false;
                     $scope.recordatorio.weekend = true;
                     $scope.recordatorio.monday = false;
@@ -1785,15 +1846,40 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     $scope.recordatorio.friday = false;
                     $scope.recordatorio.saturday = true;
                     $scope.recordatorio.sunday = true;
+                }else if($scope.recordatorio && $scope.seleccion.repetir == "Lunes a Viernes"){
+                    $scope.recordatorio.allDays = false;
+                    $scope.recordatorio.weekend = false;
+                    $scope.recordatorio.monday = true;
+                    $scope.recordatorio.tuesday = true;
+                    $scope.recordatorio.wednesday = true;
+                    $scope.recordatorio.thursday = true;
+                    $scope.recordatorio.friday = true;
+                    $scope.recordatorio.saturday = false;
+                    $scope.recordatorio.sunday = false;
                 }
                 
             });
 
             $scope.add = function () {
-                Recordatorios.add($scope.recordatorio);
-                $scope.recordatorio = Recordatorios.getEmpty();
-                $scope.$emit('recordatorios', 'add');
-                $state.go('app.notificaciones');
+                if($scope.recordatorio.id == 0){
+                    Recordatorios.add($scope.recordatorio);
+                    $scope.recordatorio = Recordatorios.getEmpty();
+                    $scope.$emit('recordatorios', 'add');
+                    $state.go('app.recordatorios');
+                }else{
+                    $scope.edit($scope.recordatorio);
+                }
             };
+            
+            $scope.edit = function () {
+                Recordatorios.update($scope.recordatorio);
+                $state.go('app.recordatorios');
+            };
+            
+            $scope.changeTime = function(){
+                $scope.recordatorio.time = Recordatorios.getParseTime($scope.recordatorio);
+                console.log($scope.recordatorio);
+            }
+            
         })
         ;

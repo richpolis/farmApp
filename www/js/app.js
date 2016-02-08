@@ -20,9 +20,16 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                     // org.apache.cordova.statusbar required
                     StatusBar.styleDefault();
                 }
-                Conekta.setPublishableKey('key_FrzHZPkJxzRSbUNFcnpGyYw');
                 
+                //Conekta.setPublishableKey('key_FrzHZPkJxzRSbUNFcnpGyYw');
                 
+                OpenPay.setId('mpoejxraordmyeoi3naf');
+                OpenPay.setApiKey('pk_9ac5b1cf9fc24904b6fac2de97c1439f');
+                OpenPay.setSandboxMode(true);
+                
+                /*var deviceSessionId = OpenPay.deviceData.setup();
+                
+                localStorage.setItem('device_session_id',deviceSessionId);*/
                            
             });
         })
@@ -204,6 +211,16 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                     })
                     .state('app.addRecordatorio', {
                         url: '/add/recordatorio',
+                        cache: false,
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/formRecordatorio.html',
+                                controller: 'FormRecordatorioController'
+                            }
+                        }
+                    })
+                    .state('app.editRecordatorio', {
+                        url: '/edit/recordatorio/:recordatorioId',
                         cache: false,
                         views: {
                             'menuContent': {

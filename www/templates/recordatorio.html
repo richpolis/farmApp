@@ -2,20 +2,19 @@
     <ion-content class="has-header padding">
         <div class="list card">
             <div class="item item-icon-left">
-                <i class="icon ion-home"></i>
-                    {{recordatorio.message}}
-                <i class="icon ion-close-round" ng-click="removeProducto(producto)" style="position: absolute; top: 2px; right: 2px; font-size: 1.5em;"></i>
+                <i class="icon ion-clock"></i>
+                    {{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}}
             </div>
             <div class="item item-body">
-                <img class="full-image" src="delorean.jpg">
                 <p>
-                  This is a "Facebook" styled Card. The header is created from a Thumbnail List item,
-                  the content is from a card-body consisting of an image and paragraph text. The footer
-                  consists of tabs, icons aligned left, within the card-footer.
+                    {{recordatorio.message}}
                 </p>
                 <p>
-                  <a href="#" class="subdued">1 Like</a>
-                  <a href="#" class="subdued">5 Comments</a>
+                  {{recordatorio.leyend}}
+                </p>
+                <p>
+                  <a href="#/app/edit/recordatorio/{{recordatorio.id}}" class="subdued">Editar</a>
+                  <a href="#"  ng-click="borrarRecordatorio(recordatorio)" class="subdued">Eliminar</a>
                 </p>
             </div>
         </div>

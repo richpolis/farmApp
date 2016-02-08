@@ -217,7 +217,7 @@ angular.module('farmApp.services', [])
                     }));
                 return deferred.promise;
             };
-            function user_login(email, password) {
+            var user_login = function(email, password) {
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.login,
@@ -242,7 +242,7 @@ angular.module('farmApp.services', [])
                             });
                 });
             };
-            function user_logout() {
+            var user_logout = function () {
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.logout,
@@ -268,89 +268,10 @@ angular.module('farmApp.services', [])
 
             };
             
-            function delete_reminder(reminder) {
-                var configHttp = {
-                    method: "DELETE",
-                    url: URL_BASE.urlBase + AUTH_PATH.recordatorios + reminder.id + "/",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Token " + accessToken.auth_token
-                    }
-                };
-                return $q(function (resolve, reject) {
-                    $http(configHttp)
-                            .success(function (data) {
-                                var recordatorios = this.getRecordatorios();
-                                var indexReminder = recordatorios.indexOf(reminder);
-                                recordatorios.splice(indexReminder,1);
-                                this.setRecordatorios(recordatorios);
-                                resolve(data);
-                            })
-                            .error(function (err) {
-                                reject(err);
-                            });
-                });
-            };
-            function post_reminder(reminder) {
-                var configHttp = {
-                    method: "POST",
-                    url: URL_BASE.urlBase + AUTH_PATH.recordatorios ,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Token " + accessToken.auth_token
-                    },
-                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.moday,
-                    "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
-                    "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday}
-                };
-                return $q(function (resolve, reject) {
-                    $http(configHttp)
-                            .success(function (data) {
-                                var recordatorios = this.getRecordatorios();
-                                recordatorios.push(data);
-                                this.setRecordatorios(recordatorios);
-                                resolve(data);
-                            })
-                            .error(function (err) {
-                                reject(err);
-                            });
-                });
-            };
-            
-            function update_reminder(reminder) {
-                var configHttp = {
-                    method: "PUT",
-                    url: URL_BASE.urlBase + AUTH_PATH.recordatorios + reminder.id + "/" ,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Token " + accessToken.auth_token
-                    },
-                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.moday,
-                    "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
-                    "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday}
-                };
-                return $q(function (resolve, reject) {
-                    $http(configHttp)
-                            .success(function (data) {
-                                var recordatorios = this.getRecordatorios();
-                                for(var cont=0; cont<recordatorios.length;cont++){
-                                    if(recordatorios[cont].id==reminder.id){
-                                        recordatorios[cont] = reminder;
-                                    }
-                                }
-                                this.setRecordatorios(recordatorios);
-                                resolve(data);
-                            })
-                            .error(function (err) {
-                                reject(err);
-                            });
-                });
-            };
-            
             function delete_card(card) {
                 var configHttp = {
                     method: "DELETE",
-                    url: URL_BASE.urlBase + AUTH_PATH.tarjetas + card.id + "/",
+                    url: URL_BASE.urlBase + API_PATH.tarjetas + card.id + "/",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": "Token " + accessToken.auth_token
@@ -359,7 +280,7 @@ angular.module('farmApp.services', [])
                 return $q(function (resolve, reject) {
                     $http(configHttp)
                             .success(function (data) {
-                                var tarjetas = this.getTarjetas();
+                                var tarjetas = user.cards || [];
                                 var indexCard = tarjetas.indexOf(card);
                                 tarjetas.splice(indexCard,1);
                                 this.setTarjetas(tarjetas);
@@ -371,7 +292,7 @@ angular.module('farmApp.services', [])
                 });
             };
 
-            function user_me() {
+            var user_me = function () {
                 var configHttp = {
                     method: "GET",
                     url: URL_BASE.urlBase + API_PATH.usuarios,
@@ -392,7 +313,7 @@ angular.module('farmApp.services', [])
                             });
                 });
             };
-            function user_register(objUser) {
+            var user_register = function(objUser) {
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.register,
@@ -421,7 +342,7 @@ angular.module('farmApp.services', [])
                             );
                 });
             };
-            function user_update(objUser) {
+            var user_update = function(objUser) {
                 var configHttp = {
                     method: "PATCH",
                     url: URL_BASE.urlBase + AUTH_PATH.me,
@@ -448,14 +369,8 @@ angular.module('farmApp.services', [])
                             });
                 });
             };
-
-            return {
-                login: user_login,
-                logout: user_logout,
-                me: user_me,
-                register: user_register,
-                update: user_update,
-                changePassword: function(objUser){
+            
+            var change_password = function(objUser){
                     var configHttp = {
                         method: "POST",
                         url: URL_BASE.urlBase + AUTH_PATH.change_password,
@@ -477,7 +392,15 @@ angular.module('farmApp.services', [])
                                 reject(err);
                             });
                     });
-                },
+            };
+            
+            return {
+                login: user_login,
+                logout: user_logout,
+                me: user_me,
+                register: user_register,
+                update: user_update,
+                changePassword: change_password,
                 hasUser: function () {
                     return user.email;
                 },
@@ -510,8 +433,8 @@ angular.module('farmApp.services', [])
                 getTarjetas: function(){
                     return user.cards || [];
                 },
-                setTarjetas: function(tarjetas){
-                    user.cards = tarjetas;
+                setTarjetas: function(cards){
+                    user.cards = cards;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
                 borrarTarjeta: delete_card,
@@ -522,7 +445,6 @@ angular.module('farmApp.services', [])
                     user.schedules_orders = pedidos;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
-                guardarRecordatorio: post_reminder,
                 getRecordatorios: function(){
                     return user.reminders || [];
                 },
@@ -530,8 +452,6 @@ angular.module('farmApp.services', [])
                     user.reminders = reminders;
                     window.localStorage.setItem('user', JSON.stringify(user));
                 },
-                updateRecordatorio: update_reminder,
-                deleteRecordatorio: delete_reminder,
                 enviarCalificacion: function(ranking){
                     var configHttp = {
                         method: "POST",
@@ -790,9 +710,7 @@ angular.module('farmApp.services', [])
             };
         })
         .factory('Pedidos', function ($http, $timeout, $q, User, URL_BASE, API_PATH) {
-            var token = User.getAuthToken();
-            return {
-                getPedidos: function () {
+            var get_pedidos = function () {
                     var configHttp = {
                         method: "GET",
                         url: URL_BASE.urlBase + API_PATH.ventas,
@@ -810,11 +728,12 @@ angular.module('farmApp.services', [])
                                 reject(err);
                             });
                     });
-                }
+                };
+            return {
+                getPedidos: get_pedidos
             };
         })
         .factory('Preguntas', function ($http, $timeout, $q, User ,URL_BASE, API_PATH) {
-            var token = User.getAuthToken();
             var preguntas = [];
             var peticionPreguntas = false;
             var get_preguntas = function () {
@@ -934,7 +853,6 @@ angular.module('farmApp.services', [])
             };
         })
         .factory('Productos', function ($http, $timeout, $q, URL_BASE, API_PATH, User ) {
-            var token = User.getAuthToken();
             var productos = [];
             var get_productos = function (categoriaId) {
                 var configHttp = {
@@ -946,7 +864,6 @@ angular.module('farmApp.services', [])
                     },
                     params: { category: categoriaId }
                 };
-                console.log(configHttp);
                 return $q(function (resolve, reject) {
                     $http(configHttp)
                         .success(function (data) {
@@ -1027,7 +944,6 @@ angular.module('farmApp.services', [])
             };
         })
         .factory('Buscador', function($q, $http, User, Productos, URL_BASE, API_PATH){
-            var token = User.getAuthToken();
             var query = "";
             query = JSON.parse(window.localStorage['query'] || '{}');
             return {
@@ -1083,7 +999,7 @@ angular.module('farmApp.services', [])
                 }
             };
 
-            function crear_user_conekta(tokenConekta){
+            function crear_user_conekta(token){
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + AUTH_PATH.register_user_conekta ,
@@ -1091,9 +1007,12 @@ angular.module('farmApp.services', [])
                         "Content-Type": "application/json",
                         "Authorization": "Token " + User.getAuthToken()
                     },
-                    data: { conektaTokenId: tokenConekta.id }
+                    data: { 
+                        token_id: token.token_id, 
+                        device_session_id: token.device_session_id 
+                    }
                 };
-                console.log("Token de Conekta: " + JSON.stringify(tokenConekta));
+                console.log("Token de tarjeta: " + JSON.stringify(token));
                 return $q(function (resolve, reject) {
                     $http(configHttp)
                         .success(function (data) {
@@ -1339,31 +1258,25 @@ angular.module('farmApp.services', [])
             var peticionPedidos = true;
             //pedidos = JSON.parse(window.localStorage['periodicos'] || '[]');
             pedidos = User.getPedidosPeriodicos();
-            function get_pedidos_periodicos(){
-                if (!peticionPedidos) {
-                    var configHttp = {
-                        method: "GET",
-                        url: URL_BASE.urlBase + API_PATH.usuarios,
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Token " + User.getAuthToken()
-                        }
-                    };
-                    return $q(function (resolve, reject) {
-                        $http(configHttp)
+            function get_pedidos_periodicos() {
+                var configHttp = {
+                    method: "GET",
+                    url: URL_BASE.urlBase + API_PATH.usuarios,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + User.getAuthToken()
+                    }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
                             .success(function (data) {
-                                pedidos = data.schedules_orders;
+                                pedidos = data.schedules_orders || [];
                                 resolve(pedidos);
                             })
                             .error(function (err) {
                                 reject(err);
                             });
-                    });
-                } else {
-                    return $q(function (resolve, reject) {
-                        resolve(pedidos);
-                    });
-                }
+                });
             };
             function add_pedido_periodico(producto){
                 var configHttp = {
@@ -1568,6 +1481,63 @@ angular.module('farmApp.services', [])
                 
             };
         })
+        .factory('UIOpenPay',function($q, Carrito ){
+            var get_tarjeta_token = function(tarjeta){
+              return $q(function(resolve, reject){
+                  var data = {
+                      "card_number": tarjeta.card.number,
+                      "holder_name": tarjeta.card.name,
+                      "expiration_year": tarjeta.card.exp_year.substring(2),
+                      "expiration_month": tarjeta.card.exp_month,
+                      "cvv2": tarjeta.card.cvc
+                  };
+                  console.log(data);
+                  OpenPay.token.create(data, function(token){
+                      console.log("Respuesta Token de openpay: ");
+                      console.log(token);
+                      var deviceSessionId = get_device_session_id();
+                      var objData = {
+                          "token_id": token.data.id, 
+                          "device_session_id": deviceSessionId
+                      };
+                      Carrito.createCardConekta(objData).then(function(data){
+                        resolve(data);
+                      },function(err){
+                        reject(err);
+                      });
+                  }, function(err) {
+                      reject(err);
+                  });
+              });
+            };
+            var validar_tarjeta = function(tarjeta){
+                return OpenPay.card.validateCardNumber(tarjeta.card.number);
+            };
+            var validar_fecha_expiracion = function(tarjeta){
+                var exp_month = tarjeta.card.exp_month || tarjeta.exp_month;
+                var exp_year = tarjeta.card.exp_year || tarjeta.exp_year;
+                return OpenPay.card.validateExpiry(exp_month, exp_year);
+            };
+            var validar_cvc = function(tarjeta){
+                return OpenPay.card.validateCVC(tarjeta.card.cvc, tarjeta.card.number);
+            };
+            var validar_brand = function(tarjeta){
+                var brand = OpenPay.card.cardType(tarjeta.card.number);
+                console.log("brand: " + brand);
+                return brand != "American Express";
+            };
+            var get_device_session_id = function(){
+                return OpenPay.deviceData.setup();
+            };
+            return {
+                getTarjetaToken: get_tarjeta_token,
+                validarTarjeta: validar_tarjeta,
+                validarFechaExpiracion: validar_fecha_expiracion,
+                validarCvc: validar_cvc,
+                validarBrand: validar_brand, 
+                getDeviceSessionId: get_device_session_id
+            };
+        })
         .factory('Contacto',function($q, $http, URL_BASE, API_PATH){
             var enviar_contacto = function(object) {
                 var configHttp = {
@@ -1624,10 +1594,10 @@ angular.module('farmApp.services', [])
               recuperarPassword:recuperar_password
             };
         })
-        .factory('Recordatorios',function(User){
+        .factory('Recordatorios',function(User, URL_BASE, API_PATH, $q, $http){
             var find_recordatorio = function(recordatorioId){
                 var obj = null;
-                var recordatorios = User.getRecordatorios();
+                var recordatorios = get_recordatorios();
                 for(var i = 0; i<=recordatorios.length; i++){
                     if(recordatorios[i].id == recordatorioId){
                         obj = recordatorios[i];
@@ -1637,15 +1607,6 @@ angular.module('farmApp.services', [])
                 return obj;
             };
 
-            var add_recordatorio = function(recordatorio) {
-                //recordatorio.time = get_time();
-                User.guardarRecordatorio(recordatorio);
-            };
-            
-            var update_recordatorio = function(recordatorio){
-                User.updateRecordatorio(recordatorio);
-            }
-
             var get_recordatorios = function(){
                 var recordatorios = User.getRecordatorios();
                 for(var cont=0; cont<recordatorios.length; cont++){
@@ -1654,18 +1615,25 @@ angular.module('farmApp.services', [])
                     recordatorios[cont].monday_to_friday = only_monday_to_friday(recordatorios[cont]);
                     recordatorios[cont].leyend = getIntervaloString(recordatorios[cont]);
                     recordatorios[cont].tiempo = get_tiempo(recordatorios[cont]);
+                    console.log(recordatorios[cont]);
                 }
                 return recordatorios;
             };
             
-            var delete_recordatorio = function(recordatorio){
-                User.deleteRecordatorio(recordatorio);
-            }
-
             var get_recordatorio_vacia = function(){
                 var date = new Date();
+                var hora = date.getHours();
+                var minutos = get_minutes_corrects(date.getMinutes());
+                if(minutos == 60){
+                    hora += 1;
+                    minutos = 0;
+                    if(hora == 24){
+                        hora = 0;
+                    }
+                }
                 var recordatorio =  {
-                    time: '00:00:00',
+                    id: 0,
+                    time: (hora<10?'0'+hora:hora) + ':' + (minutos<10?'0'+minutos:minutos) + ':00',
                     tiempo: {
                         "hora":"00",
                         "minutos": "00",
@@ -1680,18 +1648,21 @@ angular.module('farmApp.services', [])
                     saturday: false,
                     sunday: false,
                     allDays: false,
-                    weekend: false
+                    weekend: false,
+                    monday_to_friday: false
                 };
+                recordatorio.tiempo = get_tiempo(recordatorio);
+                return recordatorio;
             };
 
-            function getIntervaloString(recordatorio){
+            var getIntervaloString = function(recordatorio){
                 var cadena = "";
                 
                 if(recordatorio.allDays){
                     return "Todos los dias";
                 }
                 if(recordatorio.weekend){
-                    return "Fines de semana";
+                    return "Sabado y Domingo";
                 }
                 if(recordatorio.monday_to_friday){
                     return "Lunes a Viernes";
@@ -1719,9 +1690,9 @@ angular.module('farmApp.services', [])
                     cadena += "Domingo ";
                 }
                 return cadena;
-            }
+            };
             
-            function get_tiempo(recordatorio){
+            var get_tiempo = function(recordatorio){
                 var arreglo = recordatorio.time.split(":");
                 var tiempo = {
                     "hora": "00",
@@ -1731,44 +1702,147 @@ angular.module('farmApp.services', [])
                 var hora = (parseInt(arreglo[0])>12)?parseInt(arreglo[0])-12:parseInt(arreglo[0]);
                 var minutos = parseInt(arreglo[1]);
                 var horario = (parseInt(arreglo[0])>12)?'pm':'am';
-                tiempo.hora = ((hora<10)?"0"+hora:hora);
-                tiempo.minutos = ((minutos<10)?"0"+minutos:minutos);
+                tiempo.hora = ((hora<10)?"0"+hora:""+hora);
+                tiempo.minutos = ((minutos<10)?"0"+minutos:""+minutos);
                 tiempo.horario = horario;
                 return tiempo;
                 
-            }
+            };
             
-            function get_time(recordatorio){
+            var get_minutes_corrects = function(minutos){
+              var residuo = minutos % 5;
+              if(residuo == 0){
+                  return minutos;
+              }else{
+                  minutos += (5 - residuo);
+              }
+              return minutos;
+            };
+            
+            var get_time = function(recordatorio){
                 var hora = parseInt(recordatorio.tiempo.hora);
                 var minutos = parseInt(recordatorio.tiempo.minutos);
                 var horario = recordatorio.tiempo.horario;
-                if(horario == "pm"){
+                if(horario == "pm" && hora <= 11){
                     hora += 12;
-                    if(hora==24)
-                        hora = 0;
+                }else if(horario == "am" && hora == 12){
+                    hora = 0;
                 }
                 return ((hora<10)?"0"+hora:hora) + ":" + ((minutos<10)?"0"+minutos:minutos) + ":00";
-            }
+            };
             
-            function all_days(n){
-                return (n.monday && n.thuesday && n.wednesday && n.thursday && n.friday && n.saturday && n.sunday);
-            }
+            var all_days = function(n){
+                return (n.monday && n.tuesday && n.wednesday && n.thursday && n.friday  && n.saturday && n.sunday);
+            };
             
-            function only_weekend(n){
-                return (!n.monday && !n.thuesday && !n.wednesday && !n.thursday && !n.friday && n.saturday && n.sunday);
-            }
+            var only_weekend = function(n){
+                return (!n.monday && !n.tuesday && !n.wednesday && !n.thursday && !n.friday  && n.saturday && n.sunday);
+            };
 
-            function only_monday_to_friday(n){
-                return (n.monday && n.thuesday && n.wednesday && n.thursday && n.friday && !n.saturday && !n.sunday);
-            }
+            var only_monday_to_friday = function(n){
+                return (n.monday && n.tuesday && n.wednesday && n.thursday && n.friday  && !n.saturday && !n.sunday);
+            };
+            
+            var get_leyend_edit = function(n){
+                if(n.allDays || n.weekend || n.monday_to_friday){
+                    return n.leyend;
+                }else{
+                    return 'Personalizar';
+                }
+            };
+            
+            var post_reminder = function(reminder) {
+                var configHttp = {
+                    method: "POST",
+                    url: URL_BASE.urlBase + API_PATH.recordatorios ,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + User.getAuthToken()
+                    },
+                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.moday,
+                    "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
+                    "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday,
+                    "active": true }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = User.getRecordatorios();
+                                recordatorios.push(data);
+                                User.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            
+            var put_reminder = function(reminder) {
+                var configHttp = {
+                    method: "PUT",
+                    url: URL_BASE.urlBase + API_PATH.recordatorios + reminder.id + "/" ,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + User.getAuthToken()
+                    },
+                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.monday,
+                    "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
+                    "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday,
+                    "active": reminder.active}
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = User.getRecordatorios();
+                                for(var cont=0; cont<recordatorios.length;cont++){
+                                    if(recordatorios[cont].id==reminder.id){
+                                        recordatorios[cont] = reminder;
+                                    }
+                                }
+                                User.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            
+            var delete_reminder = function(reminder) {
+                var configHttp = {
+                    method: "DELETE",
+                    url: URL_BASE.urlBase + API_PATH.recordatorios + reminder.id + "/",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Token " + User.getAuthToken()
+                    }
+                };
+                return $q(function (resolve, reject) {
+                    $http(configHttp)
+                            .success(function (data) {
+                                var recordatorios = User.getRecordatorios();
+                                var indexReminder = recordatorios.indexOf(reminder);
+                                recordatorios.splice(indexReminder,1);
+                                User.setRecordatorios(recordatorios);
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                });
+            };
+            
 
             return {
-                add: add_recordatorio,
-                update: update_recordatorio,
+                add: post_reminder,
+                update: put_reminder,
                 get: get_recordatorios,
                 find: find_recordatorio,
-                delete: delete_recordatorio,
-                getEmpty: get_recordatorio_vacia
+                delete: delete_reminder,
+                getEmpty: get_recordatorio_vacia,
+                getLeyendEdit: get_leyend_edit,
+                getParseTime: get_time
             };
         })
         ;
