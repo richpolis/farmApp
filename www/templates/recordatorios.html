@@ -3,8 +3,8 @@
         <ion-list>
             <ion-item href="#/app/recordatorios/{{recordatorio.id}}"
               ng-repeat="recordatorio in recordatorios | orderBy:'time'">
-                <h2>{{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}}</h2>
-                <p>{{recordatorio.leyend}}</p>
+                <h2>{{recordatorio.title}}</h2>
+                <p>{{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}} - {{recordatorio.leyend}}</p>
                 <!--label class="toggle toggle-assertive">
                     <input type="checkbox" ng-model="recordatorio.active" ng-change="updateRecordatorio(recordatorio)">
                     <div class="track">

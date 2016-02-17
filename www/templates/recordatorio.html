@@ -3,9 +3,12 @@
         <div class="list card">
             <div class="item item-icon-left">
                 <i class="icon ion-clock"></i>
-                    {{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}}
+                    {{recordatorio.title}}
             </div>
             <div class="item item-body">
+                <p>
+                    {{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}}
+                </p>
                 <p>
                     {{recordatorio.message}}
                 </p>

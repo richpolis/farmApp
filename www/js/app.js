@@ -6,7 +6,7 @@
 // 'farmApp.controllers' is found in controllers.js
 angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push', 
                            'farmApp.controllers','farmApp.directives',
-                           'farmApp.services'])
+                           'farmApp.services','ngAnimate'])
 
         .run(function ($ionicPlatform, $rootScope, $timeout) {
             $ionicPlatform.ready(function () {

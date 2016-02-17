@@ -9,6 +9,12 @@
     </ion-header-bar>
     <ion-content>
         <div class="list">
+            <label class="item item-input">
+                <input type="text" ng-model="recordatorio.title" value="" placeholder="Nombre del recordatorio">
+            </label>
+            <label class="item item-input">
+                <input type="text" ng-model="recordatorio.message" value="" placeholder="Descripcion del recordatorio">
+            </label>
             <div class="item">
                 <p>Hora del recordatorio:</p>
             </div>
@@ -32,9 +38,6 @@
                 </div>
                 <select  ng-change="changeTime()" ng-model="recordatorio.tiempo.horario" ng-options="horario for horario in ['am', 'pm']">
                 </select>
-            </label>
-            <label class="item item-input">
-                <input type="text" ng-model="recordatorio.message" value="" placeholder="Ingresa el recordatorio">
             </label>
             <label class="item item-input item-select">
                 <div class="input-label">

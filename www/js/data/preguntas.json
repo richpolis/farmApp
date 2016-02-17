@@ -1,9 +1,0 @@
-[
-		{ "id":1, "pregunta": "Pregunta 1", "respuesta": "Respuesta 1" },
-		{ "id":2, "pregunta": "Pregunta 2", "respuesta": "Respuesta 2" },
-		{ "id":3, "pregunta": "Pregunta 3", "respuesta": "Respuesta 3" },
-		{ "id":4, "pregunta": "Pregunta 4", "respuesta": "Respuesta 4" },
-		{ "id":5, "pregunta": "Pregunta 5", "respuesta": "Respuesta 5" },
-		{ "id":6, "pregunta": "Pregunta 6", "respuesta": "Respuesta 6" },
-		{ "id":7, "pregunta": "Pregunta 7", "respuesta": "Respuesta 7" }
-]

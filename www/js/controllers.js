@@ -2,7 +2,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                                         'farmApp.services', 'ngCordova'])
         .controller('AppController', function ($scope, $state, $timeout, $ionicPopup,
                                 User, Carrito, PedidosPeriodicos, $ionicPush,
-                                $rootScope) {
+                                $rootScope, Carrito, FileService) {
             $scope.ionic_push = false;
 
             if (!User.hasToken()) {
@@ -12,7 +12,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             }
             $scope.closeLogin = function () {
                 User.logout().then(function (data) {
-                    $rootScope.$broadcast('empty','empty');
+                    limpiar_cache();
                     $state.go('inicio');
                 }, function (err) {
                     alert(err.detail);
@@ -41,30 +41,36 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             });
 
             $scope.$on("venta", function (event, data) {
-                if(!data=="empty"){
-                    $rootScope.$broadcast('venta_empty',"empty");
-                }
+                $rootScope.$broadcast("venta_emtpy", "limpiar");
             });
 
             $scope.$on("empty", function (event, data) {
-                if(!data=="empty"){
-                    $rootScope.$broadcast('venta_empty',"empty");
-                }
+                limpiar_cache();
+            });
+
+            var limpiar_cache = function () {
+                console.log("entrando a limpiar cache");
+                Carrito.empty();
+                FileService.empty();
                 window.localStorage.removeItem('user');
                 window.localStorage.removeItem('access_token');
-            });
+            };
 
             var ionicPush = function(){
                 $ionicPush.init({
                     "onNotification": function (notification) {
-                        var payload = notification.payload;
-                        console.log(notification, payload);
+                        var payload = notification._payload;
+                        console.log(notification);
+                        //alert(JSON.stringify(notification));
                         $ionicPopup.alert({
-                            title: notificacion.title,
-                            template: notificacion.text
+                            title: notification.title,
+                            template: notification.text
                         });
                         if(payload.reminderId){
                             $state.go('app.viewRecordatorio',{'notificacionId': payload.reminderId});
+                        }
+                        if(payload.saleId){
+                            alert("Ir a la venta: " + payload.saleId);
                         }
                     },
                     "onRegister": function (data) {
@@ -95,7 +101,11 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
 
             $scope.$on("ionic_push", function (event, data) {
                 if(!$scope.ionic_push){
-                    $rootScope.$broadcast('venta',data);
+                    $timeout(function () {
+                        $scope.$apply(function () {
+                            $scope.$broadcast('venta_emtpy',data);
+                        });
+                    }, 500);
                     ionicPush();
                     $scope.ionic_push = true;
                 }
@@ -104,7 +114,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             $scope.$on("recordatorios",function(event, data){
                 $timeout(function () {
                     $scope.$apply(function () {
-                        $rootScope.$broadcast('recordatorios_actualizar',data);
+                        $scope.$broadcast('recordatorios_actualizar',data);
                     });
                 }, 500);
             });
@@ -1033,6 +1043,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             $scope.mostrarMensajeMapa = true;
 
             $scope.$on("venta_empty", function (event, data) {
+                console.log("venta empty pedido controller");
                 $timeout(function () {
                     $scope.$apply(function () {
                         $scope.direccionGuardada = Carrito.getDireccion();
@@ -1395,6 +1406,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.$on("venta_empty", function (event, data) {
+                console.log("venta empty notas y observaciones");
                 $timeout(function () {
                     $scope.$apply(function () {
                         $scope.pedido = Carrito.getVenta();
@@ -1444,6 +1456,8 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.$on("venta_empty", function (event, data) {
+                
+                console.log("venta empty imagenes");
                 $timeout(function () {
                     $scope.$apply(function () {
                         FileService.empty();
@@ -1502,6 +1516,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     }else{
                         UIOpenPay.getTarjetaToken($scope.tarjeta).then(function (data) {
                             Loader.hideLoading();
+                            debugger;
                             if(data.error){
                                 $ionicPopup.alert({
                                     title: 'Error en registro de tarjeta!',
@@ -1566,6 +1581,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 Loader.showLoading('Enviando detalle de pedido...');
                 var productos = Carrito.getProductos();
                 var images = FileService.images();
+                debugger;
                 Carrito.enviarDetalleVentas(indice).then(function (detalle) {
                     if (productos.length > (indice + 1)) {
                         enviarDetallePedido(indice + 1);
@@ -1700,6 +1716,8 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.$on("venta_empty", function (event, data) {
+                
+                console.log("venta empty pagocontroller");
                 $timeout(function () {
                     $scope.$apply(function () {
                         $scope.tarjeta = Carrito.getTarjetaVacia();

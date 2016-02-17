@@ -1493,8 +1493,12 @@ angular.module('farmApp.services', [])
                           "device_session_id": deviceSessionId
                       };
                       Carrito.createCardConekta(objData).then(function(data){
+                        console.log("Carrito Card Conekta OK");
+                        console.log(data);
                         resolve(data);
                       },function(err){
+                        console.log("Carrito Cardo Conekta BAT!!!!");
+                        console.log(err);
                         reject(err);
                       });
                   }, function(err) {
@@ -1517,6 +1521,7 @@ angular.module('farmApp.services', [])
                 return OpenPay.card.validateCVC(tarjeta.card.cvc, tarjeta.card.number);
             };
             var validar_brand = function(tarjeta){
+                debugger;
                 var brand = OpenPay.card.cardType(tarjeta.card.number);
                 console.log("brand: " + brand);
                 return brand != "American Express";
@@ -1634,6 +1639,7 @@ angular.module('farmApp.services', [])
                         "minutos": "00",
                         "horario": 'am'
                     },
+                    title: "",
                     message: "",
                     monday: false,
                     tuesday: false,
@@ -1754,7 +1760,7 @@ angular.module('farmApp.services', [])
                         "Content-Type": "application/json",
                         "Authorization": "Token " + User.getAuthToken()
                     },
-                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.moday,
+                    data: {"message": reminder.message, "title": reminder.title, "time": reminder.time, "monday": reminder.monday,
                     "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
                     "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday,
                     "active": true }
@@ -1781,7 +1787,7 @@ angular.module('farmApp.services', [])
                         "Content-Type": "application/json",
                         "Authorization": "Token " + User.getAuthToken()
                     },
-                    data: {"message": reminder.message, "time": reminder.time, "monday": reminder.monday,
+                    data: {"message": reminder.message, "title": reminder.title, "time": reminder.time, "monday": reminder.monday,
                     "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
                     "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday,
                     "active": reminder.active}
