@@ -1911,4 +1911,35 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             }
 
         })
+        .controller('VentaController', function ($scope, $stateParams,
+                   $ionicPopup,  Pedidos, $state) {
+
+            Pedidos.getPedido($stateParams.pedidoId).then(function(data){
+                $scope.pedido = data;
+                console.log($scope.pedido);
+            },function(err){
+                $ionicPopup.alert({
+                    title: 'Error en preguntas',
+                    template: err.detail
+                });
+            });
+
+            $scope.removeProducto = function(producto){
+                var confirmPopup = $ionicPopup.confirm({
+                    title: 'Confirmacion',
+                    template: 'Desea eliminar el producto del pedido?',
+                    cancelText: "No",
+                    okText: "Si"
+                });
+                confirmPopup.then(function (res) {
+                    if (res) {
+                        console.log(recordatorio);
+                        Recordatorios.delete(recordatorio);
+                        $scope.$emit('recordatorios', 'add');
+                        $state.go('app.recordatorios');
+                    }
+                });
+            };
+
+        })
         ;

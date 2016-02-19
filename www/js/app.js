@@ -169,6 +169,15 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             }
                         }
                     })
+                    .state('app.viewPedido', {
+                        url: '/pedido/:pedidoId',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/venta.html',
+                                controller: 'VentaController'
+                            }
+                        }
+                    })
                     .state('app.notas', {
                         url: '/notas',
                         cache: false,

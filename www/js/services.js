@@ -729,8 +729,28 @@ angular.module('farmApp.services', [])
                             });
                     });
                 };
+                var get_pedido = function (saleId) {
+                    var configHttp = {
+                        method: "GET",
+                        url: URL_BASE.urlBase + API_PATH.ventas + saleId + "/",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Token " + User.getAuthToken()
+                        }
+                    };
+                    return $q(function (resolve, reject) {
+                        $http(configHttp)
+                            .success(function (data) {
+                                resolve(data);
+                            })
+                            .error(function (err) {
+                                reject(err);
+                            });
+                    });
+                };
             return {
-                getPedidos: get_pedidos
+                getPedidos: get_pedidos,
+                getPedido: get_pedido
             };
         })
         .factory('Preguntas', function ($http, $timeout, $q, User ,URL_BASE, API_PATH) {
