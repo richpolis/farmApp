@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" id="com.ionicframework.farmapp590361" version="1.0.3">
+<widget xmlns="http://www.w3.org/ns/widgets"
+  xmlns:cdv="http://cordova.apache.org/ns/1.0"
+  id="com.ionicframework.farmapp590361" version="1.0.4">
   <name>farmApp</name>
   <description>
         Un app venta mostrador para pedidos de farmaApp.

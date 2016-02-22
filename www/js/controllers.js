@@ -3,8 +3,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
         .controller('AppController', function ($scope, $state, $timeout, $ionicPopup,
                                 User, Carrito, PedidosPeriodicos, $ionicPush,
                                 $rootScope, Carrito, FileService) {
-            $scope.ionic_push = false;
-
+            
             if (!User.hasToken()) {
                 $state.go('inicio');
             } else {
@@ -57,6 +56,8 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             var ionicPush = function(){
+                debugger;
+            
                 $ionicPush.init({
                     "onNotification": function (notification) {
                         var payload = notification._payload;
@@ -70,7 +71,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                             $state.go('app.viewRecordatorio',{'notificacionId': payload.reminderId});
                         }
                         if(payload.saleId){
-                            alert("Ir a la venta: " + payload.saleId);
+                            $state.go('app.viewPedido',{'pedidoId': payload.saleId});
                         }
                     },
                     "onRegister": function (data) {
@@ -123,6 +124,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
         })
         .controller('DefaultController', function ($scope, $state, User) {
             $scope.user = User.getUser();
+            debugger;
             if (User.hasUser()) {
                 $state.go('app.categorias');
             }
@@ -1919,7 +1921,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 console.log($scope.pedido);
             },function(err){
                 $ionicPopup.alert({
-                    title: 'Error en preguntas',
+                    title: 'Error en ventas',
                     template: err.detail
                 });
             });
