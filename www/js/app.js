@@ -204,7 +204,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/recetas.html',
-                                controller: 'ImageController'
+                                controller: 'RecetasController'
                             }
                         }
                     })

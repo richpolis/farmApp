@@ -19,17 +19,21 @@ angular.module('farmApp.services', [])
                     }
                 };
         }])
-        .factory('FileService', function($cordovaFile, $ionicPopup) {
+        .factory('FileService', function($cordovaFile, $ionicPopup, $q) {
             var images;
-            var IMAGE_STORAGE_KEY = 'images';
+            var RECIPE_STORAGE_KEY = 'recetas';
+            var INAPAM_STORAGE_KEY = 'inapams';
+            var STORAGE_KEY = '';
 
             return {
-                storeImage: function(img) {
+                storeImage: function(img, storageKey) {
+                    STORAGE_KEY = storageKey || STORAGE_KEY;
                     images.push(img);
-                    window.localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(images));
+                    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
                 },
-                images: function() {
-                    var img = window.localStorage.getItem(IMAGE_STORAGE_KEY);
+                images: function(storageKey) {
+                    STORAGE_KEY = storageKey || STORAGE_KEY;
+                    var img = window.localStorage.getItem(STORAGE_KEY);
                     if (img) {
                         images = JSON.parse(img);
                     } else {
@@ -37,42 +41,58 @@ angular.module('farmApp.services', [])
                     }
                     return images;
                 },
+                recepies: function(){
+                    return this.images(RECIPE_STORAGE_KEY);
+                },
+                inapams: function(){
+                    return this.images(INAPAM_STORAGE_KEY);
+                },
                 getUrlForImage: function(imageName) {
                     var trueOrigin = cordova.file.dataDirectory + imageName;
                     return trueOrigin;
                 },
-                removeImage: function(image){
-                    var imagenes = this.images();
-                    var indexImage = imagenes.indexOf(image);
-                    var name = imagenes[indexImage].substr(imagenes[indexImage].lastIndexOf('/') + 1);
+                removeImage: function (image,storageKey) {
+                    return $q(function(resolve, reject){
+                        var imagenes = this.images(storageKey);
+                        var indexImage = imagenes.indexOf(image);
+                        var name = imagenes[indexImage].substr(imagenes[indexImage].lastIndexOf('/') + 1);
                         $cordovaFile.removeFile(cordova.file.dataDirectory, name)
-                                .then(function (success) {
-                                    $ionicPopup.alert({
-                                        title: 'Receta',
-                                        template: 'Archivo eliminado'
-                                    });
-                                }, function (error) {
-                                    $ionicPopup.alert({
-                                        title: 'Receta',
-                                        template: 'No es posible eliminar el archivo'
-                                    });
+                            .then(function (success) {
+                                $ionicPopup.alert({
+                                    title: 'Archivo',
+                                    template: 'Archivo eliminado'
                                 });
-                    imagenes.splice(indexImage,1);
-                    window.localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(imagenes));
+                                imagenes.splice(indexImage, 1);
+                                window.localStorage.setItem(STORAGE_KEY, JSON.stringify(imagenes));
+                                resolve(imagenes);
+                            }, function (error) {
+                                $ionicPopup.alert({
+                                    title: 'Archivo',
+                                    template: 'No es posible eliminar el archivo'
+                                });
+                                reject(imagenes);
+                            }); 
+                    });
                 },
-                empty: function(){
-                    var imagenes = this.images();
-                    for(var cont=0; cont<imagenes.length; cont++){
-                        var name = imagenes[cont].substr(imagenes[cont].lastIndexOf('/') + 1);
-                        $cordovaFile.removeFile(cordova.file.dataDirectory, name)
-                                .then(function (success) {
-                                    console.log("Archivo eliminado");
-                                }, function (error) {
-                                    console.log("No es posible eliminar el archivo");
-                                });
-                    }
-                    images=[];
-                    window.localStorage.setItem(IMAGE_STORAGE_KEY, JSON.stringify(images));
+                empty: function(storageKey){
+                    return $q(function(resolve, reject){
+                       var imagenes = this.images(storageKey);
+                        for(var cont=0; cont<imagenes.length; cont++){
+                            var name = imagenes[cont].substr(imagenes[cont].lastIndexOf('/') + 1);
+                            $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                                    .then(function (success) {
+                                        console.log("Archivo eliminado");
+                                    }, function (error) {
+                                        console.log("No es posible eliminar el archivo");
+                                    });
+                        }
+                        if(imagenes.length==0){
+                            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(imagenes));
+                            resolve(imagenes);
+                        }else{
+                            reject();
+                        } 
+                    });
                 }
             }
         })
@@ -99,16 +119,20 @@ angular.module('farmApp.services', [])
                                 break;
                     }
                     return {
+                        quality: 50,
                         destinationType: Camera.DestinationType.FILE_URI,
                         sourceType: source,
                         allowEdit: false,
                         encodingType: Camera.EncodingType.JPEG,
                         popoverOptions: CameraPopoverOptions,
-                        saveToPhotoAlbum: false
+                        saveToPhotoAlbum: false,
+                        correctOrientation: true,
+                        targetWidth: 600,
+                        targetHeight: 400
                     };
                 };
 
-            function saveMedia(type) {
+            function saveMedia(type, storageKey) {
                 return $q(function(resolve, reject) {
                     var options = optionsForType(type);
 
@@ -118,7 +142,7 @@ angular.module('farmApp.services', [])
                         var newName = makeid() + name;
                         $cordovaFile.copyFile(namePath, name, cordova.file.dataDirectory, newName)
                             .then(function(info) {
-                                FileService.storeImage(newName);
+                                FileService.storeImage(newName,storageKey);
                                 resolve();
                             }, function(e) {
                                 reject();
@@ -145,10 +169,11 @@ angular.module('farmApp.services', [])
             }
 
             return {
+                createId: makeid,
                 handleMediaDialog: saveMedia,
-                upload: function (images, params, headers, onSuccess, onError) {
+                uploadRecepies: function (images, params, headers, onSuccess, onError) {
                     var ft =  new FileTransfer();
-                    Loader.showLoading("Cargando imagenes de receta");
+                    Loader.showLoading("Cargando imagenes");
                     for (var i = 0; i < images.length; i++) {
                         Loader.showLoading("Cargando " + i + "/" + images.length);
                         var image = images[i];
@@ -1541,7 +1566,6 @@ angular.module('farmApp.services', [])
                 return OpenPay.card.validateCVC(tarjeta.card.cvc, tarjeta.card.number);
             };
             var validar_brand = function(tarjeta){
-                debugger;
                 var brand = OpenPay.card.cardType(tarjeta.card.number);
                 console.log("brand: " + brand);
                 return brand != "American Express";

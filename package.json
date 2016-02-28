@@ -1,6 +1,6 @@
 {
   "name": "farmapp",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "farmApp: An Ionic project",
   "dependencies": {
     "gulp": "^3.5.6",

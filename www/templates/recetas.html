@@ -1,5 +1,5 @@
 <ion-view cache-view="false" view-title="Recetas">
-    <ion-content class="has-header padding" ng-controller="ImageController">
+    <ion-content class="has-header padding">
         <div class="row">
             <div class="col balanced-bg text-center" style="color: white;">1</div>
             <div class="col balanced-bg text-center" style="color: white;">2</div>
@@ -20,7 +20,7 @@
         <button class="button button-full button-balanced" ng-click="addMedia()">
             Agregar imagen
         </button>
-        <button class="button button-full button-positive" ng-click="realizarPago()">
+        <button class="button button-full button-positive" ng-click="realizarPago()" ng-disabled="images.length==0">
             Siguiente
         </button>
         <br/>
