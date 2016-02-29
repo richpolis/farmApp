@@ -53,6 +53,7 @@ angular.module('farmApp.services', [])
                 },
                 removeImage: function (image,storageKey) {
                     return $q(function(resolve, reject){
+                        alert(storageKey);
                         var imagenes = this.images(storageKey);
                         var indexImage = imagenes.indexOf(image);
                         var name = imagenes[indexImage].substr(imagenes[indexImage].lastIndexOf('/') + 1);
@@ -71,7 +72,7 @@ angular.module('farmApp.services', [])
                                     template: 'No es posible eliminar el archivo'
                                 });
                                 reject(imagenes);
-                            }); 
+                            });
                     });
                 },
                 empty: function(storageKey){
@@ -91,7 +92,7 @@ angular.module('farmApp.services', [])
                             resolve(imagenes);
                         }else{
                             reject();
-                        } 
+                        }
                     });
                 }
             }
@@ -151,7 +152,7 @@ angular.module('farmApp.services', [])
                 })
             };
 
-            function getImageUploadOptions(imageURI, params, headers) {
+            function getImageUploadRecepiesOptions(imageURI, params, headers) {
                 var options = new FileUploadOptions();
                 options.fileKey = "receta";
                 options.fileName = imageURI.substr(imageURI.lastIndexOf('/')+1);
@@ -159,6 +160,18 @@ angular.module('farmApp.services', [])
                 options.params = params;
                 options.httpMethod = "POST";
                 options.headers = headers;
+                return options;
+            }
+
+            function getImageUploadInapamOptions(imageURI, params, headers) {
+                var options = new FileUploadOptions();
+                options.fileKey = "inapam";
+                options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+                options.mimeType = "image/" + imageURI.substr(imageURI.lastIndexOf('.') + 1);
+                options.params = params;
+                options.httpMethod = "POST";
+                options.headers = headers;
+                //alert(JSON.stringify(options));
                 return options;
             }
 
@@ -180,8 +193,17 @@ angular.module('farmApp.services', [])
                         var urlImage = FileService.getUrlForImage(image);
                         ft.upload(urlImage,
                             encodeURI(URL_BASE.urlBase + API_PATH.images_ventas),
-                            savedFile(image, onSuccess), onError, getImageUploadOptions(urlImage, params, headers));
+                            savedFile(image, onSuccess), onError, getImageUploadRecepiesOptions(urlImage, params, headers));
                     }
+                    Loader.hideLoading();
+                },
+                uploadInapam: function (image, params, headers, onSuccess, onError) {
+                    var ft =  new FileTransfer();
+                    Loader.showLoading("Cargando imagen");
+                    var urlImage = FileService.getUrlForImage(image);
+                    ft.upload(urlImage,
+                        encodeURI(URL_BASE.urlBase + API_PATH.images_inapam),
+                        savedFile(image, onSuccess), onError, getImageUploadInapamOptions(urlImage, params, headers));
                     Loader.hideLoading();
                 }
             }

@@ -5,7 +5,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                                 $rootScope, Carrito, FileService) {
 
             $scope.ionic_push = false;
-            
+
             if (!User.hasToken()) {
                 $state.go('inicio');
             } else {
@@ -329,7 +329,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             $scope.colonias = [];
             $scope.pedidos = [];
             $scope.mostrarMensajeMapa = true;
-            $scope.inapam = ImageService.inapams();
+            $scope.inapam = FileService.inapams();
             Direcciones.getDirecciones().then(function (direcciones) {
                 $scope.direcciones = direcciones;
                 if($scope.direcciones.length==1){
@@ -402,10 +402,10 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 return url;
             };
 
-            $scope.removeImage = function () {
-                FileService.removeImage($scope.inapam[0],FileService.INAPAM_STORAGE_KEY).then(function(success){
+            $scope.removeImage = function (image) {
+                FileService.removeImage(image,FileService.INAPAM_STORAGE_KEY).then(function(success){
                    $scope.$apply(function(){
-                       $scope.inapam = success;
+                       $scope.inapam = FileService.inapams();
                    });
                 });
             };
@@ -442,18 +442,6 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                         });
                     };
 
-                    function getImageUploadOptions(imageURI, params, headers) {
-                        var options = new FileUploadOptions();
-                        options.fileKey = "inapam";
-                        options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
-                        options.mimeType = "image/" + imageURI.substr(imageURI.lastIndexOf('.') + 1);
-                        options.params = params;
-                        options.httpMethod = "POST";
-                        options.headers = headers;
-                        //alert(JSON.stringify(options));
-                        return options;
-                    }
-
                     $scope.confirmarFotoInapam = function () {
                         var user = User.getUser();
                         var token = User.getAuthToken();
@@ -462,25 +450,21 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                                 "Accept": "application/json",
                                 "Authorization": "Token " + token
                             };
-                        var urlImage = $scope.inapam[0];
-                        var url = URL_BASE.urlBase + API_PATH.images_inapam;
-                        var options = getImageUploadOptions(urlImage, params, headers);
-                        $cordovaFileTransfer.upload(url, urlImage, options).then(function (result) {
-                            Loader.hideLoading();
-                            $scope.hideInapamModal();
-                            $ionicPopup.alert({
-                                title: 'Inapam',
-                                template: 'Gracias, por enviarnos su imagen, en breve sera revisada.'
-                            });
-                        }, function (err) {
-                            Loader.hideLoading();
-                            $ionicPopup.alert({
-                                title: 'Inapam',
-                                template: "ERROR: " + JSON.stringify(err)
-                            });
-                            $scope.removeImage();
-                        }, function (progress) {
-                            Loader.showLoading("Subiendo imagen: " + (progress) + "%");
+                        var image = $scope.inapam[0];
+                        ImageService.uploadInapam(image, params, headers, function(result){
+                          Loader.hideLoading();
+                          $scope.hideInapamModal();
+                          $ionicPopup.alert({
+                              title: 'Inapam',
+                              template: 'Gracias, por enviarnos su imagen, en breve sera revisada.'
+                          });
+                        }, function(err){
+                          Loader.hideLoading();
+                          $ionicPopup.alert({
+                              title: 'Inapam',
+                              template: "ERROR: " + JSON.stringify(err)
+                          });
+                          $scope.removeImage();
                         });
                     };
 
@@ -1421,7 +1405,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.$on("venta_empty", function (event, data) {
-                
+
                 console.log("venta empty imagenes");
                 $timeout(function () {
                     $scope.$apply(function () {
@@ -1679,7 +1663,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.$on("venta_empty", function (event, data) {
-                
+
                 console.log("venta empty pagocontroller");
                 $timeout(function () {
                     $scope.$apply(function () {
@@ -1691,9 +1675,9 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     });
                 }, 1000);
             });
-            
+
             $scope.validar = {terminos: false};
-            
+
             // Crear una ventana de terminos y condiciones
             $ionicModal.fromTemplateUrl('templates/terminosYCondiciones.html', {
                 scope: $scope
