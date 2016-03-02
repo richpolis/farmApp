@@ -398,15 +398,15 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.urlForImage = function (image) {
-                var url = FileService.urlForImage(image);
+                var url = FileService.getUrlForImage(image);
                 return url;
             };
 
             $scope.removeImage = function (image) {
+                alert(FileService.INAPAM_STORAGE_KEY)
                 FileService.removeImage(image,FileService.INAPAM_STORAGE_KEY).then(function(success){
-                   $scope.$apply(function(){
-                       $scope.inapam = FileService.inapams();
-                   });
+                    $scope.inapam = FileService.inapams();
+                    $scope.$apply();
                 });
             };
 

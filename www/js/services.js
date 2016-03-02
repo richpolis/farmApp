@@ -26,14 +26,16 @@ angular.module('farmApp.services', [])
             var STORAGE_KEY = '';
 
             return {
+                RECIPE_STORAGE_KEY: RECIPE_STORAGE_KEY,
+                INAPAM_STORAGE_KEY: INAPAM_STORAGE_KEY,
                 storeImage: function(img, storageKey) {
                     STORAGE_KEY = storageKey || STORAGE_KEY;
                     images.push(img);
                     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
                 },
                 images: function(storageKey) {
-                    STORAGE_KEY = storageKey || STORAGE_KEY;
-                    var img = window.localStorage.getItem(STORAGE_KEY);
+                    storageKey = storageKey || STORAGE_KEY;
+                    var img = window.localStorage.getItem(storageKey);
                     if (img) {
                         images = JSON.parse(img);
                     } else {
@@ -53,11 +55,12 @@ angular.module('farmApp.services', [])
                 },
                 removeImage: function (image,storageKey) {
                     return $q(function(resolve, reject){
-                        alert(storageKey);
+                        alert("Remove Image: " + storageKey);
                         var imagenes = this.images(storageKey);
                         var indexImage = imagenes.indexOf(image);
-                        var name = imagenes[indexImage].substr(imagenes[indexImage].lastIndexOf('/') + 1);
-                        $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                        //var name = imagenes[indexImage].substr(imagenes[indexImage].lastIndexOf('/') + 1);
+                        alert(this.getUrlForImage(image));
+                        $cordovaFile.removeFile(cordova.file.dataDirectory, image)
                             .then(function (success) {
                                 $ionicPopup.alert({
                                     title: 'Archivo',
