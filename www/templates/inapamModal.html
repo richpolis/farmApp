@@ -7,7 +7,7 @@
             </button>
         </div>
     </ion-header-bar>
-    <ion-content padding="true">
+    <ion-content scroll="true" padding="true">
         <button class="button button-block button-energized" ng-click="addImage(0)"
                 ng-show="inapam.length==0">
             Tomar una foto
@@ -16,19 +16,16 @@
                 ng-show="inapam.length==0">
             Agregar de galeria
         </button><br><br>
-        <ion-scroll>
-            <div class="card" ng-repeat="image in inapam">
+        <div class="card" ng-repeat="image in inapam">
                 <div class="item item-text-wrap">
                     <img ng-src="{{urlForImage(image)}}"
-                         style="height:200px; padding: 5px 5px 5px 5px;"/>
-                    {{image}}     
+                         style="padding: 5px 5px 5px 5px;"/>
                 </div>
                 <a class="item item-icon-left assertive" href="#" ng-click="removeImage(image)">
                     <i class="icon ion-trash-a"></i>
                     Eliminar
                 </a>
-            </div>
-        </ion-scroll>
+        </div>
     </ion-content>
     <ion-footer-bar class="bar-stable">
         <button class="button button-block button-balanced" style="margin: 0px;"

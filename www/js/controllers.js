@@ -403,8 +403,16 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.removeImage = function (image) {
-                alert(FileService.INAPAM_STORAGE_KEY)
                 FileService.removeImage(image,FileService.INAPAM_STORAGE_KEY).then(function(success){
+                    $scope.inapam = FileService.inapams();
+                    $scope.$apply();
+                });
+            };
+            
+            $scope.deleteInapam = function(image){
+                User.borrarImagesInapam(image);
+                User.me().then(function(user){
+                    $scope.userData = user;
                     $scope.inapam = FileService.inapams();
                     $scope.$apply();
                 });
@@ -424,6 +432,9 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     });
 
                     $scope.hideInapamModal = function () {
+                        if($scope.inapam.length>0){
+                            $scope.removeImage($scope.inapam[0]);
+                        }
                         $scope.modalInapam.hide();
                         $scope.modalInapam.remove();
                         $scope.userData.inapam = false;
@@ -431,9 +442,8 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
 
                     $scope.addImage = function (type) {
                         ImageService.handleMediaDialog(type, FileService.INAPAM_STORAGE_KEY).then(function(success){
-                            $scope.$apply(function(){
-                                $scope.inapam = FileService.inapams();
-                            });
+                            $scope.inapam = FileService.inapams();
+                            $scope.$apply();
                         },function(err){
                             $ionicPopup.alert({
                                 title: 'Error: Inapam',
@@ -457,6 +467,11 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                           $ionicPopup.alert({
                               title: 'Inapam',
                               template: 'Gracias, por enviarnos su imagen, en breve sera revisada.'
+                          });
+                          User.me().then(function(user){
+                              $scope.userData = user;
+                              $scope.removeImage();
+                              $scope.inapam = FileService.inapams();
                           });
                         }, function(err){
                           Loader.hideLoading();
@@ -820,7 +835,8 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
         })
-        .controller('ProductosController', function ($scope, $timeout, $stateParams, $ionicPopup, $state, Categorias, Productos) {
+        .controller('ProductosController', function ($scope, $timeout, $stateParams, 
+                        $ionicPopup, $state, Categorias, Productos) {
 
             $scope.title = "Productos";
             $scope.ordenar = 'name';
@@ -863,10 +879,12 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
 
         .controller('ProductoController', function ($scope, $stateParams, $ionicPopup, $timeout, $state, Productos,
                 PedidosPeriodicos, Carrito, Descuentos) {
+            
             $scope.subtotal = 0.0;
             $scope.descuento = 0.0;
             $scope.total = 0.0;
             $scope.title = "Detalle producto";
+            
             Productos.getProducto($stateParams.productoId).then(function (producto) {
                 $scope.producto = producto;
                 $scope.producto.quantity = 1;
@@ -898,8 +916,8 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
 
         })
 
-        .controller('CarritoController', function ($scope, $ionicPopup, $ionicModal, $timeout, Carrito,
-                PedidosPeriodicos) {
+        .controller('CarritoController', function ($scope, $ionicPopup, 
+                    $ionicModal, $timeout, Carrito, PedidosPeriodicos) {
 
             $scope.productos = Carrito.getProductos();
             $scope.totales = Carrito.getTotales();
@@ -919,7 +937,6 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 $scope.$emit('carrito', 'actualizacion');
             };
 
-
             // Crear un formulario modal de pedido periodico
             $ionicModal.fromTemplateUrl('templates/agregarPedidoPeriodico.html', {
                 scope: $scope
@@ -935,6 +952,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             $scope.showAgregarPedidoPeriodico = function (producto) {
                 if (producto.periodico.pedido) {
                     $scope.productoSeleccionado = producto;
+                    $scope.productoSeleccionado.periodico.pedido = true;
                     $scope.modalAgregarPedidoPeridico.show();
                 }
                 console.log(producto);
@@ -952,23 +970,42 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.agregarPedidoPeriodico = function () {
-                PedidosPeriodicos.addPedido($scope.productoSeleccionado).then(function (pedido) {
-                    $scope.$emit('periodicos', 'actualizacion');
-                    for (var cont = 0; cont < $scope.productos.length; cont++) {
-                        if ($scope.productos[cont].id == $scope.productoSeleccionado.id) {
-                            $scope.productos[cont] = PedidosPeriodicos.configurarProducto($scope.productos[cont]);
-                            break;
-                        }
-                    }
-                    $scope.productoSeleccionado = {};
-                    $scope.closeAgregarPedidoPeriodico();
+                /*PedidosPeriodicos.addPedido($scope.productoSeleccionado).then(function (pedido) {
+                    
                 }, function (err) {
                     //alert("Error en agregar pedido periodico");
                     $ionicPopup.alert({
                         title: 'Error en agregar pedido periodico!',
                         template: err.detail
                     });
-                });
+                });*/
+                $scope.$emit('periodicos', 'actualizacion');
+                var product = $scope.productoSeleccionado;
+                var leyenda = '';
+                for (var cont = 0; cont < $scope.productos.length; cont++) {
+                    if ($scope.productos[cont].id == product.id) {
+                        if(product.periodico.period == 'por dia'){
+                            var dias = product.periodico.days;
+                            leyenda = "Recibirás el producto cada "+dias+" dias apartir de hoy";
+                        }else if(product.periodico.period == 'semanal'){
+                            var semanas = product.periodico.days;
+                            product.periodico.days = 7 * semanas;
+                            leyenda = "Recibirás el producto cada "+semanas+" semanas apartir de hoy";
+                        }else if(product.periodico.period == 'mensual'){
+                            var meses = product.periodico.days;
+                            product.periodico.days = 30 * meses;
+                            leyenda = "Recibirás el producto cada "+meses+" meses apartir de hoy";
+                        }
+                        $scope.productos[cont] = product;
+                        $scope.productos[cont].periodico.leyend = leyenda;
+                        break;
+                    }
+                }
+                $scope.productoSeleccionado = {};
+                $scope.closeAgregarPedidoPeriodico();
+                console.log($scope.productos);
+                Carrito.setProductos($scope.productos);
+                $scope.$apply();
             };
 
         })
@@ -1365,6 +1402,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
         })
         .controller('RecetasController', function ($scope, $state, $ionicActionSheet,
                     ImageService, FileService, $timeout) {
+                        
             $scope.images = FileService.recepies();
 
             $scope.urlForImage = function (imageName) {
@@ -1388,16 +1426,16 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             $scope.addImage = function (type) {
                 $scope.hideSheet();
                 ImageService.handleMediaDialog(type, FileService.RECIPE_STORAGE_KEY).then(function () {
-                    $scope.$apply(function(){
-                        $scope.images = FileService.recepies();
-                    });
+                    $scope.images = FileService.recepies();
+                    $scope.$apply();
                 });
             };
 
             $scope.removeImage = function (image) {
-                FileService.removeImage(image, FileService.RECIPE_STORAGE_KEY);
-                $scope.images = FileService.recepies();
-                $scope.$apply();
+                FileService.removeImage(image, FileService.RECIPE_STORAGE_KEY).then(function(success){
+                    $scope.images = FileService.recepies();
+                    $scope.$apply();
+                });
             };
 
             $scope.realizarPago = function () {
@@ -1405,7 +1443,6 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             };
 
             $scope.$on("venta_empty", function (event, data) {
-
                 console.log("venta empty imagenes");
                 $timeout(function () {
                     $scope.$apply(function () {
@@ -1418,7 +1455,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
 
         .controller('PagoController', function ($scope, $ionicPopup, $state,
                     $ionicModal, $cordovaCamera, User, Carrito, FileService,
-                    ImageService, UIOpenPay, Loader,$timeout) {
+                    ImageService, UIOpenPay, Loader,$timeout, PedidosPeriodicos) {
 
             $scope.hasProductsWithRecipe = Carrito.hasProductsWithRecipe(2);
             $scope.tarjeta = Carrito.getTarjetaVacia();
@@ -1438,51 +1475,51 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     seleccionarTarjeta();
                 } else if ($scope.tarjeta.card.number) {
                     Loader.showLoading('Enviando datos pago...');
-                    if(!UIOpenPay.validarTarjeta($scope.tarjeta)){
+                    if (!UIOpenPay.validarTarjeta($scope.tarjeta)) {
                         Loader.hideLoading();
                         $ionicPopup.alert({
                             title: 'Numero de tarjeta',
                             template: 'El numero de tarjeta no es valido'
                         });
-                    /*}else if(!UIOpenPay.validarBrand($scope.tarjeta)){
+                    } /*else if (!UIOpenPay.validarBrand($scope.tarjeta)) {
                         Loader.hideLoading();
                         $ionicPopup.alert({
                             title: 'Numero de tarjeta',
                             template: 'OpenPay no acepta pagos con American Express'
-                        });*/
-                    }else if(!UIOpenPay.validarFechaExpiracion($scope.tarjeta)){
+                        });
+                    }*/ else if (!UIOpenPay.validarFechaExpiracion($scope.tarjeta)) {
                         Loader.hideLoading();
                         $ionicPopup.alert({
                             title: 'Fecha de expiración',
                             template: 'La fecha de expiración no es valida'
                         });
-                    }else if(!UIOpenPay.validarCvc($scope.tarjeta)){
+                    } else if (!UIOpenPay.validarCvc($scope.tarjeta)) {
                         Loader.hideLoading();
                         $ionicPopup.alert({
                             title: 'CVC',
                             template: 'Verifique el numero CVC de su tarjeta'
                         });
-                    }else{
+                    } else {
                         UIOpenPay.getTarjetaToken($scope.tarjeta).then(function (data) {
                             Loader.hideLoading();
-                            if(data.error){
+                            if (data.error) {
                                 $ionicPopup.alert({
                                     title: 'Error en registro de tarjeta!',
                                     template: data.message
                                 });
-                            }else{
+                            } else {
                                 enviarPedido();
                                 console.log("Enviando pedido...");
                             }
                         }, function (err) {
                             console.log("Error en token de tarjeta: " + JSON.stringify(err));
                             Loader.hideLoading();
-                            if(err.data.status){
+                            if (err.data.status) {
                                 $ionicPopup.alert({
                                     title: err.message,
                                     template: err.data.description
                                 });
-                            }else{
+                            } else {
                                 $ionicPopup.alert({
                                     title: 'Error en registro de tarjeta!',
                                     template: "Error: " + JSON.stringify(err)
@@ -1530,6 +1567,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 var productos = Carrito.getProductos();
                 var images = FileService.images();
                 Carrito.enviarDetalleVentas(indice).then(function (detalle) {
+                    PedidosPeriodicos.addPedido(productos[indice],$scope.venta);
                     if (productos.length > (indice + 1)) {
                         enviarDetallePedido(indice + 1);
                     } else if (images.length > 0) {
@@ -1697,7 +1735,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
         })
         .controller('PedidosPeriodicosController', function ($scope, $timeout, $ionicPopup, PedidosPeriodicos, Loader) {
             PedidosPeriodicos.getPedidos().then(function (pedidos) {
-                $scope.pedidos = pedidos;
+                $scope.pedidos = PedidosPeriodicos.configurarPedidos(pedidos);
                 console.log(pedidos);
             }, function (err) {
                 $ionicPopup.alert({
@@ -1883,7 +1921,6 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 $scope.pedido = data;
                 console.log($scope.pedido);
                 $ionicNavBarDelegate.title("Pedido: #" + $scope.pedido.id);
-                $ionicNavBarDelegate.showBackButton(false);
             },function(err){
                 $ionicPopup.alert({
                     title: 'Error en ventas',
@@ -1896,7 +1933,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     title: 'Confirmacion',
                     template: 'Desea eliminar el producto del pedido?',
                     cancelText: "No",
-                    okText: "Si"
+                    okText: "S i"
                 });
                 confirmPopup.then(function (res) {
                     if (res) {

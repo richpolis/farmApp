@@ -16,16 +16,16 @@
                         <label class="item item-input">
                             <input type="tel" name="celular" ng-model="userData.cell" placeholder="Celular">
                         </label>
-                        <div class="item" ng-show="inapam.length==0">
+                        <div class="item" ng-show="userData.images_inapam.length==0">
                             <ion-toggle ng-model="userData.inapam" style="border: none; font-size: .9em;" toggle-class="toggle-calm">INAPAM</ion-toggle>
                             <p class="text-center" style="color: gray;">Si cuentas con INAPAM registralo <br/>para hacerlo valido en tus compras.</p>
                         </div>
-                        <div class="card" ng-repeat="image in inapam" ng-show="inapam.length>0">
+                        <div class="card" ng-repeat="image in userData.images_inapam" ng-show="userData.images_inapam.length>0">
                             <div class="item item-text-wrap">
-                                <img ng-src="{{urlForImage(image)}}"
-                                     style="height:200px; padding: 5px 5px 5px 5px;"/>
+                                <img ng-src="{{image.inapam}}"
+                                     style="padding: 5px 5px 5px 5px;"/>
                             </div>
-                            <a class="item item-icon-left assertive" href="#" ng-click="removeImage(image)">
+                            <a class="item item-icon-left assertive" href="#" ng-click="deleteInapam(image)">
                                 <i class="icon ion-trash-a"></i>
                                 Eliminar
                             </a>

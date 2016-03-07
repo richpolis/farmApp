@@ -9,11 +9,11 @@
     </ion-header-bar>
     <ion-content>
         <div class="list card">
+            <div class="item text-center">
+                ¿Cuantas unidades quieres?
+            </div>
             <div class="item item-text-wrap">
                 <div class="row">
-                    <div class="col col-33">
-                        ¿Cuantas unidades quieres?
-                    </div>
                     <div class="col">
                         <button ng-click="productoSeleccionado.periodico.quantity=productoSeleccionado.periodico.quantity-1"
                                 ng-disabled="productoSeleccionado.periodico.quantity==1"
@@ -37,66 +37,61 @@
                     </div>
                 </div>
             </div>
-            <div class="item">
-                <div class="row">
-                    <div clas="col">
-                        ¿Cada cuando te lo enviamos?
-                    </div>
-                </div>
+            <div class="item text-center">
+                ¿Cada cuando te lo enviamos?
             </div>
             <div class="item">
-                <div class="list">
+                <div class="row">
+                    <div class="col">
                     <label class="item item-radio">
                         <input ng-model="productoSeleccionado.periodico.period" type="radio" name="period" ng-value=" 'por dia' ">
                         <div class="item-content">Dias</div>
                         <i class="radio-icon ion-checkmark"></i>
                     </label>
+                    </div>
+                    <div class="col">
                     <label class="item item-radio">
                         <input ng-model="productoSeleccionado.periodico.period" type="radio" name="period" ng-value=" 'semanal' ">
                         <div class="item-content">Semanal</div>
                         <i class="radio-icon ion-checkmark"></i>
                     </label>
+                    </div>
+                    <div class="col">
                     <label class="item item-radio">
                         <input ng-model="productoSeleccionado.periodico.period" type="radio" name="period" ng-value=" 'mensual' ">
                         <div class="item-content">Mensual</div>
                         <i class="radio-icon ion-checkmark"></i>
                     </label>
+                    </div>    
                 </div>
             </div>
-            <div class="item item-input item-select" ng-if="productoSeleccionado.periodico.period == 'por dia'">
-                <div class="input-label">
-                    Cada cuantos dias?
-                </div>
-                <select ng-model="productoSeleccionado.periodico.days">
-                    <option value="1" selected>1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                </select>
+            <div class="item text-center" ng-if="productoSeleccionado.periodico.period == 'por dia'">
+                Cada cuantos dias?
             </div>
-            <div class="item">
+            <div class="item text-center" ng-if="productoSeleccionado.periodico.period == 'semanal'">
+                Cada cuantas semanas?
+            </div>
+            <div class="item text-center" ng-if="productoSeleccionado.periodico.period == 'mensual'">
+                Cada cuantos meses?
+            </div>
+            <div class="item item-text-wrap">
                 <div class="row">
-                    <div class="col col-33">
-                        Repetir
-                    </div>
                     <div class="col">
-                        <button ng-click="productoSeleccionado.periodico.times=productoSeleccionado.periodico.times-1"
-                                ng-disabled="productoSeleccionado.periodico.times==1"
+                        <button ng-click="productoSeleccionado.periodico.days=productoSeleccionado.periodico.days-1"
+                                ng-disabled="productoSeleccionado.periodico.days==1"
                                 class="button button-clear button-block button-balanced"
                                 style="margin: 0px;">
                             <i class="icon ion-minus-circled"></i>
                         </button>
+
                     </div>
                     <div class="col">
-                        <input type="text" ng-model="productoSeleccionado.periodico.times"
+                        <input type="text" ng-model="productoSeleccionado.periodico.days"
                                style="width: 100%; border: 1px solid black; text-align:center; margin-top: 5px;"
                                readonly="readonly">
                     </div>
                     <div class="col">
-                        <button ng-click="productoSeleccionado.periodico.times=productoSeleccionado.periodico.times+1"
+                        <button ng-click="productoSeleccionado.periodico.days=productoSeleccionado.periodico.days+1"
                                 class="button button-clear button-block button-balanced"
                                 style="margin: 0px;">
                             <i class="icon ion-plus-circled"></i>

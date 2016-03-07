@@ -20,9 +20,12 @@
             <img src="img/tarjeta-american-express-icono-8441-48.png" ng-if="card.brand=='AMEX'"/>
             **** **** **** {{card.last4}}
           </ion-radio>
-          <ion-radio ng-model="seleccion.numero" ng-value="0">
+          <!--ion-radio ng-model="seleccion.numero" ng-value="0">
             Nueva
-          </ion-radio>
+          </ion-radio-->
+          <ion-item  ng-show="seleccion.numero!=0">
+              <button ng-click="seleccion.numero = 0" class="button icon-left ion-card button-clear button-energized">Nueva tarjeta</button>
+          </ion-item>
 
         </ion-list>
         <div class="row" ng-show="seleccion.numero!=0">
