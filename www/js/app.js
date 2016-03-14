@@ -66,7 +66,6 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                         templateUrl: 'templates/menu.html',
                         controller: 'AppController'
                     })
-
                     .state('app.perfil', {
                         url: '/perfil',
                         cache: false, 
@@ -77,7 +76,46 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             }
                         }
                     })
-
+                    .state('app.direcciones', {
+                        url: '/direcciones',
+                        cache: false, 
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/direcciones.html',
+                                controller: 'DireccionesController'
+                            }
+                        }
+                    })
+                    .state('app.ventas', {
+                        url: '/ventas',
+                        cache: false, 
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/ventas.html',
+                                controller: 'VentasController'
+                            }
+                        }
+                    })
+                    .state('app.viewPedido', {
+                        url: '/pedido/:pedidoId',
+                        cache: false,
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/venta.html',
+                                controller: 'VentaController'
+                            }
+                        }
+                    })
+                    .state('app.tarjetas', {
+                        url: '/tarjetas',
+                        cache: false, 
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/tarjetas.html',
+                                controller: 'TarjetasController'
+                            }
+                        }
+                    })
                     .state('app.search', {
                         url: '/search',
                         views: {
@@ -166,15 +204,6 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             'menuContent': {
                                 templateUrl: 'templates/pedido.html',
                                 controller: 'PedidoController'
-                            }
-                        }
-                    })
-                    .state('app.viewPedido', {
-                        url: '/pedido/:pedidoId',
-                        views: {
-                            'menuContent': {
-                                templateUrl: 'templates/venta.html',
-                                controller: 'VentaController'
                             }
                         }
                     })

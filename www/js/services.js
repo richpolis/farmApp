@@ -19,7 +19,7 @@ angular.module('farmApp.services', [])
                     }
                 };
         }])
-        .factory('FileService', function($cordovaFile, $ionicPopup, $q) {
+        .factory('FileService', function($cordovaFile, $q) {
             var images;
             var RECIPE_STORAGE_KEY = 'recetas';
             var INAPAM_STORAGE_KEY = 'inapams';
@@ -64,18 +64,10 @@ angular.module('farmApp.services', [])
                         console.log(self.getUrlForImage(image));
                         $cordovaFile.removeFile(cordova.file.dataDirectory, name)
                             .then(function (success) {
-                                $ionicPopup.alert({
-                                    title: 'Archivo',
-                                    template: 'Archivo eliminado'
-                                });
                                 imagenes.splice(indexImage, 1);
                                 window.localStorage.setItem(storageKey, JSON.stringify(imagenes));
                                 resolve(imagenes);
                             }, function (error) {
-                                $ionicPopup.alert({
-                                    title: 'Archivo',
-                                    template: 'No es posible eliminar el archivo'
-                                });
                                 reject(imagenes);
                             });
                     });
@@ -103,7 +95,7 @@ angular.module('farmApp.services', [])
                 }
             }
         })
-        .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile, URL_BASE, API_PATH, Loader) {
+        .factory('ImageService', function($cordovaCamera, FileService, $q, $cordovaFile, $cordovaFileTransfer, URL_BASE, API_PATH, Loader) {
 
                 function makeid() {
                     var text = '';
@@ -134,8 +126,8 @@ angular.module('farmApp.services', [])
                         popoverOptions: CameraPopoverOptions,
                         saveToPhotoAlbum: false,
                         correctOrientation: true,
-                        targetWidth: 600,
-                        targetHeight: 400
+                        targetWidth: 800,
+                        targetHeight: 600
                     };
                 };
 
@@ -149,10 +141,13 @@ angular.module('farmApp.services', [])
                         var newName = makeid() + name;
                         $cordovaFile.copyFile(namePath, name, cordova.file.dataDirectory, newName)
                             .then(function(info) {
+                                console.log(imageUrl);
+                                console.log(JSON.stringify(info));
                                 FileService.storeImage(newName,storageKey);
-                                resolve();
+                                resolve(info);
                             }, function(e) {
-                                reject();
+                                console.log(JSON.stringify(e));
+                                reject(e);
                             });
                     });
                 })
@@ -190,8 +185,8 @@ angular.module('farmApp.services', [])
             return {
                 createId: makeid,
                 handleMediaDialog: saveMedia,
-                uploadRecepies: function (images, params, headers, onSuccess, onError) {
-                    var ft =  new FileTransfer();
+                uploadRecepies: function (image, params, headers) {
+                    /*var ft =  new FileTransfer();
                     Loader.showLoading("Cargando imagenes");
                     for (var i = 0; i < images.length; i++) {
                         Loader.showLoading("Cargando " + i + "/" + images.length);
@@ -201,16 +196,59 @@ angular.module('farmApp.services', [])
                             encodeURI(URL_BASE.urlBase + API_PATH.images_ventas),
                             savedFile(image, onSuccess), onError, getImageUploadRecepiesOptions(urlImage, params, headers));
                     }
-                    Loader.hideLoading();
+                    Loader.hideLoading();*/
+                    return $q(function(resolve, reject) {
+                        var url = URL_BASE.urlBase + API_PATH.images_ventas;
+                        var filePath = FileService.getUrlForImage(image);
+                        var options = getImageUploadRecepiesOptions(filePath, params, headers);
+                        $cordovaFileTransfer.upload(url, filePath, options)
+                            .then(function(result) {
+                              Loader.hideLoading();
+                              console.log("Exito");
+                              console.log(JSON.stringify(result));
+                              resolve(result);
+                            }, function(err) {
+                              Loader.hideLoading();
+                              console.log("Error");
+                              console.log(JSON.stringify(err));
+                              reject(err);
+                            }, function (progress) {
+                              $timeout(function () {
+                                Loader.showLoading((progress.loaded / progress.total) * 100);
+                              });
+                            });
+                        
+                    });
                 },
-                uploadInapam: function (image, params, headers, onSuccess, onError) {
-                    var ft =  new FileTransfer();
-                    Loader.showLoading("Cargando imagen");
-                    var urlImage = FileService.getUrlForImage(image);
-                    ft.upload(urlImage,
-                        encodeURI(URL_BASE.urlBase + API_PATH.images_inapam),
-                        savedFile(image, onSuccess), onError, getImageUploadInapamOptions(urlImage, params, headers));
-                    Loader.hideLoading();
+                uploadInapam: function (image, params, headers) {
+                    return $q(function(resolve, reject) {
+                        Loader.showLoading("Cargando imagen");
+                        var url = URL_BASE.urlBase + API_PATH.images_inapam;
+                        var filePath = FileService.getUrlForImage(image);
+                        var options = getImageUploadInapamOptions(filePath, params, headers);
+                        /*
+                         ft.upload(urlImage,
+                            encodeURI(URL_BASE.urlBase + API_PATH.images_inapam),
+                            savedFile(image, onSuccess), onError, getImageUploadInapamOptions(urlImage, params, headers));
+                         */
+                        $cordovaFileTransfer.upload(url, filePath, options)
+                            .then(function(result) {
+                              Loader.hideLoading();
+                              console.log("Exito");
+                              console.log(JSON.stringify(result));
+                              resolve(result);
+                            }, function(err) {
+                              Loader.hideLoading();
+                              console.log("Error");
+                              console.log(JSON.stringify(err));
+                              reject(err);
+                            }, function (progress) {
+                              $timeout(function () {
+                                Loader.showLoading((progress.loaded / progress.total) * 100);
+                              });
+                            });
+                        
+                    });
                 }
             }
         })
@@ -221,55 +259,6 @@ angular.module('farmApp.services', [])
             user = JSON.parse(window.localStorage['user'] || '{}');
             accessToken = JSON.parse(window.localStorage['access_token'] || '{}');
             tokenPhone = JSON.parse(window.localStorage['token_phone'] || '{}');
-            function request(args) {
-                // Let's retrieve the token from the cookie, if available
-                if(accessToken.auth_token){
-                    $http.defaults.headers.common.Authorization = 'Token ' + accessToken.auth_token;
-                }
-                // Continue
-                var params = args.params || {};
-                var args = args || {};
-                var deferred = $q.defer(),
-                    url = this.API_URL + args.url,
-                    method = args.method || "GET",
-                    params = params,
-                    data = args.data || {};
-                // Fire the request, as configured.
-                $http({
-                    url: URL_BASE.urlBase + url,
-                    method: method.toUpperCase(),
-                    headers: {"Content-Type": "application/json"},
-                    params: params,
-                    data: data
-                })
-                    .success(angular.bind(this,function(data, status, headers, config) {
-                        deferred.resolve(data, status);
-                    }))
-                    .error(angular.bind(this,function(data, status, headers, config) {
-                        console.log("error syncing with: " + url);
-                        // Set request status
-                        if(data){
-                            data.status = status;
-                        }
-                        if(status == 0){
-                            if(data == ""){
-                                data = {};
-                                data['status'] = 0;
-                                data['non_field_errors'] = ["Could not connect. Please try again."];
-                            }
-                            // or if the data is null, then there was a timeout.
-                            if(data == null){
-                                // Inject a non field error alerting the user
-                                // that there's been a timeout error.
-                                data = {};
-                                data['status'] = 0;
-                                data['non_field_errors'] = ["Server timed out. Please try again."];
-                            }
-                        }
-                        deferred.reject(data, status, headers, config);
-                    }));
-                return deferred.promise;
-            };
             var user_login = function(email, password) {
                 var configHttp = {
                     method: "POST",
@@ -323,12 +312,13 @@ angular.module('farmApp.services', [])
 
             var delete_card = function(card) {
                 var configHttp = {
-                    method: "DELETE",
+                    method: "PATCH",
                     url: URL_BASE.urlBase + API_PATH.tarjetas + card.id + "/",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": "Token " + accessToken.auth_token
-                    }
+                    },
+                    data: {"active": false}
                 };
                 return $q(function (resolve, reject) {
                     $http(configHttp)
@@ -1388,7 +1378,7 @@ angular.module('farmApp.services', [])
                     data: {
                         product: producto.id,
                         quantity: producto.quantity,
-                        sale: venta.id,
+                        card_conekta: venta.card_conekta,
                         direction: venta.direction,
                         period: producto.periodico.period,
                         days: producto.periodico.days,
@@ -1463,10 +1453,6 @@ angular.module('farmApp.services', [])
                     var pedidos = User.getPedidosPeriodicos();
                     for (var i = 0; i < pedidos.length; i++) {
                         if (pedidos[i].product.id == producto.id) {
-                            $ionicPopup.alert({
-                                title: 'Producto no agregado!',
-                                template: 'El producto ya existe en los pedidos periodicos'
-                            });
                             encontrado = true;
                             break;
                         }
@@ -1480,10 +1466,6 @@ angular.module('farmApp.services', [])
                                 User.setPedidosPeriodicos(pedidos);
                                 resolve(pedido)
                             }, function (err) {
-                                $ionicPopup.alert({
-                                    title: 'Pedido periodico no agregado!',
-                                    template: err.detail
-                                });
                                 reject(err);
                             });
                         });
@@ -1503,10 +1485,6 @@ angular.module('farmApp.services', [])
                             User.setPedidosPeriodicos(pedidos);
                             resolve(data);
                         },function(err){
-                            $ionicPopup.alert({
-                                title: 'Pedido periodico no agregado!',
-                                template: err.detail
-                            });
                             reject(err);
                         });
                     });
@@ -1519,16 +1497,13 @@ angular.module('farmApp.services', [])
                             User.setPedidosPeriodicos(pedidos);
                             resolve(pedidos);
                         }, function (err) {
-                            $ionicPopup.alert({
-                                title: 'Pedido periodico no agregado!',
-                                template: err.detail
-                            });
                             reject(err);
                         });
                     });
                 },
                 getPedidoPeriodicoVacio: function () {
                     return {
+                        id: 0,
                         pedido: false,
                         period: 'por dia',
                         days: 1,
@@ -1543,6 +1518,7 @@ angular.module('farmApp.services', [])
                         if (pedidos[i].product && pedidos[i].product.id == producto.id) {
                             producto.periodico = this.getPedidoPeriodicoVacio();
                             producto.periodico.pedido = true;
+                            producto.periodico.id = pedidos[i].id;
                             producto.periodico.quantity = pedidos[i].quantity;
                             producto.periodico.period = pedidos[i].period;
                             producto.periodico.days = pedidos[i].days;
@@ -1558,7 +1534,7 @@ angular.module('farmApp.services', [])
                                 var meses = producto.periodico.days/30;
                                 var leyenda = "Recibirás el producto cada "+meses+" meses";
                             }
-                            producto.periodico.leyend = leyenda +  "Proxima entrega el proximo " + producto.periodico.date_next + "";
+                            producto.periodico.leyend = leyenda +  ". Proxima entrega el " + producto.periodico.date_next + "";
                             console.log("configuracion de pedido peridico realizada");
                             encontrado = true;
                             break;
@@ -1583,7 +1559,7 @@ angular.module('farmApp.services', [])
                             var meses = product.days / 30;
                             var leyenda = "Recibirás el producto cada " + meses + " meses";
                         }
-                        product.leyend = leyenda + ". Proxima entrega el proximo " + product.date_next + "";
+                        product.leyend = leyenda + ". Proxima entrega el  " + product.date_next + "";
                         console.log("configuracion de pedido peridico realizada");
                         pedidos[i] = product;
                     }

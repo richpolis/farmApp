@@ -1,5 +1,5 @@
 <ion-view view-title="Pago">
-    <ion-content class="has-header">
+    <ion-content has-footer="true" has-header="true" padding="true" style="margin-bottom: 60px;">
         <div class="row" ng-show="hasProductsWithRecipe">
             <div class="col balanced-bg text-center" style="color: white;">1</div>
             <div class="col balanced-bg text-center" style="color: white;">2</div>
@@ -13,7 +13,7 @@
         </div>
         <ion-list>
           <ion-radio ng-model="seleccion.numero" ng-value="card.id"
-          ng-repeat="card in tarjetas">
+          ng-repeat="card in tarjetas"  ng-show="card.active">
 
             <img src="img/ico_mastercard.jpg" ng-if="card.brand=='mastercard'" />
             <img src="img/ico_visa.jpg" ng-if="card.brand=='visa'" />
@@ -23,23 +23,24 @@
           <!--ion-radio ng-model="seleccion.numero" ng-value="0">
             Nueva
           </ion-radio-->
-          <ion-item  ng-show="seleccion.numero!=0">
-              <button ng-click="seleccion.numero = 0" class="button icon-left ion-card button-clear button-energized">Nueva tarjeta</button>
+          <ion-item class="item-button-right" ng-show="seleccion.numero!=0">
+              Nueva tarjeta
+                <button class="button button-energized" ng-click="seleccion.numero = 0">
+                  <i class="icon ion-card"></i>
+                </button>
           </ion-item>
-
+          <div  ng-show="seleccion.numero!=0">
+          <ion-checkbox ng-model="validar.terminos">Acepta los terminos y condiciones</ion-checkbox>
+          <div class="item item-button-right">
+                Ver terminos y condiciones
+                <button class="button button-balanced" ng-click="showModalTerminos()">
+                  <i class="icon ion-eye"></i>
+                </button>
+          </div>
+          </div>
         </ion-list>
-        <div class="row" ng-show="seleccion.numero!=0">
-            <div class="col-33">
-                <ion-list>
-                    <ion-checkbox ng-model="validar.terminos">Acepta</ion-checkbox>
-                </ion-list>
-            </div>
-            <div class="col-66">
-                <a class="button button-clear button-balanced button-block" ng-click="showModalTerminos()">Términos y condiciones.</a>
-            </div>
-        </div>
         <p class="padding text-center">
-        <button ng-show="seleccion.numero!=0" class="button button-block button-balanced" ng-disabled="!validar.terminos" ng-click="doPago()">Hacer Pedido</button>
+            <button ng-show="seleccion.numero!=0" class="button button-block button-balanced" ng-disabled="!validar.terminos" ng-click="doPago()">Hacer Pedido</button>
         </p>
         <form ng-show="seleccion.numero==0" id="formRegister" ng-submit="doPago()">
             <div class="list">
@@ -71,18 +72,13 @@
                         </label>
                     </div>
                 </div>
-                <div class="item"  ng-show="seleccion.numero==0">
-                    <div class="row">
-                        <div class="col-33">
-                            <ion-list ng-show="seleccion.numero==0">
-                                <ion-checkbox ng-model="validar.terminos">Acepta</ion-checkbox>
-                            </ion-list>
-                        </div>
-                        <div class="col-66">
-                            <a class="button button-clear button-balanced button-block" ng-click="showModalTerminos()">Términos y condiciones.</a>
-                        </div>
-                    </div>
-                </div>    
+                <ion-checkbox ng-model="validar.terminos">Acepta los terminos y condiciones</ion-checkbox>
+                <div class="item item-button-right">
+                      Ver terminos y condiciones
+                      <button class="button button-balanced" ng-click="showModalTerminos()">
+                        <i class="icon ion-eye"></i>
+                      </button>
+                </div>
                 <label class="item">
                     <button class="button button-block button-balanced"  ng-disabled="!validar.terminos" type="submit">Hacer Pedido</button>
                 </label>
@@ -90,4 +86,7 @@
         </form>
         
     </ion-content>
+    <ion-footer-bar align-title="left" class="bar-assertive">
+        <h1 class="title">Tu cobro se realizará a la entrega de tu pedido</h1>
+    </ion-footer-bar>
 </ion-view>

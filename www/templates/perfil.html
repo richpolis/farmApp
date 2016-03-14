@@ -1,141 +1,56 @@
-<ion-view cache-view="false" title="Mi cuenta">
-    <ion-tabs tabs-type="tabs-icon-only" class="has-header tabs-striped tabs-bottom tabs-background-balanced tabs-color-light">
-        <ion-tab title="Perfil" icon-on="ion-person" icon-off="ion-person">
-            <ion-content has-header="true" padding="true" scroll="true" style="margin-top: {{marginTop}};margin-bottom: {{marginTop}};">
-                <form id="formRegister" ng-submit="doRegister()">
-                    <div class="list">
-                        <label class="item item-input">
-                            <input type="text" name="nombre" ng-model="userData.first_name" placeholder="Nombre">
-                        </label>
-                        <label class="item item-input">
-                            <input type="text" name="apellido" ng-model="userData.last_name" placeholder="Apellido">
-                        </label>
-                        <label class="item item-input">
-                            <input type="email" name="email" ng-model="userData.email" placeholder="Email" ng-disabled="true">
-                        </label>
-                        <label class="item item-input">
-                            <input type="tel" name="celular" ng-model="userData.cell" placeholder="Celular">
-                        </label>
-                        <div class="item" ng-show="userData.images_inapam.length==0">
-                            <ion-toggle ng-model="userData.inapam" style="border: none; font-size: .9em;" toggle-class="toggle-calm">INAPAM</ion-toggle>
-                            <p class="text-center" style="color: gray;">Si cuentas con INAPAM registralo <br/>para hacerlo valido en tus compras.</p>
-                        </div>
-                        <div class="card" ng-repeat="image in userData.images_inapam" ng-show="userData.images_inapam.length>0">
-                            <div class="item item-text-wrap">
-                                <img ng-src="{{image.inapam}}"
-                                     style="padding: 5px 5px 5px 5px;"/>
-                            </div>
-                            <a class="item item-icon-left assertive" href="#" ng-click="deleteInapam(image)">
-                                <i class="icon ion-trash-a"></i>
-                                Eliminar
-                            </a>
-                        </div>
-                        <label class="item">
-                            <button class="button button-block button-balanced" type="submit">Actualizar</button>
-                        </label>
-                    </div>
-                </form>
-            </ion-content>
-        </ion-tab>
-
-        <ion-tab title="Direcciones" icon-on="ion-location" icon-off="ion-location">
-            <ion-content has-header="true" padding="true" scroll="true" style="margin-top: {{marginTop}};margin-bottom: {{marginTop}};">
-                <div class="list">
-                    <label class="item item-input item-select" ng-if="direcciones.length > 0">
-                        <div class="input-label">
-                            Direccion guardada
-                        </div>
-                        <select ng-model="direccionSeleccionada.id" id="recuperar-direccion">
-                            <option selected value="0">Nueva...</option>
-                            <option ng-repeat="direccion in direcciones" value="{{direccion.id}}">{{direccion.street}}</option>
-                        </select>
-                    </label>
-                    <div class="item item-button-right">
-                        Buscar en mapa
-                        <button class="button button-balanced" ng-click="showModalMap()">
-                            <i class="icon ion-map"></i>
-                        </button>
-                    </div>
+<ion-view cache-view="false"  hide-back-button="true" title="Mi cuenta">
+    <ion-content has-header="true" padding="true" scroll="true" style="margin-bottom: 60px;">
+        <form id="formRegister" ng-submit="doRegister()">
+            <div class="list">
+                <label class="item item-input">
+                    <input type="text" name="nombre" ng-model="userData.first_name" placeholder="Nombre">
+                </label>
+                <label class="item item-input">
+                    <input type="text" name="apellido" ng-model="userData.last_name" placeholder="Apellido">
+                </label>
+                <label class="item item-input">
+                    <input type="email" name="email" ng-model="userData.email" placeholder="Email" ng-disabled="true">
+                </label>
+                <label class="item item-input">
+                    <input type="tel" name="celular" ng-model="userData.cell" placeholder="Celular">
+                </label>
+                <div class="item" ng-show="userData.images_inapam.length == 0">
+                    <ion-toggle ng-model="userData.inapam" style="border: none; font-size: .9em;" toggle-class="toggle-calm">INAPAM</ion-toggle>
+                    <p class="text-center" style="color: gray;">Si cuentas con INAPAM registralo <br/>para hacerlo valido en tus compras.</p>
                 </div>
-
-                <form id="formDireccion" ng-submit="doDireccion()">
-                    <div class="list">
-                        <label class="item item-input">
-                            <input type="text" name="estado" ng-model="direccionGuardada.location" placeholder="Estado">
-                        </label>
-                        <label class="item item-input">
-                            <input type="text" name="calle" ng-model="direccionGuardada.street" placeholder="Calle">
-                        </label>
-                        <div class="row">
-                            <div class="col">
-                                <label class="item item-input">
-                                    <input type="text" name="num_exterior" ng-model="direccionGuardada.exterior_number" placeholder="Num. Exterior">
-                                </label>
-                            </div>
-                            <div class="col">
-                                <label class="item item-input">
-                                    <input type="text" name="num_interior" ng-model="direccionGuardada.interior_number" placeholder="Num. Interior">
-                                </label>
-                            </div>
-                        </div>
-                        <label class="item item-input">
-                            <input type="text" name="codigo_postal" ng-model="direccionGuardada.postal_code" placeholder="Codigo postal">
-                        </label>
-                        <label class="item item-input">
-                            <input type="text" name="delegacion_municipio" ng-model="direccionGuardada.delegation_municipaly" placeholder="Delegacion/Municipio">
-                        </label>
-                        <label class="item item-input" ng-show="colonias.length==0">
-                            <input type="text" name="colonia" ng-model="direccionGuardada.colony" placeholder="Colonia">
-                        </label>
-                        <label class="item item-input item-select" ng-show="colonias.length>1">
-                            <div class="input-label">
-                                Colonia
-                            </div>
-                            <select ng-model="direccionGuardada.colony"  ng-options="colonia for colonia in colonias">
-                            </select>
-                        </label>
-                        <div class="item">
-                            <ion-toggle ng-model="direccionGuardada.active" style="border: none; font-size: .9em;" toggle-class="toggle-calm">Utilizar direccion para envios?</ion-toggle>
-                        </div>
-                        <label class="item">
-                            <button class="button button-block button-balanced" type="submit">
-                                <span  ng-show="!direccionGuardada.id">Guardar dirección</span>
-                                <span  ng-show="direccionGuardada.id">Actualizar dirección</span>
-                            </button>
-                        </label>
-
+                <div class="card" ng-repeat="image in userData.images_inapam" ng-show="userData.images_inapam.length > 0">
+                    <div class="item item-body">
+                        <img ng-src="{{image.inapam}}" class="full-image"/>
                     </div>
-                </form>
-            </ion-content>
-        </ion-tab>
-        <ion-tab title="Ventas" icon-on="ion-ios-cart-outline" icon-off="ion-ios-cart-outline">
-            <ion-content has-header="true" padding="true" style="margin-top: {{marginTop}};margin-bottom: {{marginTop}};">
-                <ion-list ng-repeat="pedido in pedidos | orderBy:'created':true">
-                    <ion-item class="item-divider">
-                        Pedido: #{{ pedido.id }} 
-                        creado: {{pedido.created | date }}
-                        <span class="item-note">
-                          {{pedido.total|currency:"$"}}
-                        </span>
-                    </ion-item>
-                    <ion-item href="#/app/pedido/{{pedido.id}}" ng-repeat="detalle in pedido.detail_sales" class="item-thumbnail-left">
-                        <img ng-src="{{detalle.product.image}}" ng-class="{ 'no-require-receta': detalle.product.recipe == 1, 'require-show-receta': detalle.product.recipe==2,  'require-receta': detalle.product.recipe==3}">
-                        <h2>{{detalle.product.name}}</h2>
-                        <p class="ion-item-categoria">
-                            {{detalle.product.category.name}}
-                        </p>
-                        <p ng-show="detalle.product.recipe > 1" ng-class="{ 'require-receta': detalle.product.recipe > 1 }">Require receta</p>
-                        <div class="row">
-                            <div class="col col-50"></div>
-                            <div class="col col-50 text-right">
-                                <label class="balanced-bg padding color-blanco etiqueta-precio">{{detalle.quantity}}</label>
-                                <i class="icon ion-android-close"></i>
-                                <label class="balanced-bg padding color-blanco etiqueta-precio">{{detalle.total|currency:"$"}}</label>
-                            </div>
-                        </div>
-                    </ion-item>
-                </ion-list>
-            </ion-content>
-        </ion-tab>
-    </ion-tabs>
+                    <a class="item item-icon-left assertive" href="#" ng-click="deleteInapam(image)">
+                        <i class="icon ion-trash-a"></i>
+                        Eliminar
+                    </a>
+                </div>
+                <label class="item">
+                    <button class="button button-block button-balanced" type="submit">Actualizar</button>
+                </label>
+            </div>
+        </form>
+    </ion-content>
+    <div class="tabs-striped tabs-background-balanced tabs-color-light">
+        <div class="tabs">
+            <a nav-transition="none" class="tab-item disable-user-behavior active" href="#/app/perfil">
+                <i class="icon ion-person"></i>
+                Perfil
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/direcciones">
+                <i class="icon ion-location"></i>
+                Direcciones
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/ventas">
+                <i class="icon ion-android-cart"></i>
+                Compras
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/tarjetas">
+                <i class="icon ion-card"></i>
+                Tarjetas
+            </a>
+        </div>
+    </div>
 </ion-view>

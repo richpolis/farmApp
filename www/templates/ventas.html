@@ -1,0 +1,49 @@
+<ion-view cache-view="false" hide-back-button="true" title="Mis compras">
+    <ion-content has-header="true" padding="true" scroll="true" style="margin-bottom: 60px;">
+        <ion-list ng-repeat="pedido in pedidos| orderBy:'created':true">
+            <ion-item class="item-divider">
+                Pedido: #{{ pedido.id}} 
+                creado: {{pedido.created| date }}
+                <span class="item-note">
+                    {{pedido.total|currency:"$"}}
+                </span>
+            </ion-item>
+            <ion-item href="#/app/pedido/{{pedido.id}}" ng-repeat="detalle in pedido.detail_sales" class="item-thumbnail-left">
+                <img ng-src="{{detalle.product.image}}" ng-class="{ 'no-require-receta': detalle.product.recipe == 1, 'require-show-receta': detalle.product.recipe == 2,  'require-receta': detalle.product.recipe == 3}">
+                <h2>{{detalle.product.name}}</h2>
+                <p class="ion-item-categoria">
+                    {{detalle.product.category.name}}
+                </p>
+                <p ng-show="detalle.product.recipe > 1" ng-class="{ 'require-receta': detalle.product.recipe > 1 }">Require receta</p>
+                <div class="row">
+                    <div class="col col-50"></div>
+                    <div class="col col-50 text-right">
+                        <label class="balanced-bg padding color-blanco etiqueta-precio">{{detalle.quantity}}</label>
+                        <i class="icon ion-android-close"></i>
+                        <label class="balanced-bg padding color-blanco etiqueta-precio">{{detalle.total|currency:"$"}}</label>
+                    </div>
+                </div>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+    <div class="tabs-striped tabs-background-balanced tabs-color-light">
+        <div class="tabs">
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/perfil">
+                <i class="icon ion-person"></i>
+                Perfil
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/direcciones">
+                <i class="icon ion-location"></i>
+                Direcciones
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior active" href="#/app/ventas">
+                <i class="icon ion-android-cart"></i>
+                Compras
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/tarjetas">
+                <i class="icon ion-card"></i>
+                Tarjetas
+            </a>
+        </div>
+    </div>
+</ion-view>

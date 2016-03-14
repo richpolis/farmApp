@@ -4,7 +4,7 @@
             <div class="item-text-wrap" ng-repeat="producto in productos| orderBy:'name' " style="padding: 10px 2px;">
                 <div class="list card" style="padding: .2em;">
                     <div class="item item-thumbnail-left">
-                        <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}"">
+                        <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}">
                         <h2>{{producto.name}} - <span class="laboratorio">{{producto.laboratory.name}}</span></h2>
                         <p class="ion-item-categoria">
                             {{producto.category.name}}
@@ -20,7 +20,10 @@
                         <div class="row padding-top" ng-show="producto.periodico.pedido">
                             <div class="col padding-top">
                                 <label class="font-small">{{producto.periodico.leyend | uppercase}}</label>
-                            </div>                        
+                            </div>
+                            <div class="col-33" ng-show="producto.periodico.id==0">
+                                <button class="button button-clear button-assertive" ng-click="showAgregarPedidoPeriodico(producto)">Editar</button>
+                            </div>
                         </div>
                         <div class="row border-bottom border-top padding-top" ng-show="producto.recipe > 1">
                             <div class="col text-center">

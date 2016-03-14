@@ -1,17 +1,6 @@
-<ion-view view-title="Pedido">
-    <ion-content class="has-header" padding="true">
-        <div class="row" ng-show="hasProductsWithRecipe">
-            <div class="col balanced-bg text-center" style="color: white;">1</div>
-            <div class="col text-center">2</div>
-            <div class="col text-center">3</div>
-            <div class="col text-center">4</div>
-        </div>
-        <div class="row" ng-show="!hasProductsWithRecipe">
-            <div class="col balanced-bg text-center" style="color: white;">1</div>
-            <div class="col text-center">2</div>
-            <div class="col text-center">3</div>
-        </div>
-        <div class="list" style="margin-bottom: 5px;">
+<ion-view cache-view="false"  hide-back-button="true" title="Mis direcciones">
+    <ion-content has-header="true" padding="true" scroll="true" style="margin-bottom: 60px;">
+        <div class="list">
             <label class="item item-input item-select" ng-if="direcciones.length > 0">
                 <div class="input-label">
                     Direccion guardada
@@ -29,7 +18,7 @@
             </div>
         </div>
         <form id="formDireccion" ng-submit="doDireccion()">
-            <div class="list" style="margin-bottom: 5px;">
+            <div class="list">
                 <label class="item item-input">
                     <input type="text" name="estado" ng-model="direccionGuardada.location" placeholder="Estado">
                 </label>
@@ -54,20 +43,47 @@
                 <label class="item item-input">
                     <input type="text" name="delegacion_municipio" ng-model="direccionGuardada.delegation_municipaly" placeholder="Delegacion/Municipio">
                 </label>
-                <label class="item item-input" ng-show="colonias.length==0">
+                <label class="item item-input" ng-show="colonias.length == 0">
                     <input type="text" name="colonia" ng-model="direccionGuardada.colony" placeholder="Colonia">
                 </label>
-                <label class="item item-input item-select"  ng-if="colonias.length>1">
+                <label class="item item-input item-select" ng-show="colonias.length > 1">
                     <div class="input-label">
                         Colonia
                     </div>
                     <select ng-model="direccionGuardada.colony"  ng-options="colonia for colonia in colonias">
                     </select>
                 </label>
+                <div class="item">
+                    <ion-toggle ng-model="direccionGuardada.active" style="border: none; font-size: .9em;" toggle-class="toggle-calm">Utilizar direccion para envios?</ion-toggle>
+                </div>
                 <label class="item">
-                    <button class="button button-block button-balanced" type="submit">Continuar</button>
+                    <button class="button button-block button-balanced" type="submit">
+                        <span  ng-show="!direccionGuardada.id">Guardar dirección</span>
+                        <span  ng-show="direccionGuardada.id">Actualizar dirección</span>
+                    </button>
                 </label>
+
             </div>
         </form>
     </ion-content>
+    <div class="tabs-striped tabs-background-balanced tabs-color-light">
+        <div class="tabs">
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/perfil">
+                <i class="icon ion-person"></i>
+                Perfil
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior active" href="#/app/direcciones">
+                <i class="icon ion-location"></i>
+                Direcciones
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/ventas">
+                <i class="icon ion-android-cart"></i>
+                Compras
+            </a>
+            <a nav-transition="none" class="tab-item disable-user-behavior" href="#/app/tarjetas">
+                <i class="icon ion-card"></i>
+                Tarjetas
+            </a>
+        </div>
+    </div>
 </ion-view>
