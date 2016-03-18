@@ -12,9 +12,9 @@
             <label class="item item-input">
                 <input type="text" ng-model="recordatorio.title" value="" placeholder="Nombre del recordatorio">
             </label>
-            <label class="item item-input">
+            <!--label class="item item-input">
                 <input type="text" ng-model="recordatorio.message" value="" placeholder="Descripcion del recordatorio">
-            </label>
+            </label-->
             <div class="item">
                 <p>Hora del recordatorio:</p>
             </div>
@@ -22,7 +22,7 @@
                 <div class="input-label">
                     Hora
                 </div>
-                <select ng-change="changeTime()" ng-model="recordatorio.tiempo.hora" ng-options="hora for hora in ['00', '01', '02', '03','04', '05', '06', '07','08', '09', '10', '11', '12']">
+                <select ng-change="changeTime()" ng-model="recordatorio.tiempo.hora" ng-options="hora for hora in ['00', '01', '02', '03','04', '05', '06', '07','08', '09', '10', '11', '12','13','14','15','16','17','18','19','20','21','22','23']">
                 </select>
             </label>
             <label class="item item-input item-select">
@@ -32,13 +32,13 @@
                 <select ng-change="changeTime()" ng-model="recordatorio.tiempo.minutos" ng-options="minutos for minutos in ['00', '05', '10', '15','20', '25', '30', '35','40', '45', '55']">
                 </select>
             </label>
-            <label class="item item-input item-select">
+            <!--label class="item item-input item-select">
                 <div class="input-label">
                     Horario
                 </div>
                 <select  ng-change="changeTime()" ng-model="recordatorio.tiempo.horario" ng-options="horario for horario in ['am', 'pm']">
                 </select>
-            </label>
+            </label-->
             <label class="item item-input item-select">
                 <div class="input-label">
                     Repetir

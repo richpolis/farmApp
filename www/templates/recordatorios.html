@@ -1,18 +1,33 @@
 <ion-view cache-view="false" view-title="Recordatorios">
-    <ion-content class="has-header padding">
+    <ion-content has-header="true" padding="true" scroll="true">
         <ion-list>
-            <ion-item href="#/app/recordatorios/{{recordatorio.id}}"
-              ng-repeat="recordatorio in recordatorios | orderBy:'time'">
-                <h2>{{recordatorio.title}}</h2>
-                <p>{{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}} - {{recordatorio.leyend}}</p>
-                <!--label class="toggle toggle-assertive">
-                    <input type="checkbox" ng-model="recordatorio.active" ng-change="updateRecordatorio(recordatorio)">
-                    <div class="track">
-                        <div class="handle"></div>
+            <ion-item ng-repeat="recordatorio in recordatorios| orderBy:'time'">
+                <div class="list card">
+                    <div class="item item-icon-left">
+                        <i class="icon ion-clock"></i>
+                        {{recordatorio.title}}
                     </div>
-                </label-->
+                    <div class="item item-body">
+                        <p>
+                            {{recordatorio.tiempo.hora}} : {{recordatorio.tiempo.minutos}} {{recordatorio.tiempo.horario}}
+                        </p>
+                        <p>
+                            {{recordatorio.message}}
+                        </p>
+                        <p>
+                            {{recordatorio.leyend}}
+                        </p>
+                    </div>
+                    <div class="item">
+                        <p>
+                            <a href="#/app/edit/recordatorio/{{recordatorio.id}}" class="button button-balanced">Editar</a>
+                            <a href="#"  ng-click="borrarRecordatorio(recordatorio)" class="button button-assertive">Eliminar</a>
+                        </p>
+                    </div>
+                </div>
             </ion-item>
         </ion-list>
+
         <a class="button button-full button-balanced" href="#/app/add/recordatorio">
             Agregar recordatorio
         </a>

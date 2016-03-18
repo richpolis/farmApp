@@ -68,25 +68,22 @@
                     </div>
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="cvc" ng-model="tarjeta.card.cvc" placeholder="CVC" maxlength="3" style="text-align: center;">
+                            <input type="text" name="cvc" ng-model="tarjeta.card.cvc" placeholder="CVC" maxlength="4" style="text-align: center;">
                         </label>
                     </div>
                 </div>
                 <ion-checkbox ng-model="validar.terminos">Acepta los terminos y condiciones</ion-checkbox>
                 <div class="item item-button-right">
                       Ver terminos y condiciones
-                      <button class="button button-balanced" ng-click="showModalTerminos()">
+                      <a href="#" class="button button-balanced" ng-click="showModalTerminos()">
                         <i class="icon ion-eye"></i>
-                      </button>
+                      </a>
                 </div>
                 <label class="item">
                     <button class="button button-block button-balanced"  ng-disabled="!validar.terminos" type="submit">Hacer Pedido</button>
                 </label>
             </div>
         </form>
-        
+        <p class="text-center assertive">Tu cobro se realizará a la entrega de tu pedido</p>
     </ion-content>
-    <ion-footer-bar align-title="left" class="bar-assertive">
-        <h1 class="title">Tu cobro se realizará a la entrega de tu pedido</h1>
-    </ion-footer-bar>
 </ion-view>

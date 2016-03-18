@@ -76,18 +76,21 @@ angular.module('farmApp.services', [])
                     var self = this;
                     return $q(function(resolve, reject){
                        var imagenes = self.images(storageKey);
+                       var images = self.images(storageKey);
                         for(var cont=0; cont<imagenes.length; cont++){
                             var name = imagenes[cont].substr(imagenes[cont].lastIndexOf('/') + 1);
+                            var indexImage = images.indexOf(imagenes[cont]);
                             $cordovaFile.removeFile(cordova.file.dataDirectory, name)
                                     .then(function (success) {
-                                        console.log("Archivo eliminado");
+                                        images.splice(indexImage, 1);
+                                        window.localStorage.setItem(storageKey, JSON.stringify(images));
                                     }, function (error) {
                                         console.log("No es posible eliminar el archivo");
                                     });
                         }
-                        if(imagenes.length==0){
-                            window.localStorage.setItem(storageKey, JSON.stringify(imagenes));
-                            resolve(imagenes);
+                        if(images.length==0){
+                            window.localStorage.setItem(storageKey, JSON.stringify(images));
+                            resolve(images);
                         }else{
                             reject();
                         }
@@ -320,13 +323,18 @@ angular.module('farmApp.services', [])
                     },
                     data: {"active": false}
                 };
+                var self = this;
                 return $q(function (resolve, reject) {
                     $http(configHttp)
                             .success(function (data) {
                                 var tarjetas = user.cards || [];
-                                var indexCard = tarjetas.indexOf(card);
-                                tarjetas.splice(indexCard,1);
-                                this.setTarjetas(tarjetas);
+                                for(var cont=0; cont<tarjetas.length; cont++){
+                                    if(tarjetas[cont].id==data.id){
+                                        tarjetas[cont]=data;
+                                        break;
+                                    }
+                                }
+                                self.setTarjetas(tarjetas);
                                 resolve(data);
                             })
                             .error(function (err) {
@@ -1627,7 +1635,7 @@ angular.module('farmApp.services', [])
                         console.log(data);
                         resolve(data);
                       },function(err){
-                        console.log("Carrito Cardo Conekta BAT!!!!");
+                        console.log("Carrito Card Conekta BAT!!!!");
                         console.log(err);
                         reject(err);
                       });
@@ -1889,7 +1897,9 @@ angular.module('farmApp.services', [])
                         "Content-Type": "application/json",
                         "Authorization": "Token " + User.getAuthToken()
                     },
-                    data: {"message": reminder.message, "title": reminder.title, "time": reminder.time, "monday": reminder.monday,
+                    data: {
+                        "message": reminder.message, 
+                        "title": reminder.title, "time": reminder.time, "monday": reminder.monday,
                     "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
                     "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday,
                     "active": true }

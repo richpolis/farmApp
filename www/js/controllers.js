@@ -52,7 +52,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             var limpiar_cache = function () {
                 console.log("entrando a limpiar cache");
                 Carrito.empty();
-                FileService.empty();
+                FileService.empty(FileService.RECIPE_STORAGE_KEY);
                 window.localStorage.removeItem('user');
                 window.localStorage.removeItem('access_token');
             };
@@ -1061,8 +1061,11 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
         .controller('PedidoController', function ($scope, $state, $ionicModal,
                 $ionicPopup, $timeout, $cordovaGeolocation, User, Direcciones,
                 Carrito, Loader) {
-
-
+            
+            $scope.proceso = {
+                direccion: true
+            };
+                
             $scope.hasProductsWithRecipe = Carrito.hasProductsWithRecipe(2);
             $scope.userData = User.getUser();
             $scope.direccionSeleccionada = {
@@ -1097,6 +1100,8 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     });
                 }, 1000);
             });
+            
+            
 
             Direcciones.getDirecciones().then(function (direcciones) {
                 $scope.direcciones = [];
@@ -1210,6 +1215,12 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                                 });
                             });
                 }
+            });
+            
+            $scope.$watch('proceso.direccion',function(){
+               if($scope.proceso.direccion==false){
+                   
+               } 
             });
 
             $scope.hasDireccionbuscar = function () {
@@ -1855,7 +1866,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
             })
         })
         .controller('RecordatoriosController', function ($scope, $timeout,
-        $state, Recordatorios) {
+        $state, Recordatorios, $ionicPopup) {
 
             $scope.recordatorios = Recordatorios.get();
 
@@ -1876,6 +1887,24 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     });
                 }, 1000);
             });
+            
+            $scope.borrarRecordatorio = function(recordatorio){
+                var confirmPopup = $ionicPopup.confirm({
+                    title: 'Confirmar eliminar recordatorio',
+                    template: 'Desea eliminar el recordatorio?',
+                    cancelText: "No",
+                    okText: "Si"
+                });
+                confirmPopup.then(function (res) {
+                    if (res) {
+                        console.log(recordatorio);
+                        Recordatorios.delete(recordatorio);
+                        $scope.$emit('recordatorios', 'add');
+                        $state.go('app.recordatorios');
+                    }
+                });
+            };
+            
         })
         .controller('RecordatorioController', function ($scope, $stateParams,
                    $ionicPopup,  Recordatorios, $state) {
