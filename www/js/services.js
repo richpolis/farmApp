@@ -84,16 +84,17 @@ angular.module('farmApp.services', [])
                                     .then(function (success) {
                                         images.splice(indexImage, 1);
                                         window.localStorage.setItem(storageKey, JSON.stringify(images));
+                                        if(images.length==0){
+                                            resolve(images);
+                                        }
                                     }, function (error) {
                                         console.log("No es posible eliminar el archivo");
+                                        if(images.length>0){
+                                            reject({'detail':'No fue posible eliminar todas las imagenes'});
+                                        }
                                     });
                         }
-                        if(images.length==0){
-                            window.localStorage.setItem(storageKey, JSON.stringify(images));
-                            resolve(images);
-                        }else{
-                            reject();
-                        }
+                        
                     });
                 }
             }
@@ -216,11 +217,9 @@ angular.module('farmApp.services', [])
                               console.log(JSON.stringify(err));
                               reject(err);
                             }, function (progress) {
-                              $timeout(function () {
-                                Loader.showLoading((progress.loaded / progress.total) * 100);
-                              });
+                              Loader.showLoading((progress.loaded / progress.total) * 100);
                             });
-                        
+
                     });
                 },
                 uploadInapam: function (image, params, headers) {
@@ -246,11 +245,9 @@ angular.module('farmApp.services', [])
                               console.log(JSON.stringify(err));
                               reject(err);
                             }, function (progress) {
-                              $timeout(function () {
-                                Loader.showLoading((progress.loaded / progress.total) * 100);
-                              });
+                              Loader.showLoading((progress.loaded / progress.total) * 100);
                             });
-                        
+
                     });
                 }
             }
@@ -342,7 +339,7 @@ angular.module('farmApp.services', [])
                             });
                 });
             };
-            
+
             var delete_image_inapam = function(image) {
                 var imageInapam = image;
                 var configHttp = {
@@ -883,7 +880,6 @@ angular.module('farmApp.services', [])
             var categorias = [];
             var peticionCategorias = false;
             var get_categorias = function () {
-                if (!peticionCategorias) {
                     var configHttp = {
                         method: "GET",
                         url: URL_BASE.urlBase + API_PATH.categorias,
@@ -905,15 +901,6 @@ angular.module('farmApp.services', [])
                                 reject(err);
                             });
                     });
-                } else {
-                    return $q(function (resolve, reject) {
-                        if (categorias.length > 0) {
-                            resolve(categorias);
-                        } else {
-                            reject([]);
-                        }
-                    });
-                }
             };
             var get_categoria = function(id){
                 if (!peticionCategorias) {
@@ -1081,7 +1068,7 @@ angular.module('farmApp.services', [])
                 }
             };
         })
-        .factory('Carrito', function ($q, $http, User, Direcciones, Descuentos, 
+        .factory('Carrito', function ($q, $http, User, Direcciones, Descuentos,
                                       ImageService, FileService, PedidosPeriodicos,
                                       URL_BASE, AUTH_PATH, API_PATH) {
 
@@ -1166,7 +1153,7 @@ angular.module('farmApp.services', [])
                     if(!encontrado){
                         productos.push(item);
                     }
-                    
+
                     window.localStorage.setItem('carrito', JSON.stringify(productos));
                     sumarTotal();
                     return true;
@@ -1228,19 +1215,27 @@ angular.module('farmApp.services', [])
                     var totales = {
                         subtotal: 0.0,
                         descuento: 0.0,
+                        inapam: 0.0,
                         iva: 0.0,
                         total: 0.0
                     };
-                    var subT = 0.0, desc = 0.0;
+                    var subT = 0.0, desc = 0.0, descInapam = 0.0;
+                    var user = User.getUser();
                     for (var cont = 0; cont <= productos.length - 1; cont++) {
                         subT = productos[cont].price * productos[cont].quantity;
                         desc = Descuentos.calcularDescuento(productos[cont]);
                         totales.subtotal += subT;
                         totales.descuento += desc;
-                        totales.iva += Descuentos.calcularIva(productos[cont],subT, desc);
+                        if(user.inapam == true){
+                            descInapam = (subT - desc) * 0.10;
+                            totales.inapam += descInapam;
+                        }else{
+                            descInapam = 0.0;
+                        }
+                        totales.iva += Descuentos.calcularIva(productos[cont],subT, desc + descInapam);
                     }
 
-                    totales.total = totales.subtotal - totales.descuento + totales.iva;
+                    totales.total = totales.subtotal - totales.descuento - totales.inapam + totales.iva;
 
                     return totales;
 
@@ -1465,8 +1460,8 @@ angular.module('farmApp.services', [])
                             break;
                         }
                     }
-                    if (!encontrado) {
-                        return $q(function(resolve, reject){
+                    return $q(function(resolve, reject){
+                        if(!encontrado){
                             add_pedido_periodico(producto,venta).then(function (pedido) {
                                 delete producto.periodico;
                                 pedido.product = producto;
@@ -1476,9 +1471,10 @@ angular.module('farmApp.services', [])
                             }, function (err) {
                                 reject(err);
                             });
-                        });
-                    }
-                    return !encontrado;
+                        }else{
+                            reject({'detail': producto.name + ' ya se encuentra en pedidos periodicos'});
+                        }
+                    });
                 },
                 editPedido: function(pedido){
                     var pedidos = User.getPedidosPeriodicos();
@@ -1752,6 +1748,7 @@ angular.module('farmApp.services', [])
                     recordatorios[cont].monday_to_friday = only_monday_to_friday(recordatorios[cont]);
                     recordatorios[cont].leyend = getIntervaloString(recordatorios[cont]);
                     recordatorios[cont].tiempo = get_tiempo(recordatorios[cont]);
+                    recordatorios[cont].tiempo_12h = get_tiempo_12h(recordatorios[cont]);
                     console.log(recordatorios[cont]);
                 }
                 return recordatorios;
@@ -1837,14 +1834,28 @@ angular.module('farmApp.services', [])
                     "minutos": "00",
                     "horario": 'am'
                 };
-                var hora = (parseInt(arreglo[0])>12)?parseInt(arreglo[0])-12:parseInt(arreglo[0]);
-                var minutos = parseInt(arreglo[1]);
-                var horario = (parseInt(arreglo[0])>12)?'pm':'am';
+                var iHora = parseInt(arreglo[0],10);
+                var hora = ((iHora<10)?'0'+iHora:iHora);
+                var minutos = parseInt(arreglo[1],10);
+                var horario = (iHora>=12)?'pm':'am';
                 tiempo.hora = ((hora<10)?"0"+hora:""+hora);
                 tiempo.minutos = ((minutos<10)?"0"+minutos:""+minutos);
                 tiempo.horario = horario;
                 return tiempo;
 
+            };
+
+            var get_tiempo_12h = function(recordatorio){
+                var tiempo = get_tiempo(recordatorio);
+                var iHora = parseInt(tiempo.hora,10);
+                if(iHora >= 12 ){
+                    iHora = iHora - 12;
+                    tiempo.hora = ((iHora<10)?'0'+iHora:iHora);
+                    tiempo.horario = 'pm';
+                }else{
+                    tiempo.horario = 'am';
+                }
+                return tiempo;
             };
 
             var get_minutes_corrects = function(minutos){
@@ -1858,14 +1869,14 @@ angular.module('farmApp.services', [])
             };
 
             var get_time = function(recordatorio){
-                var hora = parseInt(recordatorio.tiempo.hora);
-                var minutos = parseInt(recordatorio.tiempo.minutos);
+                var hora = parseInt(recordatorio.tiempo.hora,10);
+                var minutos = parseInt(recordatorio.tiempo.minutos,10);
                 var horario = recordatorio.tiempo.horario;
-                if(horario == "pm" && hora <= 11){
+                /*if(horario == "pm" && hora <= 11){
                     hora += 12;
                 }else if(horario == "am" && hora == 12){
                     hora = 0;
-                }
+                }*/
                 return ((hora<10)?"0"+hora:hora) + ":" + ((minutos<10)?"0"+minutos:minutos) + ":00";
             };
 
@@ -1889,6 +1900,40 @@ angular.module('farmApp.services', [])
                 }
             };
 
+            var get_next_day = function(tiempo, dayWeek){
+                var now = new Date();
+                var dia = 0;
+                now.setHours(parseInt(tiempo.hora,10));
+                now.setMinutes(parseInt(tiempo.minutos,10));
+                now.setSeconds(0);
+                if(now.getDay()==dayWeek){
+                    var now2 = new Date();
+                    if(now.getHours()<now2.getHours()){
+                        dia = 7;
+                    }else if(now.getHours()==now2.getHours()){
+                        if(now.getMinutes()<now2.getMinutes()){
+                            dia = 7;
+                        }else{
+                            dia = 0;
+                        }
+                    }else{
+                        dia = 0;
+                    }
+                }else if(dayWeek==0){
+                    dia = 7 - now.getDay();
+                }else{
+                    dia = dayWeek - now.getDay();
+                }
+                now.setDate(now.getDate()+dia);
+                return now;
+            };
+
+            var get_array_ids = function(id){
+                var numero = id * 10;
+                var arreglo = [numero+1,numero+2,numero+3,numero+4,numero+5,numero+6,numero+7];
+                return arreglo;
+            };
+
             var post_reminder = function(reminder) {
                 var configHttp = {
                     method: "POST",
@@ -1898,7 +1943,7 @@ angular.module('farmApp.services', [])
                         "Authorization": "Token " + User.getAuthToken()
                     },
                     data: {
-                        "message": reminder.message, 
+                        "message": reminder.title,
                         "title": reminder.title, "time": reminder.time, "monday": reminder.monday,
                     "tuesday":reminder.tuesday, "wednesday":reminder.wednesday, "thursday":reminder.thursday,
                     "friday": reminder.friday, "saturday": reminder.saturday, "sunday": reminder.sunday,
@@ -1973,6 +2018,53 @@ angular.module('farmApp.services', [])
                 });
             };
 
+            var parsear_recordatorios = function(recordatorio){
+                var semana = [];
+                var dia = {id:0, at: null};
+                var dias = [recordatorio.sunday, recordatorio.monday, recordatorio.tuesday,
+                recordatorio.wednesday, recordatorio.thursday, recordatorio.friday, recordatorio.saturday];
+                var tiempo = get_tiempo(recordatorio);
+                for(var cont=1; cont<8; cont++){
+                    if(dias[cont-1]==true){
+                        dia.id = (recordatorio.id*10) + cont;
+                        dia.at = get_next_day(tiempo, cont-1);
+                        semana.push(dia);
+                        dia = {id:0, at: null};
+                    }
+                }
+                var notificaciones = [];
+                var event = {
+                    id: 0,
+                    at: null,
+                    title: recordatorio.title,
+                    text: recordatorio.title,
+                    every: 'week',
+                    icon: 'res://icon.png', 
+                    smallIcon: 'res://icon.png',
+                    data: {
+                        reminderId: recordatorio.id
+                    }
+                };
+                for(var i = 0; i < semana.length; i++){
+                    event.id = semana[i].id;
+                    event.at = semana[i].at;
+                    notificaciones.push(event);
+                    event = {
+                        id: 0,
+                        at: null,
+                        title: recordatorio.title,
+                        text: recordatorio.title,
+                        every: 'week',
+                        icon: 'res://icon.png', 
+                        smallIcon: 'res://icon.png',
+                        data: {
+                            reminderId: recordatorio.id
+                        }
+                    };
+                }
+                return notificaciones;
+            }
+
 
             return {
                 add: post_reminder,
@@ -1982,7 +2074,10 @@ angular.module('farmApp.services', [])
                 delete: delete_reminder,
                 getEmpty: get_recordatorio_vacia,
                 getLeyendEdit: get_leyend_edit,
-                getParseTime: get_time
+                getParseTime: get_time,
+                getParserNotificaciones: parsear_recordatorios,
+                getArrayIds: get_array_ids
+
             };
         })
         ;

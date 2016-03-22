@@ -29,7 +29,7 @@
                 <div class="input-label">
                     Minutos
                 </div>
-                <select ng-change="changeTime()" ng-model="recordatorio.tiempo.minutos" ng-options="minutos for minutos in ['00', '05', '10', '15','20', '25', '30', '35','40', '45', '55']">
+                <select ng-change="changeTime()" ng-model="recordatorio.tiempo.minutos" ng-options="minutos for minutos in ['00', '05', '10', '15','20', '25', '30', '35','40', '45','50','55']">
                 </select>
             </label>
             <!--label class="item item-input item-select">
@@ -46,18 +46,6 @@
                 <select ng-model="seleccion.repetir" ng-options="dato for dato in ['Todos los dias', 'Sabado y Domingo', 'Lunes a Viernes', 'Personalizar']">
                 </select>
             </label>
-            <div class="item item-checkbox" ng-show="seleccion.repetir==='Personalizar'">
-                <label class="checkbox">
-                    <input type="checkbox" ng-model="recordatorio.sunday">
-                </label>
-                Domingo
-            </div>
-            <div class="item item-checkbox" ng-show="seleccion.repetir==='Personalizar'">
-                <label class="checkbox">
-                    <input type="checkbox" ng-model="recordatorio.saturday">
-                </label>
-                Sabado
-            </div>
             <div class="item item-checkbox" ng-show="seleccion.repetir==='Personalizar'">
                 <label class="checkbox">
                     <input type="checkbox" ng-model="recordatorio.monday">
@@ -87,6 +75,18 @@
                     <input type="checkbox" ng-model="recordatorio.friday">
                 </label>
                 Viernes
+            </div>
+            <div class="item item-checkbox" ng-show="seleccion.repetir==='Personalizar'">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="recordatorio.saturday">
+                </label>
+                Sabado
+            </div>
+            <div class="item item-checkbox" ng-show="seleccion.repetir==='Personalizar'">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="recordatorio.sunday">
+                </label>
+                Domingo
             </div>
             <label class="item">
                 <button class="button button-block button-balanced" ng-click="add()">Guardar</button>

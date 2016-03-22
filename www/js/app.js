@@ -8,7 +8,8 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                            'farmApp.controllers','farmApp.directives',
                            'farmApp.services','ngAnimate'])
 
-        .run(function ($ionicPlatform, $rootScope, $timeout) {
+        .run(function ($ionicPlatform, $rootScope, $timeout, $ionicPopup , 
+            $state, User, $ionicPush, $cordovaLocalNotification) {
             $ionicPlatform.ready(function () {
                 // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
                 // for form inputs)
@@ -30,6 +31,59 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                 /*var deviceSessionId = OpenPay.deviceData.setup();
                 
                 localStorage.setItem('device_session_id',deviceSessionId);*/
+                
+                $ionicPush.init({
+                    "onNotification": function (notification) {
+                        var payload = notification._payload;
+                        console.log(notification);
+                        //alert(JSON.stringify(notification));
+                        $ionicPopup.alert({
+                            title: notification.title,
+                            template: notification.text
+                        });
+                        if(payload.reminderId){
+                            $state.go('app.viewRecordatorio',{'recordatorioId': payload.reminderId});
+                        }
+                        if(payload.saleId){
+                            $state.go('app.viewPedido',{'pedidoId': payload.saleId});
+                        }
+                        if(payload.inapam){
+                            User.me().then(function(user){
+                               $state.go('app.perfil'); 
+                            });
+                        }
+                    },
+                    "onRegister": function (data) {
+                        console.log("Login Token Phone: " + data.token);
+                        //alert("Login Token Phone: " + data.token);
+                        if(!User.hasTokenPhone()){
+                            User.addTokenPhone(data.token);
+                        }else{
+                            User.updateTokenPhone(data.token);
+                        }
+                    },
+                    "onError": function(e){
+                      console.log(e);
+                    },
+                    "pluginConfig": {
+                      "ios": {
+                        "badge": true,
+                        "sound": true
+                       },
+                       "android": {
+                         "sound": true,
+                         "vibrate": true
+                       }
+                    }
+                });
+                $ionicPush.register();
+                
+                $cordovaLocalNotification.registerPermission().then(function () {
+                    console.log("LocalNotification: registered");
+                }, function () {
+                    console.log("LocalNotification: denied registration");
+                });
+
                            
             });
         })

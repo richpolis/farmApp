@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" id="com.ionicframework.farmapp590361" version="1.0.5">
-  <name>farmApp</name>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" id="com.ionicframework.farmapp590361" version="1.0.6">
+  <name>FARMAAPP</name>
   <description>
-        Un app venta mostrador para pedidos de farmaApp.
+        Un app venta mostrador para pedidos de FARMAAPP.
     </description>
   <author email="richpolis@gmail.com" href="http://farmaapp.mx/">
       Richpolis Systems

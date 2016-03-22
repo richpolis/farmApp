@@ -90,6 +90,14 @@
                         -{{ totales.descuento|currency:"$" }}
                     </div>
                 </div>
+                <div class="row" ng-if="totales.inapam > 0">
+                    <div class="col">
+                        Inapam -10%:
+                    </div>
+                    <div class="col text-right">
+                        -{{ totales.inapam|currency:"$" }}
+                    </div>
+                </div>
                 <div class="row" ng-if="totales.iva > 0">
                     <div class="col">
                         IVA:

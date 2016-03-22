@@ -20,7 +20,7 @@
             Selecciona una Categoría:
         </p>
         <ion-list>
-            <ion-item class="item-avatar item-balanced" ng-repeat="categoria in categorias" href="#/app/productos/{{categoria.id}}">
+            <ion-item class="item-avatar item-balanced" ng-repeat="categoria in categorias|orderBy:'position':false" href="#/app/productos/{{categoria.id}}">
                 <img ng-src="{{categoria.image}}" style="width: 60px; height: 60px;" />
                 <h2 style="color: white;">{{categoria.name}}</h2>
             </ion-item>
