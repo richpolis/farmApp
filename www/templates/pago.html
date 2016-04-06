@@ -1,5 +1,5 @@
 <ion-view view-title="Pago">
-    <ion-content has-footer="true" has-header="true" padding="true" style="margin-bottom: 60px;">
+    <ion-content has-header="true" padding="true">
         <div class="row" ng-show="hasProductsWithRecipe">
             <div class="col balanced-bg text-center" style="color: white;">1</div>
             <div class="col balanced-bg text-center" style="color: white;">2</div>
@@ -45,15 +45,42 @@
         <form ng-show="seleccion.numero==0" id="formRegister" ng-submit="doPago()">
             <div class="list">
                 <label class="item item-input">
+                    <span class="input-label">Nombre: </span>
                     <input type="text" name="name" ng-model="tarjeta.card.name" placeholder="Nombre de cliente">
                 </label>
                 <label class="item item-input">
-                    <input type="text" name="number" ng-model="tarjeta.card.number" placeholder="Numero de tarjeta">
+                    <span class="input-label">Numero de tarjeta:</span>
+                    <input type="hidden" name="number" ng-model="tarjeta.card.number" placeholder="Numero de tarjeta">
                 </label>
                 <div class="row">
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="exp_month" ng-model="tarjeta.card.exp_month" placeholder="MM" maxlength="2" style="text-align: center;">
+                            <input type="text" style="padding-right: 10px;" placeholder="----" name="tarj_part1" id="tarj_part1" ng-model="tarj.part1" placeholder="" maxlength="4" style="text-align: center;" ng-keyup="overTarjeta1()">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" style="padding-right: 10px;" placeholder="----" name="tarj_part2" id="tarj_part2" ng-model="tarj.part2" placeholder="" maxlength="4" style="text-align: center;" ng-keyup="overTarjeta2()">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" style="padding-right: 10px;" placeholder="----" name="tarj_part3" id="tarj_part3" ng-model="tarj.part3" placeholder="" maxlength="4" style="text-align: center;" ng-keyup="overTarjeta3()">
+                        </label>
+                    </div>
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" style="padding-right: 10px;" placeholder="----" name="tarj_part4" id="tarj_part4" ng-model="tarj.part4" placeholder="" maxlength="4" style="text-align: center;" ng-keyup="overTarjeta4()">
+                        </label>
+                    </div>
+                </div>
+                <label class="item item-input">
+                    <span class="input-label">Vigencias y CVC:</span>
+                </label>
+                <div class="row">
+                    <div class="col">
+                        <label class="item item-input">
+                            <input type="text" style="padding-right: 10px;" name="exp_month" id="exp_month" ng-model="tarjeta.card.exp_month" placeholder="MM" maxlength="2" style="text-align: center;">
                         </label>
                     </div>
                     <div class="col">
@@ -63,12 +90,12 @@
                     </div>
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="exp_year" ng-model="tarjeta.card.exp_year" placeholder="AAAA" maxlength="4" style="text-align: center;">
+                            <input type="text" style="padding-right: 10px;" name="exp_year" id="exp_year" ng-model="tarjeta.card.exp_year" placeholder="AAAA" maxlength="4" style="text-align: center;">
                         </label>
                     </div>
                     <div class="col">
                         <label class="item item-input">
-                            <input type="text" name="cvc" ng-model="tarjeta.card.cvc" placeholder="CVC" maxlength="4" style="text-align: center;">
+                            <input type="text" style="padding-right: 10px;" name="cvc" id="cvc" ng-model="tarjeta.card.cvc" placeholder="CVC" maxlength="4" style="text-align: center;">
                         </label>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" id="com.ionicframework.farmapp590361" version="1.0.6">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" id="com.ionicframework.farmapp590361" version="1.0.9">
   <name>FARMAAPP</name>
   <description>
         Un app venta mostrador para pedidos de FARMAAPP.
@@ -12,6 +12,11 @@
   <access origin="http://maps.google.com"/>
   <access launch-external="yes" origin="tel:*"/>
   <allow-intent href="tel:*"/>
+  <!-- The above is equivalent to these three declarations -->
+  <allow-navigation href="http://*/*" />
+  <allow-navigation href="https://*/*" />
+  <allow-navigation href="data:*" />
+  
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>
@@ -64,5 +69,5 @@
     <splash src="resources/ios/splash/Default@2x~iphone.png" width="640" height="960"/>
     <splash src="resources/ios/splash/Default~iphone.png" width="320" height="480"/>
   </platform>
-  <icon src="resources/android/icon/drawable-xhdpi-icon.png"/>
+  <icon src="resources/android/icon/drawable-xhdpi-icon.png"/>  
 </widget>

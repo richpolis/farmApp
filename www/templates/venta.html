@@ -66,12 +66,12 @@
                 </div>
             </div>
             <ion-item style="background-color: #2EC7C7; color: white;">
-                <div class="row" ng-if="pedido.subtotal > 0">
+                <div class="row" ng-if="pedido.subtotal > 0.0">
                     <div class="col">
                         Subtotal:
                     </div>
                     <div class="col text-right">
-                        {{ totales.subtotal|currency:"$" }}
+                        {{ pedido.subtotal|currency:"$" }}
                     </div>
                 </div>
                 <div class="row" ng-if="pedido.descuento > 0">
@@ -82,12 +82,52 @@
                         -{{ pedido.descuento|currency:"$" }}
                     </div>
                 </div>
+                <div class="row" ng-if="pedido.discount > 0">
+                    <div class="col">
+                        Descuento:
+                    </div>
+                    <div class="col text-right">
+                        -{{ pedido.discount|currency:"$" }}
+                    </div>
+                </div>
+                <div class="row" ng-if="pedido.inapam > 0">
+                    <div class="col">
+                        Inapam -10%:
+                    </div>
+                    <div class="col text-right">
+                        -{{ pedido.inapam|currency:"$" }}
+                    </div>
+                </div>
+                <div class="row" ng-if="pedido.discount_inapam > 0">
+                    <div class="col">
+                        Inapam -10%:
+                    </div>
+                    <div class="col text-right">
+                        -{{ pedido.discount_inapam|currency:"$" }}
+                    </div>
+                </div>
                 <div class="row" ng-if="pedido.iva > 0">
                     <div class="col">
                         IVA:
                     </div>
                     <div class="col text-right">
                         {{ pedido.iva|currency:"$" }}
+                    </div>
+                </div>
+                <div class="row" ng-if="pedido.tax > 0">
+                    <div class="col">
+                        IVA:
+                    </div>
+                    <div class="col text-right">
+                        {{ pedido.tax|currency:"$" }}
+                    </div>
+                </div>
+                <div class="row" ng-if="pedido.shipping > 0">
+                    <div class="col">
+                        Envio:
+                    </div>
+                    <div class="col text-right">
+                        {{ pedido.shipping|currency:"$" }}
                     </div>
                 </div>
                 <div class="row">

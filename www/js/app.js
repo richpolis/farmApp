@@ -9,7 +9,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                            'farmApp.services','ngAnimate'])
 
         .run(function ($ionicPlatform, $rootScope, $timeout, $ionicPopup , 
-            $state, User, $ionicPush, $cordovaLocalNotification) {
+            $state, User, Loader, $ionicPush, $cordovaLocalNotification) {
             $ionicPlatform.ready(function () {
                 // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
                 // for form inputs)
@@ -34,32 +34,35 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                 
                 $ionicPush.init({
                     "onNotification": function (notification) {
-                        var payload = notification._payload;
-                        console.log(notification);
-                        //alert(JSON.stringify(notification));
+                        var payload = notification.payload || notification._payload || {};
+                        console.log(JSON.stringify(payload));
+                        //alert(JSON.stringify(payload));
+                        //alert(payload.reminderId || payload.saleId || payload.inapam || "ninguno");
+                        
                         $ionicPopup.alert({
                             title: notification.title,
                             template: notification.text
                         });
-                        if(payload.reminderId){
+                        if(payload.reminderId && payload.reminderId > 0){
                             $state.go('app.viewRecordatorio',{'recordatorioId': payload.reminderId});
                         }
-                        if(payload.saleId){
+                        if(payload.saleId && payload.saleId > 0){
                             $state.go('app.viewPedido',{'pedidoId': payload.saleId});
                         }
                         if(payload.inapam){
-                            User.me().then(function(user){
-                               $state.go('app.perfil'); 
-                            });
+                            //alert(window.location.hash);
+                            $state.go('app.perfil');
                         }
                     },
                     "onRegister": function (data) {
                         console.log("Login Token Phone: " + data.token);
-                        //alert("Login Token Phone: " + data.token);
-                        if(!User.hasTokenPhone()){
-                            User.addTokenPhone(data.token);
-                        }else{
-                            User.updateTokenPhone(data.token);
+                        window.localStorage.setItem('gcmid', JSON.stringify(data.token));
+                        if(User.hasUser()){
+                            if(!User.hasTokenPhone()){
+                                User.addTokenPhone(data.token);
+                            }else{
+                                User.updateTokenPhone(data.token);
+                            }
                         }
                     },
                     "onError": function(e){

@@ -1,6 +1,6 @@
 {
   "name": "FARMAAPP",
-  "version": "1.0.6",
+  "version": "1.0.9",
   "description": "App para punto de venta de FARMAAPP",
   "dependencies": {
     "gulp": "^3.5.6",
@@ -24,7 +24,13 @@
       "locator": "https://github.com/platanus/PushNotification.git",
       "id": "com.phonegap.plugins.PushPlugin"
     },
-    "phonegap-plugin-push"
+    {
+      "variables": {
+        "SENDER_ID": "1012709617565"
+      },
+      "locator": "phonegap-plugin-push",
+      "id": "phonegap-plugin-push"
+    }
   ],
   "cordovaPlatforms": [
     "android"

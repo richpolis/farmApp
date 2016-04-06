@@ -72,30 +72,18 @@ angular.module('farmApp.services', [])
                             });
                     });
                 },
-                empty: function(storageKey){
+                empty: function (storageKey) {
+                    var images = this.images(storageKey);
                     var self = this;
-                    return $q(function(resolve, reject){
-                       var imagenes = self.images(storageKey);
-                       var images = self.images(storageKey);
-                        for(var cont=0; cont<imagenes.length; cont++){
-                            var name = imagenes[cont].substr(imagenes[cont].lastIndexOf('/') + 1);
-                            var indexImage = images.indexOf(imagenes[cont]);
-                            $cordovaFile.removeFile(cordova.file.dataDirectory, name)
-                                    .then(function (success) {
-                                        images.splice(indexImage, 1);
-                                        window.localStorage.setItem(storageKey, JSON.stringify(images));
-                                        if(images.length==0){
-                                            resolve(images);
-                                        }
-                                    }, function (error) {
-                                        console.log("No es posible eliminar el archivo");
-                                        if(images.length>0){
-                                            reject({'detail':'No fue posible eliminar todas las imagenes'});
-                                        }
-                                    });
-                        }
-                        
-                    });
+                    if (images.length > 0) {
+                        this.removeImage(images[0], storageKey).then(function (imagenes) {
+                            return self.emtpy(storageKey);
+                        }, function (err) {
+                            return err;
+                        })
+                    }else{
+                        return images;
+                    }
                 }
             }
         })
@@ -190,17 +178,6 @@ angular.module('farmApp.services', [])
                 createId: makeid,
                 handleMediaDialog: saveMedia,
                 uploadRecepies: function (image, params, headers) {
-                    /*var ft =  new FileTransfer();
-                    Loader.showLoading("Cargando imagenes");
-                    for (var i = 0; i < images.length; i++) {
-                        Loader.showLoading("Cargando " + i + "/" + images.length);
-                        var image = images[i];
-                        var urlImage = FileService.getUrlForImage(image);
-                        ft.upload(urlImage,
-                            encodeURI(URL_BASE.urlBase + API_PATH.images_ventas),
-                            savedFile(image, onSuccess), onError, getImageUploadRecepiesOptions(urlImage, params, headers));
-                    }
-                    Loader.hideLoading();*/
                     return $q(function(resolve, reject) {
                         var url = URL_BASE.urlBase + API_PATH.images_ventas;
                         var filePath = FileService.getUrlForImage(image);
@@ -217,7 +194,7 @@ angular.module('farmApp.services', [])
                               console.log(JSON.stringify(err));
                               reject(err);
                             }, function (progress) {
-                              Loader.showLoading((progress.loaded / progress.total) * 100);
+                              Loader.showLoading(Math.ceil((progress.loaded / progress.total) * 100)+'%');
                             });
 
                     });
@@ -228,11 +205,6 @@ angular.module('farmApp.services', [])
                         var url = URL_BASE.urlBase + API_PATH.images_inapam;
                         var filePath = FileService.getUrlForImage(image);
                         var options = getImageUploadInapamOptions(filePath, params, headers);
-                        /*
-                         ft.upload(urlImage,
-                            encodeURI(URL_BASE.urlBase + API_PATH.images_inapam),
-                            savedFile(image, onSuccess), onError, getImageUploadInapamOptions(urlImage, params, headers));
-                         */
                         $cordovaFileTransfer.upload(url, filePath, options)
                             .then(function(result) {
                               Loader.hideLoading();
@@ -245,7 +217,7 @@ angular.module('farmApp.services', [])
                               console.log(JSON.stringify(err));
                               reject(err);
                             }, function (progress) {
-                              Loader.showLoading((progress.loaded / progress.total) * 100);
+                              Loader.showLoading(Math.ceil((progress.loaded / progress.total) * 100)+'%');
                             });
 
                     });
@@ -434,9 +406,11 @@ angular.module('farmApp.services', [])
                 return $q(function (resolve, reject) {
                     $http(configHttp)
                             .success(function (data) {
-                                user = data;
-                                window.localStorage.setItem('user', JSON.stringify(user));
-                                resolve(data);
+                                user_me().then(function(data){
+                                    resolve(data);
+                                }, function(err){
+                                    reject(err);
+                                })
                             })
                             .error(function (err) {
                                 reject(err);
@@ -560,17 +534,18 @@ angular.module('farmApp.services', [])
                     var tokenPhone = this.getTokenPhone();
                     return tokenPhone.id != 0;
                 },
-                tokenPhoneIsEqual: function(){
-                    this.getUser();
-                    var token = this.getTokenPhone();
-                    if(tokenPhone.token && tokenPhone.token == token.token){
+                tokenPhoneIsEqual: function(gcmid){
+                    var tokenPhone = this.getTokenPhone();
+                    console.log(tokenPhone);
+                    console.log(gcmid);
+                    if(tokenPhone.token && tokenPhone.token == gcmid){
                         return true;
                     }else{
                         return false;
                     }
                 },
                 getTokenPhone: function () {
-                    if(user.token_phone.length && user.token_phone.length > 0){
+                    if(user.token_phone && user.token_phone.length && user.token_phone.length > 0){
                         return user.token_phone[0];
                     }else{
                         return {id: 0, token:''};
@@ -590,6 +565,9 @@ angular.module('farmApp.services', [])
                     return $q(function (resolve, reject) {
                         $http(configHttp)
                                 .success(function (data) {
+                                    if(!user.token_phone){
+                                        user.token_phone = [];
+                                    }
                                     user.token_phone.push(data);
                                     tokenPhone = data;
                                     window.localStorage.setItem('user', JSON.stringify(user));
@@ -1216,6 +1194,7 @@ angular.module('farmApp.services', [])
                         subtotal: 0.0,
                         descuento: 0.0,
                         inapam: 0.0,
+                        shipping: 25.0,
                         iva: 0.0,
                         total: 0.0
                     };
@@ -1234,9 +1213,10 @@ angular.module('farmApp.services', [])
                         }
                         totales.iva += Descuentos.calcularIva(productos[cont],subT, desc + descInapam);
                     }
-
-                    totales.total = totales.subtotal - totales.descuento - totales.inapam + totales.iva;
-
+                    if(productos.length == 0){
+                        totales.shipping = 0.0;
+                    }
+                    totales.total = totales.subtotal - totales.descuento - totales.inapam + totales.shipping + totales.iva;
                     return totales;
 
                 },
@@ -1611,11 +1591,11 @@ angular.module('farmApp.services', [])
             var get_tarjeta_token = function(tarjeta){
               return $q(function(resolve, reject){
                   var data = {
-                      "card_number": tarjeta.card.number,
+                      "card_number": tarjeta.card.number +'',
                       "holder_name": tarjeta.card.name,
-                      "expiration_year": tarjeta.card.exp_year.substring(2),
-                      "expiration_month": tarjeta.card.exp_month,
-                      "cvv2": tarjeta.card.cvc
+                      "expiration_year": (tarjeta.card.exp_year + '').substring(2),
+                      "expiration_month": tarjeta.card.exp_month+'',
+                      "cvv2": tarjeta.card.cvc + ''
                   };
                   console.log(data);
                   OpenPay.token.create(data, function(token){
@@ -1641,21 +1621,21 @@ angular.module('farmApp.services', [])
               });
             };
             var validar_tarjeta = function(tarjeta){
-                return OpenPay.card.validateCardNumber(tarjeta.card.number);
+                return OpenPay.card.validateCardNumber(tarjeta.card.number + '');
             };
             var validar_fecha_expiracion = function(tarjeta){
                 var exp_month = tarjeta.card.exp_month || tarjeta.exp_month;
                 var exp_year = tarjeta.card.exp_year || tarjeta.exp_year;
-                if(exp_year.length==2){
+                if((exp_year + '').length==2){
                   exp_year = "20" + exp_year;
                 }
-                return OpenPay.card.validateExpiry(exp_month, exp_year);
+                return OpenPay.card.validateExpiry(exp_month + '', exp_year + '');
             };
             var validar_cvc = function(tarjeta){
-                return OpenPay.card.validateCVC(tarjeta.card.cvc, tarjeta.card.number);
+                return OpenPay.card.validateCVC(tarjeta.card.cvc + '', tarjeta.card.number + '');
             };
             var validar_brand = function(tarjeta){
-                var brand = OpenPay.card.cardType(tarjeta.card.number);
+                var brand = OpenPay.card.cardType(tarjeta.card.number + '');
                 console.log("brand: " + brand);
                 return brand != "American Express";
             };
@@ -1671,8 +1651,13 @@ angular.module('farmApp.services', [])
                 getDeviceSessionId: get_device_session_id
             };
         })
-        .factory('Contacto',function($q, $http, URL_BASE, API_PATH){
+        .factory('Contacto',function($q, $http, User, URL_BASE, API_PATH){
             var enviar_contacto = function(object) {
+                var user = User.getUser();
+                object.name = user.first_name + " " + user.last_name;
+                object.email = user.email;
+                object.phone = user.cell;
+                object.subject = "Contacto desde app";
                 var configHttp = {
                     method: "POST",
                     url: URL_BASE.urlBase + API_PATH.contacto,
@@ -1834,10 +1819,9 @@ angular.module('farmApp.services', [])
                     "minutos": "00",
                     "horario": 'am'
                 };
-                var iHora = parseInt(arreglo[0],10);
-                var hora = ((iHora<10)?'0'+iHora:iHora);
+                var hora = parseInt(arreglo[0],10);
                 var minutos = parseInt(arreglo[1],10);
-                var horario = (iHora>=12)?'pm':'am';
+                var horario = (hora>=12)?'pm':'am';
                 tiempo.hora = ((hora<10)?"0"+hora:""+hora);
                 tiempo.minutos = ((minutos<10)?"0"+minutos:""+minutos);
                 tiempo.horario = horario;
@@ -1849,7 +1833,7 @@ angular.module('farmApp.services', [])
                 var tiempo = get_tiempo(recordatorio);
                 var iHora = parseInt(tiempo.hora,10);
                 if(iHora >= 12 ){
-                    iHora = iHora - 12;
+                    iHora = iHora - ((iHora>12)?12:0);
                     tiempo.hora = ((iHora<10)?'0'+iHora:iHora);
                     tiempo.horario = 'pm';
                 }else{
@@ -1905,7 +1889,7 @@ angular.module('farmApp.services', [])
                 var dia = 0;
                 now.setHours(parseInt(tiempo.hora,10));
                 now.setMinutes(parseInt(tiempo.minutos,10));
-                now.setSeconds(0);
+                //now.setSeconds(1);
                 if(now.getDay()==dayWeek){
                     var now2 = new Date();
                     if(now.getHours()<now2.getHours()){

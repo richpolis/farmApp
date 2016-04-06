@@ -39,29 +39,26 @@
             <div class="item text-center">
                 ¿Cada cuando te lo enviamos?
             </div>
-            <div class="item">
+            <div class="item" style="padding: 0;">
                 <div class="row">
                     <div class="col">
-                        <label class="item item-radio">
-                            <input ng-model="productoSeleccionado.periodico.period" type="radio" name="period" ng-value=" 'por dia' ">
-                            <div class="item-content">Dias</div>
-                            <i class="radio-icon ion-checkmark"></i>
-                        </label>
+                        <button 
+                            ng-click="productoSeleccionado.periodico.period = 'por dia'" 
+                            ng-class="{'button-balanced': productoSeleccionado.periodico.period != 'por dia', 'button-assertive': productoSeleccionado.periodico.period == 'por dia'}"
+                            class="button button-block button-balanced">Dias</button>
                     </div>
                     <div class="col">
-                        <label class="item item-radio">
-                            <input ng-model="productoSeleccionado.periodico.period" type="radio" name="period" ng-value=" 'semanal' ">
-                            <div class="item-content">Semanal</div>
-                            <i class="radio-icon ion-checkmark"></i>
-                        </label>
+                        <button 
+                            ng-click="productoSeleccionado.periodico.period = 'semanal'" 
+                            ng-class="{'button-balanced': productoSeleccionado.periodico.period != 'semanal', 'button-assertive': productoSeleccionado.periodico.period == 'semanal'}"
+                            class="button button-block button-balanced">Semanal</button>
                     </div>
                     <div class="col">
-                        <label class="item item-radio">
-                            <input ng-model="productoSeleccionado.periodico.period" type="radio" name="period" ng-value=" 'mensual' ">
-                            <div class="item-content">Mensual</div>
-                            <i class="radio-icon ion-checkmark"></i>
-                        </label>
-                    </div>    
+                        <button 
+                            ng-click="productoSeleccionado.periodico.period = 'mensual'" 
+                            ng-class="{'button-balanced': productoSeleccionado.periodico.period != 'mensual', 'button-assertive': productoSeleccionado.periodico.period == 'mensual'}"
+                            class="button button-block button-balanced">Mensual</button>
+                    </div>
                 </div>
             </div>
             <div class="item text-center" ng-if="productoSeleccionado.periodico.period == 'por dia'">
