@@ -1,7 +1,7 @@
 <ion-view cache-view="false" view-title="Carrito">
     <ion-content>
         <ion-list>
-            <div class="item-text-wrap" ng-repeat="producto in productos| orderBy:'name' " style="padding: 10px 2px;">
+            <div class="item-text-wrap" ng-repeat="producto in productos| reverse " style="padding: 10px 2px;">
                 <div class="list card" style="padding: .2em;">
                     <div class="item item-thumbnail-left">
                         <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}">
@@ -124,7 +124,7 @@
                 </div>
             </ion-item>
         </ion-list>
-        <p class="text-center balanced" ng-if="productos.length>0">El 2% del total se destinará a la fundación tal</p>
+        <!--p class="text-center balanced" ng-if="productos.length>0">El 2% del total se destinará a la fundación tal</p-->
         <a href="#/app/pedido" class="button button-block button-assertive" ng-if="productos.length>0">Realizar pago</a>
         <a href="#/app/categorias" class="button button-block button-balanced button-clear">Seguir comprando</a>
     </ion-content>

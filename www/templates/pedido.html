@@ -11,23 +11,26 @@
             <div class="col text-center">2</div>
             <div class="col text-center">3</div>
         </div>
+        <p class="text-center">
+            Ingresa tu dirección
+        </p>
+        <button class="button button-block button-balanced icon-right ion-location" ng-click="showModalMap()">
+            Buscar en mapa
+        </button>
         <div class="list" style="margin-bottom: 5px;">
             <label class="item item-input item-select" ng-if="direcciones.length > 0">
                 <div class="input-label">
-                    Direccion guardada
+                    Utilizar dirección guardada:
                 </div>
                 <select ng-model="direccionSeleccionada.id" id="recuperar-direccion">
                     <option selected value="0">Nueva...</option>
                     <option ng-repeat="direccion in direcciones" value="{{direccion.id}}">{{direccion.street}}</option>
                 </select>
             </label>
-            <div class="item item-button-right">
-                Buscar en mapa
-                <button class="button button-balanced" ng-click="showModalMap()">
-                    <i class="icon ion-map"></i>
-                </button>
-            </div>
         </div>
+        <p class="text-center">
+            O ingresa tu dirección
+        </p>
         <form id="formDireccion" ng-submit="doDireccion()">
             <div class="list" style="margin-bottom: 5px;">
                 <label class="item item-input">

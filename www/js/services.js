@@ -817,39 +817,43 @@ angular.module('farmApp.services', [])
             var preguntas = [];
             var peticionPreguntas = false;
             var get_preguntas = function () {
-                if (!peticionPreguntas) {
-                    var configHttp = {
+                var configHttp = {
                         method: "GET",
                         url: URL_BASE.urlBase + API_PATH.preguntas,
                         headers: {
                             "Content-Type": "application/json",
                             "Authorization": "Token " + User.getAuthToken()
                         }
-                    };
-                    return $q(function (resolve, reject) {
+                };
+                return $q(function (resolve, reject) {
                         $http(configHttp)
                             .success(function (data) {
                                 preguntas = data;
                                 window.localStorage.setItem('preguntas', JSON.stringify(preguntas));
-                                peticionPreguntas = true;
                                 resolve(preguntas);
                             })
                             .error(function (err) {
                                 reject(err);
                             });
-                    });
-                } else {
-                    return $q(function (resolve, reject) {
-                        if (preguntas.length > 0) {
-                            resolve(preguntas);
-                        } else {
-                            reject([]);
-                        }
-                    });
-                }
+                });
             };
+            var get_pregunta = function(id){
+                return $q(function (resolve, reject) {
+                    var preguntas = JSON.parse(window.localStorage['preguntas'] || '[]');
+                    var pregunta = {};
+                    for(var cont=0; cont < preguntas.length; cont++){
+                        if(preguntas[cont].id == id){
+                            pregunta = preguntas[cont];
+                            break;
+                        }
+                    }
+                    resolve(pregunta);
+                });
+            }
+            
             return {
-                getPreguntas: get_preguntas
+                getPreguntas: get_preguntas,
+                getPregunta: get_pregunta
             };
 
         })

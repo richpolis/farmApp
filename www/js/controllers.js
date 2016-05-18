@@ -1968,7 +1968,13 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     title: 'Error en preguntas',
                     template: err.detail
                 });
-            })
+            });
+        })
+        .controller('PreguntaController',function($scope, $stateParams, Preguntas){
+            $scope.pregunta = {};
+            Preguntas.getPregunta($stateParams.preguntaId).then(function(pregunta){
+               $scope.pregunta = pregunta; 
+            });
         })
         .controller('RecordatoriosController', function ($scope, $timeout,
         $state, Recordatorios, $ionicPopup) {
@@ -2122,6 +2128,8 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                        
             $scope.title = "Pedido";
 
+            $scope.status_string = JSON.parse(window.localStorage['sale_status'] || '{}');
+
             Pedidos.getPedido($stateParams.pedidoId).then(function(data){
                 $scope.pedido = data;
                 $timeout(function () {
@@ -2136,6 +2144,60 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 });
             });
 
+            // Creamos el modal para finalizar el pago
+            $ionicModal.fromTemplateUrl('templates/pedidoEntregadoModal.html', {
+                scope: $scope
+            }).then(function (pedidoEntregado) {
+                $scope.pedidoEntregado = pedidoEntregado;
+            });
+
+            // Accion para cerrar el pedidoRealizado
+            $scope.closePedidoRealizado = function () {
+                if ($scope.ranking.calificacion > 0) {
+                    User.enviarCalificacion($scope.ranking);
+                }
+                $scope.pedidoEntregado.hide();
+            };
+
+            $scope.ratingArr = [{
+                    value: 1,
+                    icon: 'ion-ios-star-outline'
+                }, {
+                    value: 2,
+                    icon: 'ion-ios-star-outline'
+                }, {
+                    value: 3,
+                    icon: 'ion-ios-star-outline'
+                }, {
+                    value: 4,
+                    icon: 'ion-ios-star-outline'
+                }, {
+                    value: 5,
+                    icon: 'ion-ios-star-outline'
+                }];
+
+            $scope.ranking = {
+                'calificacion': 0,
+                'comentario': "",
+            };
+
+            $scope.setRating = function (val) {
+                $scope.ranking.calificacion = val;
+                var rtgs = $scope.ratingArr;
+                for (var i = 0; i < rtgs.length; i++) {
+                    if (i < val) {
+                        rtgs[i].icon = 'ion-ios-star';
+                    } else {
+                        rtgs[i].icon = 'ion-ios-star-outline';
+                    }
+                }
+            };
+
+            // Accion para mostrar el pedidoRealizado
+            var showPedidoEntregado = function () {
+                $scope.pedidoRealizado.show();
+            };
+
             $scope.removeProducto = function(producto){
                 var confirmPopup = $ionicPopup.confirm({
                     title: 'Confirmacion',
@@ -2149,6 +2211,14 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                     }
                 });
             };
+
+            $scope.$watch('status_string.status', function(){
+            	if($scope.status_string.status && $scope.status_string.status == "Pagado"){
+            		$timeout(function(){
+            			$scope.pedidoRealizado.show();
+            		},2000);
+            	}
+            });
 
         })
         ;

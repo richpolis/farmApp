@@ -47,6 +47,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             $state.go('app.viewRecordatorio',{'recordatorioId': payload.reminderId});
                         }
                         if(payload.saleId && payload.saleId > 0){
+                            window.localStorage.setItem('sale_status', JSON.stringify({'status':payload.status_string}));
                             $state.go('app.viewPedido',{'pedidoId': payload.saleId});
                         }
                         if(payload.inapam){
@@ -203,7 +204,15 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             }
                         }
                     })
-
+                    .state('app.pregunta', {
+                        url: '/preguntas/:preguntaId',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/pregunta.html',
+                                controller: 'PreguntaController'
+                            }
+                        }
+                    })
                     .state('app.periodicos', {
                         url: '/pedidos/periodicos',
                         views: {

@@ -28,4 +28,9 @@ angular.module('farmApp')
     recordatorios: 'api/reminders/',
     contacto: 'contacto/',
     recover_password: 'solicitud/recuperar/password/'
+})
+.filter('reverse', function() {
+  return function(items) {
+    return items.slice().reverse();
+  };
 });
