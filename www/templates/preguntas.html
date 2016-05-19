@@ -1,7 +1,9 @@
 <ion-view view-title="Preguntas">
   <ion-content>
    	<ion-list>
-   	  <ion-item class="item-text-wrap" href="#/app/preguntas/{{pregunta.id}}" ng-repeat="pregunta in preguntas">
+   	  <ion-item class="item-icon-left item-text-wrap balanced" href="#/app/preguntas/{{pregunta.id}}" 
+                    ng-repeat="pregunta in preguntas">
+                <i class="icon ion-help-circled"></i>    
    		<h2 class="balanced">{{pregunta.question}}</h2>
           </ion-item>
    	</ion-list>

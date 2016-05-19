@@ -47,7 +47,8 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             $state.go('app.viewRecordatorio',{'recordatorioId': payload.reminderId});
                         }
                         if(payload.saleId && payload.saleId > 0){
-                            window.localStorage.setItem('sale_status', JSON.stringify({'status':payload.status_string}));
+                            alert(payload.status_string)
+                            window.localStorage.setItem('status_string', JSON.stringify({'status':payload.status_string}));
                             $state.go('app.viewPedido',{'pedidoId': payload.saleId});
                         }
                         if(payload.inapam){
