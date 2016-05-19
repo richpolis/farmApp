@@ -1,6 +1,6 @@
 angular.module('farmApp')
 .constant('URL_BASE', {
-    urlBase: 'http://localhost:8000/',
+    urlBase: 'http://farmaapp.mx/',
     urlConekta: 'https://api.conekta.io/charges'
 })
 .constant('AUTH_PATH', {
@@ -28,4 +28,9 @@ angular.module('farmApp')
     recordatorios: 'api/reminders/',
     contacto: 'contacto/',
     recover_password: 'solicitud/recuperar/password/'
+})
+.filter('reverse', function() {
+  return function(items) {
+    return items.slice().reverse();
+  };
 });

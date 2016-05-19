@@ -1,5 +1,5 @@
-<ion-view cache-view="false" view-title="{{ title }}">
-    <ion-content class="padding">
+<ion-view cache-view="false" view-title="{{ title }}" ng-cloak>
+    <ion-content class="padding" >
         <ion-list class="card">
             <ion-item class="item-thumbnail-left">
                 <img ng-src="{{producto.image}}" ng-class="{ 'no-require-receta': producto.recipe == 1, 'require-show-receta': producto.recipe==2,  'require-receta': producto.recipe==3}">

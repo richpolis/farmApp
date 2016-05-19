@@ -6,9 +6,10 @@
 // 'farmApp.controllers' is found in controllers.js
 angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push', 
                            'farmApp.controllers','farmApp.directives',
-                           'farmApp.services'])
+                           'farmApp.services','ngAnimate'])
 
-        .run(function ($ionicPlatform, $rootScope, $timeout) {
+        .run(function ($ionicPlatform, $rootScope, $timeout, $ionicPopup , 
+            $state, User, Loader, $ionicPush, $cordovaLocalNotification) {
             $ionicPlatform.ready(function () {
                 // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
                 // for form inputs)
@@ -30,6 +31,64 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                 /*var deviceSessionId = OpenPay.deviceData.setup();
                 
                 localStorage.setItem('device_session_id',deviceSessionId);*/
+                
+                $ionicPush.init({
+                    "onNotification": function (notification) {
+                        var payload = notification.payload || notification._payload || {};
+                        console.log(JSON.stringify(payload));
+                        //alert(JSON.stringify(payload));
+                        //alert(payload.reminderId || payload.saleId || payload.inapam || "ninguno");
+                        
+                        $ionicPopup.alert({
+                            title: notification.title,
+                            template: notification.text
+                        });
+                        if(payload.reminderId && payload.reminderId > 0){
+                            $state.go('app.viewRecordatorio',{'recordatorioId': payload.reminderId});
+                        }
+                        if(payload.saleId && payload.saleId > 0){
+                            alert(payload.status_string)
+                            window.localStorage.setItem('status_string', JSON.stringify({'status':payload.status_string}));
+                            $state.go('app.viewPedido',{'pedidoId': payload.saleId});
+                        }
+                        if(payload.inapam){
+                            //alert(window.location.hash);
+                            $state.go('app.perfil');
+                        }
+                    },
+                    "onRegister": function (data) {
+                        console.log("Login Token Phone: " + data.token);
+                        window.localStorage.setItem('gcmid', JSON.stringify(data.token));
+                        if(User.hasUser()){
+                            if(!User.hasTokenPhone()){
+                                User.addTokenPhone(data.token);
+                            }else{
+                                User.updateTokenPhone(data.token);
+                            }
+                        }
+                    },
+                    "onError": function(e){
+                      console.log(e);
+                    },
+                    "pluginConfig": {
+                      "ios": {
+                        "badge": true,
+                        "sound": true
+                       },
+                       "android": {
+                         "sound": true,
+                         "vibrate": true
+                       }
+                    }
+                });
+                $ionicPush.register();
+                
+                $cordovaLocalNotification.registerPermission().then(function () {
+                    console.log("LocalNotification: registered");
+                }, function () {
+                    console.log("LocalNotification: denied registration");
+                });
+
                            
             });
         })
@@ -66,7 +125,6 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                         templateUrl: 'templates/menu.html',
                         controller: 'AppController'
                     })
-
                     .state('app.perfil', {
                         url: '/perfil',
                         cache: false, 
@@ -77,7 +135,46 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             }
                         }
                     })
-
+                    .state('app.direcciones', {
+                        url: '/direcciones',
+                        cache: false, 
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/direcciones.html',
+                                controller: 'DireccionesController'
+                            }
+                        }
+                    })
+                    .state('app.ventas', {
+                        url: '/ventas',
+                        cache: false, 
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/ventas.html',
+                                controller: 'VentasController'
+                            }
+                        }
+                    })
+                    .state('app.viewPedido', {
+                        url: '/pedido/:pedidoId',
+                        cache: false,
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/venta.html',
+                                controller: 'VentaController'
+                            }
+                        }
+                    })
+                    .state('app.tarjetas', {
+                        url: '/tarjetas',
+                        cache: false, 
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/tarjetas.html',
+                                controller: 'TarjetasController'
+                            }
+                        }
+                    })
                     .state('app.search', {
                         url: '/search',
                         views: {
@@ -108,7 +205,15 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                             }
                         }
                     })
-
+                    .state('app.pregunta', {
+                        url: '/preguntas/:preguntaId',
+                        views: {
+                            'menuContent': {
+                                templateUrl: 'templates/pregunta.html',
+                                controller: 'PreguntaController'
+                            }
+                        }
+                    })
                     .state('app.periodicos', {
                         url: '/pedidos/periodicos',
                         views: {
@@ -195,7 +300,7 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                         views: {
                             'menuContent': {
                                 templateUrl: 'templates/recetas.html',
-                                controller: 'ImageController'
+                                controller: 'RecetasController'
                             }
                         }
                     })

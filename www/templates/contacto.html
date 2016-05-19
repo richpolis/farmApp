@@ -2,7 +2,7 @@
   <ion-content class="has-header padding">
     <form ng-submit="doContacto()">
       <div class="list">
-        <label class="item item-input">
+        <!--label class="item item-input">
           <input type="text" ng-model="contactoData.name" placeholder="Nombre">
         </label>
         <label class="item item-input">
@@ -13,9 +13,9 @@
         </label>
         <label class="item item-input">
           <input type="text" ng-model="contactoData.subject" placeholder="Asunto">
-        </label>
+        </label-->
         <label class="item item-input">
-          <input type="text" ng-model="contactoData.message" placeholder="Mensaje">
+            <textarea ng-model="contactoData.message" placeholder="Mensaje" style="width: 98%; height: 100px;border: 2px solid #2EC7C7; padding: 5px;"></textarea>
         </label>
         <label class="item">
           <button class="button button-block button-balanced" type="submit">Enviar</button>

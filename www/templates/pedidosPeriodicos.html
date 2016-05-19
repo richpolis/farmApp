@@ -14,113 +14,21 @@
                     <div class="item item-text-wrap">
                         <div class="row padding-top">
                             <div class="col padding-top">
-                                <label class="font-small">{{pedido.period | uppercase}}</label>
+                                <label class="font-small balanced">{{pedido.leyend | uppercase}}</label>
                             </div>                        
                         </div>
                     </div>
-                    <div class="item">
-                        <div class="row">
-                            <div class="col col-33">
-                                ¿Cuantas unidades quieres?
-                            </div>
-                            <div class="col">
-                                <button ng-click="pedido.quantity=pedido.quantity-1;cambioPedido(pedido)"
-                                        ng-disabled="pedido.quantity==1"
-                                        class="button button-clear button-block button-balanced"
-                                        style="margin: 0px;">
-                                    <i class="icon ion-minus-circled"></i>
-                                </button>
-
-                            </div>
-                            <div class="col">
-                                <input type="text" ng-model="pedido.quantity"
-                                       style="width: 100%; border: 1px solid black; text-align:center; margin-top: 5px;"
-                                       readonly="readonly">
-                            </div>
-                            <div class="col">
-                                <button ng-click="pedido.quantity=pedido.quantity+1;cambioPedido(pedido)"
-                                        class="button button-clear button-block button-balanced"
-                                        style="margin: 0px;">
-                                    <i class="icon ion-plus-circled"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="row">
-                            <div clas="col">
-                                ¿Cada cuando te lo enviamos?
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="list">
-                            <label class="item item-radio">
-                                <input ng-model="pedido.period" type="radio" name="period" ng-value=" 'por dia' ">
-                                <div class="item-content">Dias</div>
-                                <i class="radio-icon ion-checkmark"></i>
-                            </label>
-                            <label class="item item-radio">
-                                <input ng-model="pedido.period" type="radio" name="period" ng-value=" 'semanal' ">
-                                <div class="item-content">Semanal</div>
-                                <i class="radio-icon ion-checkmark"></i>
-                            </label>
-                            <label class="item item-radio">
-                                <input ng-model="pedido.period" type="radio" name="period" ng-value=" 'mensual' ">
-                                <div class="item-content">Mensual</div>
-                                <i class="radio-icon ion-checkmark"></i>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="item item-input item-select" ng-if="pedido.period == 'por dia'">
-                        <div class="input-label">
-                            Cada cuantos dias?
-                        </div>
-                        <select ng-model="pedido.days" ng-change="cambioPedido(pedido)">
-                            <option value="1" selected>1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                        </select>
-                    </div>
-                    <div class="item">
-                        <div class="row">
-                            <div class="col col-33">
-                                Repetir
-                            </div>
-                            <div class="col">
-                                <button ng-click="pedido.times=pedido.times-1;cambioPedido(pedido)"
-                                        ng-disabled="pedido.times==1"
-                                        class="button button-clear button-block button-balanced"
-                                        style="margin: 0px;">
-                                    <i class="icon ion-minus-circled"></i>
-                                </button>
-                            </div>
-                            <div class="col">
-                                <input type="text" ng-model="pedido.times"
-                                       style="width: 100%; border: 1px solid black; text-align:center; margin-top: 5px;"
-                                       readonly="readonly">
-                            </div>
-                            <div class="col">
-                                <button ng-click="pedido.times=pedido.times+1;cambioPedido(pedido)"
-                                        class="button button-clear button-block button-balanced"
-                                        style="margin: 0px;">
-                                    <i class="icon ion-plus-circled"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item item-text-wrap">
-                        <div class="row border-bottom border-top padding-top" ng-show="pedido.product.recipe > 1">
+                    <div class="item item-text-wrap" ng-show="pedido.product.recipe > 1">
+                        <div class="row padding-top">
                             <div class="col text-center">
                                 <label class="require-receta font-small">Este producto require receta médica.</label><br/>
                                 <label class="assertive font-small" ng-show="pedido.product.recipe == 3">El repartidor te pedira y se quedara con la receta.</label><br/>
                                 <label class="assertive font-small" ng-show="pedido.product.recipe == 2">El repartidor te pedira que le muestres la receta.</label>
                             </div>
                         </div>
+                    </div>
+                    <div class="item">
+                        <button ng-click="removePedido(pedido)" class="button button-assertive subdued">Cancelar pedido periodico</button>
                     </div>
                 </div>
             </ion-item>

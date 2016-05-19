@@ -1,7 +1,7 @@
 {
-  "name": "farmapp",
-  "version": "1.0.0",
-  "description": "farmApp: An Ionic project",
+  "name": "FARMAAPP",
+  "version": "1.0.11",
+  "description": "App para punto de venta de FARMAAPP",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-sass": "^1.3.3",
@@ -24,9 +24,16 @@
       "locator": "https://github.com/platanus/PushNotification.git",
       "id": "com.phonegap.plugins.PushPlugin"
     },
-    "phonegap-plugin-push"
+    {
+      "variables": {
+        "SENDER_ID": "1012709617565"
+      },
+      "locator": "phonegap-plugin-push",
+      "id": "phonegap-plugin-push"
+    }
   ],
   "cordovaPlatforms": [
-    "android"
+    "android",
+    "ios"
   ]
 }
