@@ -2127,14 +2127,15 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                    $ionicPopup,  Pedidos, $timeout, $ionicModal, User) {
                        
             $scope.title = "Pedido";
-
-            $scope.status_string = JSON.parse(window.localStorage['status_string'] || '{}');
+            $scope.user = User.getUser();
 
             Pedidos.getPedido($stateParams.pedidoId).then(function(data){
                 $scope.pedido = data;
                 $timeout(function () {
                     $scope.$apply(function () {
                         $scope.title = "Pedido: #" + $scope.pedido.id;
+                        $scope.status_string = JSON.parse(window.localStorage['status_string'] || '{status:""}');
+                        showPedidoEntregado();
                     });
                 }, 1000);
             },function(err){
@@ -2195,7 +2196,11 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
 
             // Accion para mostrar el pedidoRealizado
             var showPedidoEntregado = function () {
-                $scope.pedidoEntregado.show();
+                if($scope.status_string.status && $scope.status_string.status == "Pagado"){
+                    $timeout(function(){
+                        $scope.pedidoEntregado.show();
+                    },2000);
+                }
             };
 
             $scope.removeProducto = function(producto){
@@ -2212,13 +2217,6 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 });
             };
 
-            $scope.$watch('status_string.status', function(){
-            	if($scope.status_string.status && $scope.status_string.status == "Pagado"){
-            		$timeout(function(){
-            			showPedidoEntregado();
-            		},2000);
-            	}
-            });
 
         })
         ;

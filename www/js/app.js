@@ -39,21 +39,55 @@ angular.module('farmApp', ['ionic','ionic.service.core', 'ionic.service.push',
                         //alert(JSON.stringify(payload));
                         //alert(payload.reminderId || payload.saleId || payload.inapam || "ninguno");
                         
-                        $ionicPopup.alert({
-                            title: notification.title,
-                            template: notification.text
-                        });
                         if(payload.reminderId && payload.reminderId > 0){
-                            $state.go('app.viewRecordatorio',{'recordatorioId': payload.reminderId});
+                            var confirmPopup = $ionicPopup.confirm({
+                                title: notification.title,
+                                template: notification.text,
+                                cancelText: "No mostrar",
+                                okText: "Mostrar"
+                            });
+                            confirmPopup.then(function (res) {
+                                if (res) {
+                                    $state.go('app.viewRecordatorio',{'recordatorioId': payload.reminderId});
+                                }
+                            });
                         }
                         if(payload.saleId && payload.saleId > 0){
-                            alert(payload.status_string)
-                            window.localStorage.setItem('status_string', JSON.stringify({'status':payload.status_string}));
-                            $state.go('app.viewPedido',{'pedidoId': payload.saleId});
+                            if(payload.status_string == "Pagado"){
+                                var confirmPopup = $ionicPopup.confirm({
+                                    title: notification.title,
+                                    template: notification.text,
+                                    cancelText: "No mostrar",
+                                    okText: "Mostrar"
+                                });
+                                confirmPopup.then(function (res) {
+                                    if (res) {
+                                        window.localStorage.setItem('status_string', JSON.stringify({'status':payload.status_string}));
+                                        $state.go('app.viewPedido',{'pedidoId': payload.saleId});
+                                    }else{
+                                        window.localStorage.setItem('status_string', JSON.stringify({'status':""}));
+                                    }
+                                });
+                            }else{
+                                $ionicPopup.alert({
+                                    title: notification.title,
+                                    template: notification.text
+                                });
+                            }
                         }
                         if(payload.inapam){
-                            //alert(window.location.hash);
-                            $state.go('app.perfil');
+                            var confirmPopup = $ionicPopup.confirm({
+                                title: notification.title,
+                                template: notification.text,
+                                cancelText: "No mostrar",
+                                okText: "Mostrar"
+                            });
+                            confirmPopup.then(function (res) {
+                                if (res) {
+                                    $state.go('app.perfil');
+                                }
+                            });
+                            
                         }
                     },
                     "onRegister": function (data) {
