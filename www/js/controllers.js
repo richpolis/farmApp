@@ -635,6 +635,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 $timeout(function(){
                     $scope.mostrarMensajeMapa = false;
                 },4000);
+                Loader.showLoading("Buscando localizacion...");
                 var posOptions = {timeout: 10000, enableHighAccuracy: true};
                 $cordovaGeolocation
                         .getCurrentPosition(posOptions)
@@ -643,8 +644,10 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                             $scope.direccionGuardada.lat = position.coords.latitude;
                             $scope.direccionGuardada.lng = position.coords.longitude;
                             $scope.mostrarMapa = true;
+                            Loader.hideLoading();
                             $scope.ubicacionDelMapa(position);
                         }, function (err) {
+                            Loader.hideLoading();
                             $ionicPopup.alert({
                                 title: 'Error de localizacion!',
                                 template: 'No esta activa la localizacion'
@@ -1300,6 +1303,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                 $timeout(function(){
                     $scope.mostrarMensajeMapa = false;
                 },4000);
+                Loader.showLoading('Buscando localizacion...');
                 var posOptions = {timeout: 10000, enableHighAccuracy: true};
                 $cordovaGeolocation
                         .getCurrentPosition(posOptions)
@@ -1310,6 +1314,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                             $scope.mostrarMapa = true;
                             $scope.ubicacionDelMapa(position);
                         }, function (err) {
+                            Loader.hideLoading();
                             $ionicPopup.alert({
                                 title: 'Error de localizacion!',
                                 template: 'No esta activa la localizacion'
@@ -1949,6 +1954,7 @@ angular.module('farmApp.controllers', ['ionic','ionic.service.core',  'ionic.ser
                         title: 'Enviando...',
                         template: 'Gracias por enviar tus comentarios'
                     });
+                    $scope.contactoData.message = "";
                 }, function(err){
                     console.log(err);
                     //alert("Error: " + JSON.stringify(err));
